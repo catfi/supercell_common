@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cd $1
+
+ssh $2 `pwd`/RdmaDirectSendTest server 10.3.1.1:7777 &
+
+sleep 1
+
+ssh $3 `pwd`/RdmaDirectSendTest client 10.3.1.1:7777

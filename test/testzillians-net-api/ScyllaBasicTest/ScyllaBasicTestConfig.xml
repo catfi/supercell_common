@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node-configuration>
+	<node name="dev0" uuid="1f6bc712-67d1-11de-bf75-001d92648305">
+		<transport bind="tcp://10.1.0.1:3000"/>
+	</node>
+	<node name="dev1" uuid="9a631736-6a0b-11de-8132-001d926482c4">
+		<transport bind="tcp://10.1.0.2:3000"/>
+	</node>
+	<node name="dev2" uuid="d570dc4c-67e4-11de-8145-001d926482c4">
+		<transport bind="tcp://10.1.0.3:3000"/>
+	</node>
+	<node name="dev3" uuid="a11dcada-6a0b-11de-83c9-001d926482c4">
+		<transport bind="tcp://10.1.0.4:3000"/>
+	</node>
+	<node name="dev4" uuid="a81a2f7c-6a0b-11de-b4e7-001d926482c4">
+		<transport bind="tcp://10.1.0.5:3000"/>
+	</node>
+	<node name="g0" uuid="3bd7cf18-67d1-11de-82f6-001d92648305">
+		<transport bind="tcp://10.1.1.100:3000"/>
+	</node>
+	<node name="g1" uuid="4f7d62f2-a049-11de-a5bc-001d92648328">
+		<transport bind="tcp://10.1.1.110:3000"/>
+	</node>
+	<node name="g2" uuid="58498b36-a049-11de-8959-001d92648328">
+		<transport bind="tcp://10.1.1.120:3000"/>
+	</node>
+	<node name="g3" uuid="606fac32-a049-11de-8e46-001d92648328">
+		<transport bind="tcp://10.1.1.130:3000"/>
+	</node>
+	<node name="g4" uuid="65072e50-a049-11de-949a-001d92648328">
+		<transport bind="tcp://10.1.1.140:3000"/>
+	</node>
+	<node name="g5" uuid="652e9c10-a049-11de-ae6b-001d92648328">
+		<transport bind="tcp://10.1.1.150:3000"/>
+	</node>
+	<node name="s0-world-server" uuid="f5379cce-a041-11de-b2a3-001d92648328">
+		<transport bind="tcp://10.1.2.100:3000"/>
+	</node>
+	<node name="s0-auth-server" uuid="04e60bbe-782f-11de-9836-001d926482c4">
+		<transport bind="tcp://10.1.2.100:3001"/>
+	</node>
+	<node name="s1" uuid="654b86d6-a049-11de-b6a7-001d92648328">
+		<transport bind="tcp://10.1.2.110:3000"/>
+	</node>
+</node-configuration>

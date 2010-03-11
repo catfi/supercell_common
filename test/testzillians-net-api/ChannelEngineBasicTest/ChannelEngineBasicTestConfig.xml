@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node-configuration>
+	<node name="dev0" uuid="1f6bc712-67d1-11de-bf75-001d92648305">
+		<transport bind="tcp://10.1.0.1:6666"/>
+	</node>
+	<node name="g0" uuid="3bd7cf18-67d1-11de-82f6-001d92648305">
+		<transport bind="tcp://10.1.1.100:6666"/>
+	</node>
+</node-configuration>
