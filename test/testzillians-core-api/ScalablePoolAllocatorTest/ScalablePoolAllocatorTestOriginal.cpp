@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <vector>
 #include <list>
+#include "core-api/Types.h"
 #include "core-api/ScalablePoolAllocator.h"
 #include "log4cxx/basicconfigurator.h"
 #include "log4cxx/helpers/exception.h"
@@ -32,7 +33,8 @@ using std::endl;
 using std::setw;
 using namespace log4cxx;
 using namespace log4cxx::helpers;
-using zillians::ScalablePoolAllocator;
+using namespace zillians;
+//using zillians::ScalablePoolAllocator;
 
 const size_t TEST_SIZE = 1048576 * 1024;//100MB
 const size_t THREAD_COUNT = 1;

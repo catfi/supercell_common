@@ -36,7 +36,7 @@ ENDIF()
 
 ADD_SUBDIRECTORY(SessionBasicTest)
 ADD_SUBDIRECTORY(SessionDispatcherTest)
-ADD_SUBDIRECTORY(SessionSendReceiveTest)
+#ADD_SUBDIRECTORY(SessionSendReceiveTest)
 ADD_SUBDIRECTORY(SessionSynchronousTest)
 ADD_SUBDIRECTORY(SessionConcurrentTest)
 ADD_SUBDIRECTORY(SessionVectorBufferTest)

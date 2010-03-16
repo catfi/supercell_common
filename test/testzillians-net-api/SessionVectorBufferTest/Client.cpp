@@ -148,7 +148,7 @@ void handle_buffer_read(TcpSession& session, uint32 type, SharedPtr<Buffer>& buf
 
 	if(ctx->count_to_send > ctx->count_sent)
 	{
-		session.writeAsync(0, ctx->send_buffer, boost::bind(handle_message_write, placeholders::error));
+		session.writeAsync(0, ctx->send_buffers, boost::bind(handle_message_write, placeholders::error));
 		++ctx->count_sent;
 	}
 	else
