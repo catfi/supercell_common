@@ -37,7 +37,7 @@ log4cxx::LoggerPtr mLogger(log4cxx::Logger::getLogger("CloseProcessGroupTest"));
 
 void RunThreadProc(CloseProcessGroup* cpg)
 {
-	bool result = cpg->run();
+	bool result = cpg->dispatch();
 }
 
 void OnlineHandler(const char* groupName, CloseProcessGroup::MemberInfo& memberInfo, MembershipChangeReason reason)
