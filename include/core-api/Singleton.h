@@ -34,7 +34,7 @@ namespace zillians {
  * NOTE: have potential problem when linking against dynamic library (nothing said that...)
  * NOTE: this is NOT thread-safe because the Singleton object can be created in two different threads in the same time
  */
-template <class T>
+template <class T, bool AUTO = false>
 class Singleton
 {
 public:
@@ -55,6 +55,11 @@ public:
 public:
 	static T* instance()
 	{
+		if(AUTO && !mInstance)
+		{
+			mInstance = new T;
+		}
+
 		return mInstance;
 	}
 
