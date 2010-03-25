@@ -67,7 +67,7 @@ private:
 	static T* mInstance;
 };
 
-template <typename T> T* Singleton<T>::mInstance = NULL;
+template <typename T, bool AUTO> T* Singleton<T, AUTO>::mInstance = NULL;
 
 }
 
