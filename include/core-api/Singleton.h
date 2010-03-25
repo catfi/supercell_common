@@ -24,6 +24,7 @@
 #define ZILLIANS_SINGLETON_H_
 
 #include "core-api/Common.h"
+#include <boost/assert.hpp>
 
 namespace zillians {
 
