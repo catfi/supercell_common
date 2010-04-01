@@ -44,7 +44,7 @@ class F { };
 
 BOOST_AUTO_TEST_CASE( ContextHubTestCase1 )
 {
-	ContextHub hub;
+	ContextHub<true> hub;
 
 	BOOST_CHECK_NO_THROW(hub.set<A>(new A));
 	BOOST_CHECK_NO_THROW(hub.set<B>(new B));
@@ -85,7 +85,7 @@ typedef Counter<F> CF;
 
 BOOST_AUTO_TEST_CASE( ContextHubTestCase2 )
 {
-	ContextHub hub;
+	ContextHub<true> hub;
 
 	int ctor_counter = 0;
 	int dtor_counter = 0;

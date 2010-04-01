@@ -50,6 +50,7 @@ namespace zillians {
  * three different types named A, B, and C. You can only save one instance of A into
  * one instance of ContextHub. Same for B and C.
  */
+template<bool TransferOwnership>
 class ContextHub
 {
 public:
@@ -60,13 +61,21 @@ public:
 	/**
 	 * Save an object of type T into the universal storage.
 	 *
-	 * @note The ownership of the given object is transferred to this ContextHub instance.
+	 * @note If the TransferOwnership template parameter is set, the ownership of the given object is transferred to this ContextHub instance.
+	 *
 	 * @param ctx The given object of type T
 	 */
 	template <typename T>
 	inline void set(T* ctx)
 	{
-		refContext<T>() = boost::shared_ptr<T>(ctx);
+		if(TransferOwnership)
+		{
+			refSharedContext<T>() = boost::shared_ptr<T>(ctx);
+		}
+		else
+		{
+			refContext<T>() = (void*)ctx;
+		}
 	}
 
 	/**
@@ -77,20 +86,32 @@ public:
 	template <typename T>
 	inline T* get()
 	{
-		return boost::static_pointer_cast<T>(refContext<T>()).get();
+		if(TransferOwnership)
+		{
+			return boost::static_pointer_cast<T>(refSharedContext<T>()).get();
+		}
+		else
+		{
+			return (T*)(refContext<T>());
+		}
 	}
 
 	/**
 	 * Remove the previously stored object instance of type T.
 	 *
-	 * @note Since we use shared pointer to store the actual object pointer,
-	 * ContextHub will automatically destroy the object, so you don't need
-	 * to call this manually.
+	 * @note If the TransferOwnership template parameter is set, ContextHub will automatically destroy the object; otherwise
 	 */
 	template <typename T>
 	inline void reset()
 	{
-		refContext<T>().reset();
+		if(TransferOwnership)
+		{
+			refSharedContext<T>().reset();
+		}
+		else
+		{
+			refContext<T>() = NULL;
+		}
 	}
 
 private:
@@ -101,14 +122,36 @@ private:
 	 * @return The reference to the shared pointer
 	 */
 	template <typename T>
-	inline std::vector< boost::shared_ptr<void> >::reference refContext()
+	inline std::vector< boost::shared_ptr<void> >::reference refSharedContext()
+	{
+		static uint32 index = msContextIndexer++;
+		if(UNLIKELY(index >= mSharedContextObjects.size()))
+		{
+			while(index >= mSharedContextObjects.size())
+			{
+				mSharedContextObjects.push_back(boost::shared_ptr<void>());
+			}
+		}
+
+		BOOST_ASSERT(index < mSharedContextObjects.size());
+		return mSharedContextObjects[index];
+	}
+
+	/**
+	 * The magic trick to store and access context object by using static
+	 * initialization to identify the index of a specific type.
+	 *
+	 * @return The reference to the shared pointer
+	 */
+	template <typename T>
+	inline std::vector< void* >::reference refContext()
 	{
 		static uint32 index = msContextIndexer++;
 		if(UNLIKELY(index >= mContextObjects.size()))
 		{
 			while(index >= mContextObjects.size())
 			{
-				mContextObjects.push_back(boost::shared_ptr<void>());
+				mContextObjects.push_back(NULL);
 			}
 		}
 
@@ -116,13 +159,16 @@ private:
 		return mContextObjects[index];
 	}
 
-	std::vector< boost::shared_ptr<void> > mContextObjects;
+	std::vector< boost::shared_ptr<void> > mSharedContextObjects;
+	std::vector< void* > mContextObjects;
 #if ZILLIANS_SERVICEHUB_ALLOW_ARBITRARY_CONTEXT_PLACEMENT_FOR_DIFFERENT_INSTANCE
 	tbb::atomic<uint32> msContextIndexer;
 #else
 	static tbb::atomic<uint32> msContextIndexer;
 #endif
 };
+
+template<bool TransferOwnership> tbb::atomic<uint32> ContextHub<TransferOwnership>::msContextIndexer;
 
 }
 #endif/*ZILLIANS_SERVICEHUB_H_*/
