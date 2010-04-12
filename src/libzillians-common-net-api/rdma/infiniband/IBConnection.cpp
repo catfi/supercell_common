@@ -17,6 +17,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include "core-api/ConditionVariable.h"
+#include "core-api/ObjectPool.h"
 #include "net-api/rdma/infiniband/IBConnection.h"
 #include "net-api/rdma/infiniband/IBNetEngine.h"
 #include "net-api/rdma/infiniband/IBDeviceResourceManager.h"
@@ -274,6 +276,15 @@
 namespace zillians { namespace net { namespace rdma {
 
 //////////////////////////////////////////////////////////////////////////
+struct PooledConditionVariable : public zillians::ConditionVariable<int>, public zillians::ConcurrentObjectPool<PooledConditionVariable>
+{ };
+
+void gSignalConditionVariable(zillians::ConditionVariable<int>* cv, int error)
+{
+	cv->signal(error);
+}
+
+//////////////////////////////////////////////////////////////////////////
 const uint32 IBConnection::CONTROL_CREDIT_UPDATE 		= 1;//0x10000000;
 const uint32 IBConnection::CONTROL_LARGE_BUFFER_SEND	= 2;//0x20000000;
 const uint32 IBConnection::CONTROL_LARGE_BUFFER_ACK		= 3;//0x30000000;
@@ -349,9 +360,15 @@ IBConnection::IBConnection(IBNetEngine* engine, SharedPtr<rdma_cm_id> id)
     {
     	SharedPtr<Buffer> recvBuffer = createBuffer(IB_DEFAULT_RECEIVE_BUFFER_SIZE);
 
-    	_HOLD_BUFFER(mRecvBufferHolder, recvBuffer.get(), recvBuffer);
+    	//_HOLD_BUFFER(mRecvBufferHolder, recvBuffer.get(), recvBuffer);
 
-    	postRecv(recvBuffer.get());
+    	CompletionInfo* info = new CompletionInfo;
+    	info->buffer = recvBuffer;
+
+    	if(!postRecv(recvBuffer.get(), info))
+    	{
+    		SAFE_DELETE(info);
+    	}
     }
 
     // create stocked buffer for control messages
@@ -491,7 +508,7 @@ bool IBConnection::send(uint32 type, SharedPtr<Buffer> buffer)
 }
 
 //////////////////////////////////////////////////////////////////////////
-uint64 IBConnection::registrerDirect(SharedPtr<Buffer> buffer)
+uint64 IBConnection::registerDirect(SharedPtr<Buffer> buffer)
 {
 	// hold the buffer
 	_HOLD_BUFFER(mRemoteDirectBufferHolder, buffer.get(), buffer);
@@ -513,6 +530,145 @@ void IBConnection::unregisterDirect(uint64 sink_id)
 	_UNHOLD_BUFFER(mRemoteDirectBufferHolder, buffer);
 }
 
+
+bool IBConnection::write(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size)
+{
+	bool result = true;
+
+	// lookup the remote address by id
+	uint32 rkey = mRemoteAccess.rkey;
+	uint64 address = 0;
+	uint64 source_id = reinterpret_cast<uint64>(buffer.get());
+
+	_GET_REF(mRemoteDirectBufferRefHolder, sink, address);
+	BOOST_ASSERT(address != 0);
+
+	// create condition variable
+	PooledConditionVariable* cv = new PooledConditionVariable;
+
+	// create completion info
+	CompletionInfo* info = new CompletionInfo;
+	info->buffer = buffer;
+	info->handler = boost::bind(gSignalConditionVariable, cv, _1);
+
+	// post RDMA WRITE
+	result = postWrite(address, rkey, (size == 0) ? buffer->dataSize() : size, buffer.get(), info);
+
+	// if something goes wrong, clean up the completion info (otherwise the object is deleted in handleSendCompletionRdmaWrite)
+	if(!result)
+	{
+		SAFE_DELETE(info);
+	}
+	else
+	{
+		// wait for completion and get the result
+		int error; cv->wait(error);
+		if(!error) result = false;
+	}
+
+	SAFE_DELETE(cv);
+
+	return result;
+}
+
+bool IBConnection::writeAsync(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size, CompletionHandler handler)
+{
+	bool result = true;
+
+	// lookup the remote address by id
+	uint32 rkey = mRemoteAccess.rkey;
+	uint64 address = 0;
+	uint64 source_id = reinterpret_cast<uint64>(buffer.get());
+
+	_GET_REF(mRemoteDirectBufferRefHolder, sink, address);
+	BOOST_ASSERT(address != 0);
+
+	// create completion info
+	CompletionInfo* info = new CompletionInfo;
+	info->buffer = buffer;
+	info->handler = handler;
+
+	// post RDMA WRITE
+	result = postWrite(address, rkey, (size == 0) ? buffer->dataSize() : size, buffer.get(), info);
+
+	// if something goes wrong, clean up the completion info (otherwise the object is deleted in handleSendCompletionRdmaWrite)
+	if(!result)
+	{
+		SAFE_DELETE(info);
+	}
+
+	return result;
+}
+
+bool IBConnection::read(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size)
+{
+	bool result = true;
+
+	// lookup the remote address by id
+	uint32 rkey = mRemoteAccess.rkey;
+	uint64 address = 0;
+	uint64 source_id = reinterpret_cast<uint64>(buffer.get());
+
+	_GET_REF(mRemoteDirectBufferRefHolder, sink, address);
+	BOOST_ASSERT(address != 0);
+
+	// create condition variable
+	PooledConditionVariable* cv = new PooledConditionVariable;
+
+	// create completion info
+	CompletionInfo* info = new CompletionInfo;
+	info->buffer = buffer;
+	info->handler = boost::bind(gSignalConditionVariable, cv, _1);
+
+	// post RDMA WRITE
+	result = postRead(address, rkey, (size == 0) ? buffer->freeSize() : size, buffer.get(), info);
+
+	// if something goes wrong, clean up the completion info (otherwise the object is deleted in handleSendCompletionRdmaRead)
+	if(!result)
+	{
+		SAFE_DELETE(info);
+	}
+	else
+	{
+		// wait for completion and get the result
+		int error; cv->wait(error);
+		if(!error) result = false;
+	}
+
+	SAFE_DELETE(cv);
+
+	return result;
+}
+
+bool IBConnection::readAsync(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler)
+{
+	bool result = true;
+
+	// lookup the remote address by id
+	uint32 rkey = mRemoteAccess.rkey;
+	uint64 address = 0;
+	uint64 source_id = reinterpret_cast<uint64>(buffer.get());
+
+	_GET_REF(mRemoteDirectBufferRefHolder, sink, address);
+	BOOST_ASSERT(address != 0);
+
+	// create completion info
+	CompletionInfo* info = new CompletionInfo;
+	info->buffer = buffer;
+	info->handler = handler;
+
+	// post RDMA WRITE
+	result = postRead(address, rkey, (size == 0) ? buffer->freeSize() : size, buffer.get(), info);
+
+	// if something goes wrong, clean up the completion info (otherwise the object is deleted in handleSendCompletionRdmaRead)
+	if(!result)
+	{
+		SAFE_DELETE(info);
+	}
+
+	return result;
+}
+/*
 bool IBConnection::sendDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id)
 {
 	IB_DEBUG("send direct message length = " << buffer->dataSize() << ", type = " << type << ", buffer = " << buffer.get() << ", sink_id = " << sink_id);
@@ -546,6 +702,7 @@ bool IBConnection::sendDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink
 		return result;
 	}
 }
+*/
 
 //////////////////////////////////////////////////////////////////////////
 void IBConnection::close()
@@ -860,54 +1017,48 @@ void IBConnection::handleChannelEvent(ev::io& w, int revent)
 //////////////////////////////////////////////////////////////////////////
 void IBConnection::handleSendCompletionRdmaWrite(const ibv_wc &wc)
 {
-	// get the buffer reference from wr_id
-	Buffer* b = reinterpret_cast<Buffer*>(wc.wr_id);
+	// get the completion info from wr_id
+	CompletionInfo* info = reinterpret_cast<CompletionInfo*>(wc.wr_id);
 
-	IB_DEBUG("[COMPLETION] [SEND] RDMA WRITE, buffer = " << b);
+	if(wc.status == IBV_WC_SUCCESS)
+	{
+		// skip read pointer by number of bytes written
+		info->buffer->rskip(wc.byte_len);
 
-#ifdef IB_ENABLE_COMPLETION_DISPATCH
-	// dispatch completion
-	SharedPtr<Buffer> sb;
+		// invoke the completion handler if necessary
+		if(!info->handler.empty())	info->handler(1);
+	}
+	else
+	{
+		// invoke the completion handler if necessary
+		if(!info->handler.empty())	info->handler(0);
+	}
 
-	_GET_AND_UNHOLD_BUFFER(mLocalDirectBufferHolder, b, sb);
-	SharedPtr<IBConnection> shared_from_this(mWeakThis);
-
-	mEngine->getDispatcher()->dispatchCompletion(sb, shared_from_this);
-#else
-	// remove the buffer from "send buffer reference holder"
-    _UNHOLD_BUFFER(mLocalDirectBufferHolder, b);
-#endif
+	// delete the completion info object
+	SAFE_DELETE(info);
 }
 
 void IBConnection::handleSendCompletionRdmaRead(const ibv_wc &wc)
 {
-	// get the buffer reference from wr_id
-	Buffer* b = reinterpret_cast<Buffer*>(wc.wr_id);
-	b->rpos(0); b->wpos(wc.byte_len);
+	// get the completion info from wr_id
+	CompletionInfo* info = reinterpret_cast<CompletionInfo*>(wc.wr_id);
 
-	IB_DEBUG("[COMPLETION] [SEND] RDMA READ, buffer = " << b);
+	if(wc.status == IBV_WC_SUCCESS)
+	{
+		// skip read pointer by number of bytes written
+		info->buffer->wskip(wc.byte_len);
 
-	// get the reference id from reference container
-	uint64 id = 0;
-	_GET_AND_UNHOLD_REF(mLargeBufferAckRefHolder, reinterpret_cast<uint64>(b), id);
+		// invoke the completion handler if necessary
+		if(!info->handler.empty())	info->handler(1);
+	}
+	else
+	{
+		// invoke the completion handler if necessary
+		if(!info->handler.empty())	info->handler(0);
+	}
 
-	// get the requested buffer type
-	uint64 type64 = 0; uint32 type;
-	_GET_AND_UNHOLD_REF(mLargeBufferTypeHolder, reinterpret_cast<uint64>(b), type64);
-
-	// tricky: we know the type is only 32bits but for convenience we save it in the 64bit reference container
-	type = static_cast<int32>(type64);
-
-	// send large buffer ack message back to the sender
-	sendControlLargeBufferAck(id, 0);
-
-	// dispatch to upper application
-	SharedPtr<IBConnection> shared_from_this(mWeakThis);
-
-	SharedPtr<Buffer> sb;
-	_GET_AND_UNHOLD_BUFFER(mSendBufferHolder, b, sb);
-
-	mEngine->getDispatcher()->dispatchDataEvent(type, sb, shared_from_this);
+	// delete the completion info object
+	SAFE_DELETE(info);
 }
 
 void IBConnection::handleSendCompletionControlBuffer(const ibv_wc &wc)
@@ -969,48 +1120,49 @@ void IBConnection::handleSendCompletionGeneralBuffer(const ibv_wc &wc)
 void IBConnection::handleRecvCompletionControlBuffer(const ibv_wc &wc)
 {
 	// get the buffer reference from wr_id
-	Buffer* b = reinterpret_cast<Buffer*>(wc.wr_id);
-    b->rpos(0); b->wpos(wc.byte_len);
+	CompletionInfo* info = reinterpret_cast<CompletionInfo*>(wc.wr_id);
+
+    info->buffer->rpos(0); info->buffer->wpos(wc.byte_len);
 
     IB_DEBUG("[COMPLETION] [RECV] CONTROL BUFFER RECV, buffer = " << b);
 
 	// NOTE the type of control message is embedded in the buffer itself, but general buffer are using imm field to store buffer types
-	uint32 type; b->read(type);
+	uint32 type; info->buffer->read(type);
 	switch(type)
 	{
 		case CONTROL_CREDIT_UPDATE:
 		{
-			handleControlCreditUpdate(b);
+			handleControlCreditUpdate(info->buffer.get());
 			break;
 		}
 		case CONTROL_LARGE_BUFFER_SEND:
 		{
-			handleControlLargeBufferSend(b);
+			handleControlLargeBufferSend(info->buffer.get());
 			break;
 		}
 		case CONTROL_LARGE_BUFFER_ACK:
 		{
-			handleControlLargeBufferAck(b);
+			handleControlLargeBufferAck(info->buffer.get());
 			break;
 		}
 		case CONTROL_ACCESS_EXCHANGE:
 		{
-			handleControlAccessExchange(b);
+			handleControlAccessExchange(info->buffer.get());
 			break;
 		}
 		case CONTROL_SEND_DIRECT_SIGNAL:
 		{
-			handleControlSendDirectSignal(b);
+			handleControlSendDirectSignal(info->buffer.get());
 			break;
 		}
 		case CONTROL_REG_DIRECT_BUFFER:
 		{
-			handleControlRegDirectBuffer(b);
+			handleControlRegDirectBuffer(info->buffer.get());
 			break;
 		}
 		case CONTROL_UNREG_DIRECT_BUFFER:
 		{
-			handleControlUnregDirectBuffer(b);
+			handleControlUnregDirectBuffer(info->buffer.get());
 			break;
 		}
 		default:
@@ -1020,51 +1172,46 @@ void IBConnection::handleRecvCompletionControlBuffer(const ibv_wc &wc)
 	}
 
 	// as we know all control buffer handler will not hold the buffer for future use, so here we reuse the buffer
-	b->clear();
-	postRecv(b);
+	info->buffer->clear();
+	postRecv(info->buffer.get(), info);
 }
 
 void IBConnection::handleRecvCompletionGeneralBuffer(const ibv_wc &wc)
 {
 	// get the buffer reference from wr_id
-	Buffer* b = reinterpret_cast<Buffer*>(wc.wr_id);
-    b->rpos(0); b->wpos(wc.byte_len);
+	CompletionInfo* info = reinterpret_cast<CompletionInfo*>(wc.wr_id);
+
+    info->buffer->rpos(0); info->buffer->wpos(wc.byte_len);
 
     IB_DEBUG("[COMPLETION] [RECV] GENERAL BUFFER RECV, buffer = " << b);
 
 	// dispatch buffer through IBDispatcher
 	SharedPtr<IBConnection> shared_from_this(mWeakThis);
 
-	SharedPtr<Buffer> sb;
-	_GET_BUFFER(mRecvBufferHolder, b, sb);
-
 	// NOTE we store the type of general buffer in the imm field (in the host order but not in network order as we assume all machines are in little endian format)
 	uint32 type = wc.imm_data;
-	mEngine->getDispatcher()->dispatchDataEvent(type, sb, shared_from_this);
+	mEngine->getDispatcher()->dispatchDataEvent(type, info->buffer, shared_from_this);
 
 	// if the buffer is still referenced by upper application, create another buffer to post receive
-	if(sb.use_count() > 2L)
+	if(info->buffer.use_count() > 2L)
 	{
-		IB_DEBUG("[COMPLETION] [RECV] buffer dispatched but still in use, create new buffer (use count = " << sb.use_count() << ")");
-
-		// release the buffer
-		_UNHOLD_BUFFER(mRecvBufferHolder, b);
+		IB_DEBUG("[COMPLETION] [RECV] buffer dispatched but still in use, create new buffer (use count = " << info->buffer.use_count() << ")");
 
 		// create another buffer
 		SharedPtr<Buffer> newBuffer = createBuffer(IB_DEFAULT_RECEIVE_BUFFER_SIZE);
 
-		// insert into receive buffer container
-		_HOLD_BUFFER(mRecvBufferHolder, newBuffer.get(), newBuffer);
+		// replace the buffer
+		info->buffer = newBuffer;
 
 		// post to receive
-		postRecv(newBuffer.get());
+		postRecv(newBuffer.get(), info);
 	}
 	else
 	{
 		IB_DEBUG("[COMPLETION] [RECV] buffer dispatched and reused");
 		// reuse the buffer by reseting and re-posting it
-		b->clear();
-		postRecv(b);
+		info->buffer->clear();
+		postRecv(info->buffer.get(), info);
 	}
 }
 
@@ -1114,15 +1261,16 @@ bool IBConnection::postGeneral(uint32 type, SharedPtr<Buffer> buffer)
 
 	IB_DEBUG("[POST GENERAL] hold buffer, buffer.get() = " << buffer.get() << ", dataSize = " << buffer->dataSize());
 
-	// insert the buffer to container
-	_HOLD_BUFFER(mSendBufferHolder, buffer.get(), buffer);
+	// create completion info
+	CompletionInfo* info = new CompletionInfo;
+	info->buffer = buffer;
 
 	// send the buffer
 	// if the size of the buffer can be fitted into receiver's pre-posted buffer, just send it
 	if(buffer->dataSize() <= IB_DEFAULT_RECEIVE_BUFFER_SIZE)
 	{
 		// post the SEND WR
-		result = postSend(buffer.get(), type);
+		result = postSend(buffer.get(), type, info);
 	}
 	// otherwise we have to do our own large buffer send algorithm
 	else
@@ -1135,7 +1283,9 @@ bool IBConnection::postGeneral(uint32 type, SharedPtr<Buffer> buffer)
 	if(!result)
 	{
 		IB_ERROR("[ERROR] [POST GENERAL] fail to post send with IMM, unhold the buffer");
-		_UNHOLD_BUFFER(mSendBufferHolder, buffer.get());
+
+		SAFE_DELETE(info);
+
 		return false;
 	}
 
@@ -1163,23 +1313,27 @@ bool IBConnection::postControl(SharedPtr<Buffer> buffer)
 
 	IB_DEBUG("[POST CONTROL] hold buffer, buffer.get() = " << buffer.get());
 
-	// insert the buffer to container
-	_HOLD_BUFFER(mSendBufferHolder, buffer.get(), buffer);
+	// create completion info
+	CompletionInfo* info = new CompletionInfo;
+	info->buffer = buffer;
 
 	// post send without imm directly
-	result = postSend(buffer.get());
+	result = postSend(buffer.get(), info);
 
 	// if something goes wrong, unhold the buffer
 	if(!result)
 	{
 		IB_ERROR("[ERROR] [POST CONTROL] fail to post send, unhold the buffer");
-		_UNHOLD_BUFFER(mSendBufferHolder, buffer.get());
+
+		SAFE_DELETE(info);
+
 		return false;
 	}
 
 	return true;
 }
 
+/*
 bool IBConnection::postDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id)
 {
 	bool result = true;
@@ -1214,9 +1368,10 @@ bool IBConnection::postDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink
 
 	return result;
 }
+*/
 
 //////////////////////////////////////////////////////////////////////////
-bool IBConnection::postRecv(Buffer* buffer)
+bool IBConnection::postRecv(Buffer* buffer, CompletionInfo* info)
 {
 	tbb::queuing_mutex::scoped_lock lock(mVerbs.recv_lock);
 
@@ -1229,7 +1384,7 @@ bool IBConnection::postRecv(Buffer* buffer)
     sge.length = buffer->freeSize();
     sge.lkey   = mDeviceResource->getGlobalMemoryRegion()->lkey;
 
-    rwr.wr_id   = reinterpret_cast<uint64_t>(buffer);
+    rwr.wr_id   = reinterpret_cast<uint64_t>(info);
     rwr.sg_list = &sge;
     rwr.num_sge = 1;
 
@@ -1259,7 +1414,7 @@ bool IBConnection::postRecv(Buffer* buffer)
 	return true;
 }
 
-bool IBConnection::postSend(Buffer* buffer)
+bool IBConnection::postSend(Buffer* buffer, CompletionInfo* info)
 {
 	++mFlowControl.outstandingSend;
 
@@ -1274,7 +1429,7 @@ bool IBConnection::postSend(Buffer* buffer)
     sge.length = buffer->dataSize();
     sge.lkey   = mDeviceResource->getGlobalMemoryRegion()->lkey;
 
-    swr.wr_id      = reinterpret_cast<uint64_t>(buffer);
+    swr.wr_id      = reinterpret_cast<uint64_t>(info);
     swr.opcode     = IBV_WR_SEND;
     swr.send_flags = IBV_SEND_SIGNALED;
     swr.sg_list    = &sge;
@@ -1306,7 +1461,7 @@ bool IBConnection::postSend(Buffer* buffer)
     return true;
 }
 
-bool IBConnection::postSend(Buffer* buffer, uint32 imm)
+bool IBConnection::postSend(Buffer* buffer, uint32 imm, CompletionInfo* info)
 {
 	++mFlowControl.outstandingSend;
 
@@ -1354,7 +1509,7 @@ bool IBConnection::postSend(Buffer* buffer, uint32 imm)
     return true;
 }
 
-bool IBConnection::postRead(uint64 address, uint32 rkey, uint32 length, Buffer* buffer)
+bool IBConnection::postRead(uint64 address, uint32 rkey, uint32 length, Buffer* buffer, CompletionInfo* info)
 {
 	++mFlowControl.outstandingSend;
 
@@ -1371,7 +1526,7 @@ bool IBConnection::postRead(uint64 address, uint32 rkey, uint32 length, Buffer* 
     sge.length = length;
     sge.lkey   = mDeviceResource->getGlobalMemoryRegion()->lkey;
 
-    swr.wr_id      = reinterpret_cast<uint64_t>(buffer);
+    swr.wr_id      = reinterpret_cast<uint64_t>(info);
     swr.opcode     = IBV_WR_RDMA_READ;
     swr.send_flags = IBV_SEND_SIGNALED;
     swr.sg_list    = &sge;
@@ -1406,7 +1561,7 @@ bool IBConnection::postRead(uint64 address, uint32 rkey, uint32 length, Buffer* 
     return true;
 }
 
-bool IBConnection::postWrite(uint64 address, uint32 rkey, uint32 length, Buffer* buffer)
+bool IBConnection::postWrite(uint64 address, uint32 rkey, uint32 length, Buffer* buffer, CompletionInfo* info)
 {
 	// TODO check if we need to use signal and remove source_id
 	++mFlowControl.outstandingSend;
@@ -1424,7 +1579,7 @@ bool IBConnection::postWrite(uint64 address, uint32 rkey, uint32 length, Buffer*
     sge.length = length;
     sge.lkey   = mDeviceResource->getGlobalMemoryRegion()->lkey;
 
-    swr.wr_id      = reinterpret_cast<uint64_t>(buffer);
+    swr.wr_id      = reinterpret_cast<uint64_t>(info);
     swr.opcode     = IBV_WR_RDMA_WRITE;
     swr.send_flags = IBV_SEND_SIGNALED;
     swr.sg_list    = &sge;
@@ -1600,35 +1755,25 @@ void IBConnection::handleControlLargeBufferSend(Buffer* buffer)
 
 	IB_DEBUG("[HANDLE CONTROL] [LARGE BUFFER SEND] => large buffer send: id = " << send.id << ", address = " << send.address << ", rkey = " << send.rkey << ", length = " << send.length);
 
-	// prepare the buffer to receive (allocate from buffer manager)
-	SharedPtr<Buffer> largeBuffer = createBuffer(send.length);
-	if(!largeBuffer)
+	CompletionInfo* info = new CompletionInfo;
+	info->buffer = createBuffer(send.length);
+
+	if(!info->buffer)
 	{
 		IB_ERROR("[ERROR] [HANDLE CONTROL] [LARGE BUFFER SEND] => fail to create large buffer for RDMA READ!");
+		SAFE_DELETE(info);
 		return;
 	}
 
-	// insert the buffer to send buffer container (although it's actually an RDMA READ, it's signaled through send completion)
-	_HOLD_BUFFER(mSendBufferHolder, largeBuffer.get(), largeBuffer);
-
 	// post RDMA read to poll buffer from remote
-	result = postRead(send.address, send.rkey, send.length, largeBuffer.get());
+	result = postRead(send.address, send.rkey, send.length, info->buffer.get(), info);
 
 	// check if anything goes wrong
 	if(!result)
 	{
 		IB_ERROR("[ERROR] [HANDLE CONTROL] [LARGE BUFFER SEND] => fail to post RDMA READ!");
 
-		// unhold the buffer if anyting goes wrong
-		_UNHOLD_BUFFER(mSendBufferHolder, largeBuffer.get());
-	}
-	else
-	{
-		// save the id into id reference container- send direct signal
-		_HOLD_REF(mLargeBufferAckRefHolder, reinterpret_cast<uint64>(largeBuffer.get()), send.id);
-
-		// save the requested buffer type
-		_HOLD_REF(mLargeBufferTypeHolder, reinterpret_cast<uint64>(largeBuffer.get()), send.type)
+		SAFE_DELETE(info);
 	}
 }
 
@@ -1727,12 +1872,14 @@ bool IBConnection::sendControlUnregDirectBuffer(uint64 sink_id)
 					postGeneral(request.type, request.buffer);
 					break;
 				}
+				/*
 				case SendRequest::DIRECT:
 				{
 					IB_DEBUG("[HANDLE CONTROL] [CREDIT UPDATE] => Process DIRECT request, xmitCredit = " << mFlowControl.xmitCredit << ", type = " << request.type << ", buffer = " << request.buffer.get() << ", sink_id = " << request.sink_id);
 					postDirect(request.type, request.buffer, request.sink_id);
 					break;
 				}
+				*/
 				case SendRequest::CONTROL:
 				{
 					IB_DEBUG("[HANDLE CONTROL] [CREDIT UPDATE] => Process CONTROL request, xmitCredit = " << mFlowControl.xmitCredit << ", buffer = " << request.buffer.get());
@@ -1836,12 +1983,14 @@ void IBConnection::flushSendRequestQueue()
 					postGeneral(request.type, request.buffer);
 					break;
 				}
+				/*
 				case SendRequest::DIRECT:
 				{
 					IB_DEBUG("[FLUSH SEND REQUEST QUEUE] => Process DIRECT request, xmitCredit = " << mFlowControl.xmitCredit << ", type = " << request.type << ", buffer = " << request.buffer.get() << ", sink_id = " << request.sink_id);
 					postDirect(request.type, request.buffer, request.sink_id);
 					break;
 				}
+				*/
 				case SendRequest::CONTROL:
 				{
 					IB_DEBUG("[FLUSH SEND REQUEST QUEUE] => Process CONTROL request, xmitCredit = " << mFlowControl.xmitCredit << ", buffer = " << request.buffer.get());

@@ -83,7 +83,8 @@ IF(RDMA_FOUND)
     TARGET_LINK_LIBRARIES(zillians-common-net-api 
         zillians-common-core-api
         zillians-common-util-api
-    	rdmacm_custom_build ibverbs_custom_build mthca_custom_build
+#    	rdmacm_custom_build ibverbs_custom_build mthca_custom_build
+        rdmacm ibverbs
     	${ZILLIANS_DEP_LIBS}
     	${EV_LIBRARIES}
     	${TICPP_LIBRARIES}

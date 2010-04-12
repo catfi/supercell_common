@@ -47,12 +47,13 @@ class IBNetEngine;
  *
  * @see NetEngine, IBConnector, IBAcceptor
  */
-class IBConnection : public ContextHub
+class IBConnection : public ContextHub<true>
 {
 	friend class IBConnector;
 	friend class IBAcceptor;
 public:
 	typedef rdma_cm_id* HandleType;
+	typedef boost::function< void (int error) > CompletionHandler;
 
 public:
 	IBConnection(IBNetEngine* engine, SharedPtr<rdma_cm_id> id);
@@ -75,11 +76,29 @@ public:
 	bool sendThrottled(uint32 type, SharedPtr<Buffer> buffer);
 	bool send(uint32 type, SharedPtr<Buffer> buffer);
 
-	uint64 registrerDirect(SharedPtr<Buffer> buffer);
-	void unregisterDirect(uint64 sink_id);
-	bool sendDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id);
+//	uint64 registrerDirect(SharedPtr<Buffer> buffer);
+//	void unregisterDirect(uint64 sink_id);
+//	bool sendDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id);
 
 	void close();
+
+	//////////////////////////////////////////////////////////////////////
+	//// RDMA Read/Write Semantics
+	//////////////////////////////////////////////////////////////////////
+	uint64 registerDirect(SharedPtr<Buffer> buffer);
+	void unregisterDirect(uint64 sink);
+
+	bool write(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size);
+	bool writeAsync(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size, CompletionHandler handler);
+
+	bool read(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size);
+	bool readAsync(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler);
+
+	//////////////////////////////////////////////////////////////////////
+	//// RDMA Send/Receive Semantics
+	//////////////////////////////////////////////////////////////////////
+	bool sendAsync(uint32 type, SharedPtr<Buffer>, CompletionHandler handler);
+	bool receiveAsync(SharedPtr<Buffer>, CompletionHandler handler);
 
 	//////////////////////////////////////////////////////////////////////
 	//// Parameter Adjust
@@ -93,7 +112,6 @@ public:
     typedef tbb::concurrent_hash_map<uint64, uint64> RefHolder;
     typedef tbb::concurrent_hash_map<uint64, SharedPtr<Buffer> > BufferRefHolder;
 	typedef tbb::concurrent_bounded_queue< SharedPtr<Buffer> > BufferQueue;
-
 
 	//////////////////////////////////////////////////////////////////////
 	//// Poller Handlers & Related
@@ -124,8 +142,18 @@ private:
 	bool postGeneral(uint32 type, SharedPtr<Buffer> buffer);
 	bool sendControl(SharedPtr<Buffer> buffer);
 	bool postControl(SharedPtr<Buffer> buffer);
-	bool postDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id);
+	//bool postDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id);
 
+	//////////////////////////////////////////////////////////////////////
+	//// Internal Control - Completion Info
+	//////////////////////////////////////////////////////////////////////
+	struct CompletionInfo : zillians::ConcurrentObjectPool<CompletionInfo>
+	{
+		CompletionInfo() { }
+		~CompletionInfo() { buffer.reset(); handler.clear(); }
+		SharedPtr<Buffer> buffer;
+		CompletionHandler handler;
+	};
 
 	//////////////////////////////////////////////////////////////////////
 	//// RDMA Send/Recv Read/Write
@@ -135,12 +163,12 @@ private:
 	tbb::concurrent_bounded_queue<uint64> mPostRecvOrderQueue;
 #endif
 
-	bool postRecv(Buffer* buffer);
-	bool postSend(Buffer* buffer);
-	bool postSend(Buffer* buffer, uint32 imm);
+	bool postRecv(Buffer* buffer, CompletionInfo* info);
+	bool postSend(Buffer* buffer, CompletionInfo* info);
+	bool postSend(Buffer* buffer, uint32 imm, CompletionInfo* info);
 
-	bool postRead(uint64 address, uint32 rkey, uint32 length, Buffer* buffer);
-	bool postWrite(uint64 address, uint32 rkey, uint32 length, Buffer* buffer);
+	bool postRead(uint64 address, uint32 rkey, uint32 length, Buffer* buffer, CompletionInfo* info);
+	bool postWrite(uint64 address, uint32 rkey, uint32 length, Buffer* buffer, CompletionInfo* info);
 
 	void notifyRecv();
 	void notifySend();
@@ -322,7 +350,7 @@ private:
     //////////////////////////////////////////////////////////////////////
     struct SendRequest
     {
-    	enum { GENERAL, DIRECT, CONTROL } req;
+    	enum { GENERAL, /*DIRECT, */CONTROL } req;
     	uint32 type;
     	SharedPtr<Buffer> buffer;
     	uint64 sink_id;

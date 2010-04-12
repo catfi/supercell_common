@@ -1,6 +1,6 @@
 # 
 # Zillians MMO
-# Copyright (C) 2007-2008 Zillians.com, Inc.
+# Copyright (C) 2007-2009 Zillians.com, Inc.
 # For more information see http:#www.zillians.com
 #
 # Zillians MMO is the library and runtime for massive multiplayer online game
@@ -19,26 +19,24 @@
 # Contact Information: info@zillians.com
 #
 
-IF(RDMA_FOUND)
-#    ADD_SUBDIRECTORY(InfinibandDeviceResourceManagerTest)
-#    ADD_SUBDIRECTORY(InfinibandBasicSendReceiveTest)
-#    ADD_SUBDIRECTORY(InfinibandDirectSendTest)
-#    ADD_SUBDIRECTORY(InfinibandLargeSendTest)
-    ADD_SUBDIRECTORY(InfinibandReadWriteTest)
-ENDIF()
+INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
 
-IF(TICPP_FOUND)
-    ADD_SUBDIRECTORY(ScyllaBasicTest)
-ENDIF()
+ADD_EXECUTABLE(InfinibandReadWriteTest InfinibandReadWriteTest.cpp) 
 
-IF(COROSYNC_FOUND)
-    ADD_SUBDIRECTORY(CloseProcessGroupTest)
-ENDIF()
+TARGET_LINK_LIBRARIES(InfinibandReadWriteTest 
+    zillians-common-core-api 
+    zillians-common-net-api)
 
-ADD_SUBDIRECTORY(SessionBasicTest)
-ADD_SUBDIRECTORY(SessionDispatcherTest)
-#ADD_SUBDIRECTORY(SessionSendReceiveTest)
-ADD_SUBDIRECTORY(SessionSynchronousTest)
-ADD_SUBDIRECTORY(SessionConcurrentTest)
-ADD_SUBDIRECTORY(SessionVectorBufferTest)
-ADD_SUBDIRECTORY(TimeSynchronizerTest)
+ADD_CUSTOM_COMMAND(
+	TARGET InfinibandReadWriteTest 
+	POST_BUILD COMMAND cmake -E copy_if_different
+	${CMAKE_CURRENT_SOURCE_DIR}/InfinibandReadWriteTest.run
+	${EXECUTABLE_OUTPUT_PATH}/InfinibandReadWriteTest.run
+	)
+	
+ADD_CUSTOM_COMMAND(
+	TARGET InfinibandReadWriteTest 
+	POST_BUILD COMMAND chmod +x ${EXECUTABLE_OUTPUT_PATH}/InfinibandReadWriteTest.run
+	)
+	
+ADD_TEST(InfinibandReadWriteTest ${EXECUTABLE_OUTPUT_PATH}/InfinibandReadWriteTest.run ${EXECUTABLE_OUTPUT_PATH} g0 g1)

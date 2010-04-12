@@ -30,7 +30,7 @@
 #include "core-api/SharedPtr.h"
 #include "core-api/Buffer.h"
 
-#if BUILD_WITH_BOOST
+//#if BUILD_WITH_BOOST
 #include <boost/assert.hpp>
 #include <boost/algorithm/minmax.hpp>
 #include <boost/shared_ptr.hpp>
@@ -48,7 +48,15 @@
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/utility.hpp>
-#endif
+#include <boost/lambda/lambda.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/if.hpp>
+#include <boost/lambda/loops.hpp>
+#include <boost/lambda/switch.hpp>
+#include <boost/lambda/construct.hpp>
+#include <boost/lambda/exceptions.hpp>
+#include <boost/lambda/algorithm.hpp>
+//#endif
 
 #if BUILD_WITH_LOG4CXX
 #include <log4cxx/logger.h>
