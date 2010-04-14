@@ -34,10 +34,11 @@ using namespace zillians;
  * Print the tokenized result
  * @param a
  */
-void print_result(const vector<string> &a)
+template <typename T>
+void print_result(const vector<T> &a)
 {
 	int i=0;
-	for(vector<string>::const_iterator x = a.begin(); x != a.end(); ++x, ++i)
+	for(typename vector<T>::const_iterator x = a.begin(); x != a.end(); ++x, ++i)
 	{
 		printf("[%d] %s\n", i, x->c_str());
 	}
@@ -49,12 +50,13 @@ void print_result(const vector<string> &a)
  * @param b second string vector
  * @return true if equal, false otherwise
  */
-bool compare_result(const vector<string> &a, const vector<string> &b)
+template <typename T>
+bool compare_result(const vector<T> &a, const vector<T> &b)
 {
 	if(a.size() != b.size()) return false;
 
-	vector<string>::const_iterator x = a.begin();
-	vector<string>::const_iterator y = b.begin();
+	typename vector<T>::const_iterator x = a.begin();
+	typename vector<T>::const_iterator y = b.begin();
 
 	while(x != a.end() && y != b.end())
 	{
@@ -224,5 +226,150 @@ BOOST_AUTO_TEST_CASE( UpperLowerCaseConversionCase1 )
 
 	BOOST_CHECK(s0_u.compare(s1_u) == 0);
 }
+
+
+
+
+BOOST_AUTO_TEST_CASE( WideTokenizerCase1 )
+{
+	wstring input = L"a.b.c.d";
+
+	vector<wstring> output;
+	output.push_back(L"a");
+	output.push_back(L"b");
+	output.push_back(L"c");
+	output.push_back(L"d");
+
+	vector<wstring> result = StringUtil::tokenize(input, L".");
+	//printf("result => \n");
+	//print_result(result);
+
+	BOOST_CHECK(compare_result(output, result));
+}
+
+BOOST_AUTO_TEST_CASE( WideTokenizerCase2 )
+{
+	wstring input = L"a..b...c...d";
+
+	vector<wstring> output;
+	output.push_back(L"a");
+	output.push_back(L"b");
+	output.push_back(L"c");
+	output.push_back(L"d");
+
+	vector<wstring> result = StringUtil::tokenize(input, L".");
+	//printf("result => \n");
+	//print_result(result);
+
+	BOOST_CHECK(compare_result(output, result));
+}
+
+BOOST_AUTO_TEST_CASE( WideTokenizerCase3 )
+{
+	wstring input = L"a.,,,.b.,,,c,,d";
+
+	vector<wstring> output;
+	output.push_back(L"a");
+	output.push_back(L"b");
+	output.push_back(L"c");
+	output.push_back(L"d");
+
+	vector<wstring> result = StringUtil::tokenize(input, L".,");
+	//printf("result => \n");
+	//print_result(result);
+
+	BOOST_CHECK(compare_result(output, result));
+}
+
+BOOST_AUTO_TEST_CASE( WideTokenizerCase4 )
+{
+	wstring input = L"..,.";
+
+	vector<wstring> output;
+
+	vector<wstring> result = StringUtil::tokenize(input, L".,");
+	//printf("result => \n");
+	//print_result(result);
+
+	BOOST_CHECK(compare_result(output, result));
+}
+
+BOOST_AUTO_TEST_CASE( WideTokenizerCase5 )
+{
+	wstring input = L"...A....";
+
+	vector<wstring> output;
+	output.push_back(L"A");
+
+	vector<wstring> result = StringUtil::tokenize(input, L".");
+	//printf("result => \n");
+	//print_result(result);
+
+	BOOST_CHECK(compare_result(output, result));
+}
+
+BOOST_AUTO_TEST_CASE( WideTokenizerCase6 )
+{
+	wstring input = L"A..B.";
+
+	vector<wstring> output;
+	output.push_back(L"A");
+	output.push_back(L"");
+	output.push_back(L"B");
+	output.push_back(L"");
+
+	vector<wstring> result = StringUtil::tokenize(input, L".", true);
+	//printf("result => \n");
+	//print_result(result);
+
+	BOOST_CHECK(compare_result(output, result));
+}
+
+BOOST_AUTO_TEST_CASE( WideTokenizerCase7 )
+{
+	wstring input = L".";
+
+	vector<wstring> output;
+	output.push_back(L"");
+	output.push_back(L"");
+
+	vector<wstring> result = StringUtil::tokenize(input, L".", true);
+	//printf("result => \n");
+	//print_result(result);
+
+	BOOST_CHECK(compare_result(output, result));
+}
+
+BOOST_AUTO_TEST_CASE( WideTokenizerCase8 )
+{
+	wstring input = L"ABCDEFG.HIJKLMN.";
+
+	vector<wstring> output;
+	output.push_back(L"ABCDEFG");
+	output.push_back(L"HIJKLMN");
+	output.push_back(L"");
+
+	vector<wstring> result = StringUtil::tokenize(input, L".", true);
+	//printf("result => \n");
+	//print_result(result);
+
+	BOOST_CHECK(compare_result(output, result));
+}
+
+BOOST_AUTO_TEST_CASE( WideTokenizerCase9 )
+{
+	wstring input = L"ABCDEFG;HIJKLMN;";
+
+	vector<wstring> output;
+	output.push_back(L"ABCDEFG");
+	output.push_back(L"HIJKLMN");
+
+	vector<wstring> result = StringUtil::tokenize(input, L";", false);
+	//printf("result => \n");
+	//print_result(result);
+
+	BOOST_CHECK(compare_result(output, result));
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

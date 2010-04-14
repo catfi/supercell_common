@@ -80,4 +80,54 @@ std::vector<std::string> StringUtil::tokenize(const std::string& str, const std:
 	return tokens;
 }
 
+
+
+std::vector<std::wstring> StringUtil::tokenize(const std::wstring& str, const std::wstring& delimiters, bool allowEmptyTokenString)
+{
+	std::vector<std::wstring> tokens;
+	std::wstring::size_type delimPos = 0, tokenPos = 0, pos = 0;
+
+	if (str.length() < 1)
+		return tokens;
+
+	while (true)
+	{
+		delimPos = str.find_first_of(delimiters, pos);
+		tokenPos = str.find_first_not_of(delimiters, pos);
+
+		if (std::wstring::npos != delimPos)
+		{
+			if (std::wstring::npos != tokenPos)
+			{
+				if (tokenPos < delimPos)
+				{
+					tokens.push_back(str.substr(pos, delimPos - pos));
+				}
+				else
+				{
+					if (allowEmptyTokenString)	tokens.push_back(L"");
+				}
+			}
+			else
+			{
+				if (allowEmptyTokenString) tokens.push_back(L"");
+			}
+			pos = delimPos + 1;
+		}
+		else
+		{
+			if (std::wstring::npos != tokenPos)
+			{
+				tokens.push_back(str.substr(pos));
+			}
+			else
+			{
+				if (allowEmptyTokenString) tokens.push_back(L"");
+			}
+			break;
+		}
+	}
+	return tokens;
+}// tokenize(wstring)
+
 }
