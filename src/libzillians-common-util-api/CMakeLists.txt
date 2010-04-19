@@ -22,6 +22,6 @@
 INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
 
 ADD_LIBRARY(zillians-common-util-api
-	StringUtil.cpp
-	UUIDUtil.cpp
+	util-api/StringUtil.cpp
+	util-api/UUIDUtil.cpp
     )

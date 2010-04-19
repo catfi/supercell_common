@@ -1063,15 +1063,17 @@ void IBConnection::handleSendCompletionRdmaRead(const ibv_wc &wc)
 
 void IBConnection::handleSendCompletionControlBuffer(const ibv_wc &wc)
 {
-	// get the buffer reference from wr_id
+	// get the completion info from wr_id
+	CompletionInfo* info = reinterpret_cast<CompletionInfo*>(wc.wr_id);
+
 	Buffer* b = reinterpret_cast<Buffer*>(wc.wr_id);
 
 	// NOTE here we dont update the buffer's wpos and rpos because these completed control buffer are probably going to be read on the next few lines
 	//b->rpos(0); b->wpos(wc.byte_len);
 
 	// get the buffer object
-	SharedPtr<Buffer> sb;
-	_GET_BUFFER(mSendBufferHolder, b, sb);
+	//SharedPtr<Buffer> sb;
+	//_GET_BUFFER(mSendBufferHolder, b, sb);
 
 	IB_DEBUG("[COMPLETION] [SEND] CONTROL BUFFER SEND, buffer = " << b);
 
@@ -1089,18 +1091,21 @@ void IBConnection::handleSendCompletionControlBuffer(const ibv_wc &wc)
 	}*/
 
 	// push the control buffer back to "stocked control buffer container"
-	returnControlBuffer(sb);
+	returnControlBuffer(info->buffer);
 
 	// remove the buffer from "send buffer reference holder"
-    _UNHOLD_BUFFER(mSendBufferHolder, b);
+    //_UNHOLD_BUFFER(mSendBufferHolder, b);
+
+	// delete the completion info object
+	SAFE_DELETE(info);
 }
 
 void IBConnection::handleSendCompletionGeneralBuffer(const ibv_wc &wc)
 {
-	// get the buffer reference from wr_id
-	Buffer* b = reinterpret_cast<Buffer*>(wc.wr_id);
+	// get the completion info from wr_id
+	CompletionInfo* info = reinterpret_cast<CompletionInfo*>(wc.wr_id);
 
-	IB_DEBUG("[COMPLETION] [SEND] GENERAL BUFFER SEND, buffer = " << b);
+	//IB_DEBUG("[COMPLETION] [SEND] GENERAL BUFFER SEND, buffer = " << b);
 
 #ifdef IB_ENABLE_COMPLETION_DISPATCH
 	// dispatch completion
@@ -1112,8 +1117,11 @@ void IBConnection::handleSendCompletionGeneralBuffer(const ibv_wc &wc)
 	mEngine->getDispatcher()->dispatchCompletion(sb, shared_from_this);
 #else
 	// remove the buffer from "send buffer reference holder"
-    _UNHOLD_BUFFER(mSendBufferHolder, b);
+    //_UNHOLD_BUFFER(mSendBufferHolder, b);
 #endif
+	// delete the completion info object
+	SAFE_DELETE(info);
+
 
 }
 
