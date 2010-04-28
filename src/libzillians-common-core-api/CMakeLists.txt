@@ -22,8 +22,8 @@
 INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
 
 ADD_LIBRARY(zillians-common-core-api
-	ScalablePoolAllocator.cpp
-	FragmentFreeAllocator.cpp
+	core-api/ScalablePoolAllocator.cpp
+	core-api/FragmentFreeAllocator.cpp
     )
     
 TARGET_LINK_LIBRARIES(zillians-common-core-api

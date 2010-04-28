@@ -29,15 +29,15 @@ INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
 SET(ZILLIANS_TEMPORARY_BUILD_LIST "")
 
 LIST(APPEND TEMPORARY_BUILD_LIST
-    Channel.cpp
-	sys/tcp/TcpSessionImpl.cpp
+    net-api/Channel.cpp
+	net-api/sys/tcp/TcpSessionImpl.cpp
 	)
 
 IF(COROSYNC_FOUND)
     LIST(APPEND TEMPORARY_BUILD_LIST
-    	group/CloseProcessGroup.cpp
-    	group/CloseProcessGroupManager.cpp
-    	group/ExtendedVirtualSynchrony.cpp
+    	net-api/group/CloseProcessGroup.cpp
+    	net-api/group/CloseProcessGroupManager.cpp
+    	net-api/group/ExtendedVirtualSynchrony.cpp
 	)
 ELSE()
     MESSAGE(STATUS "Corosync not available, disabling build for CPG part in libzillians-common-net-api")
@@ -45,9 +45,9 @@ ENDIF()
 
 IF(TICPP_FOUND)
     LIST(APPEND TEMPORARY_BUILD_LIST
-    	scylla/ScyllaChannelEngine.cpp
-    	scylla/ScyllaNodeDB.cpp
-    	scylla/ScyllaChannel.cpp
+    	net-api/scylla/ScyllaChannelEngine.cpp
+    	net-api/scylla/ScyllaNodeDB.cpp
+    	net-api/scylla/ScyllaChannel.cpp
 	)
 ELSE()
     MESSAGE(STATUS "TICPP not available, disabling build for Scylla part in libzillians-common-net-api")
@@ -55,19 +55,19 @@ ENDIF()
 	
 IF(RDMA_FOUND)
 	LIST(APPEND TEMPORARY_BUILD_LIST
-		rdma/address/InetAddress.cpp
-		rdma/address/InetSocketAddress.cpp
-		rdma/buffer_manager/IBBufferManager.cpp
-		rdma/infiniband/IBAcceptor.cpp
-		rdma/infiniband/IBCommon.cpp
-		rdma/infiniband/IBConnection.cpp
-		rdma/infiniband/IBConnector.cpp
-		rdma/infiniband/IBCxxCompatibleWrapper.c
-		rdma/infiniband/IBDeviceResource.cpp
-		rdma/infiniband/IBDeviceResourceManager.cpp
-		rdma/infiniband/IBFactory.cpp
-		rdma/resolver/InetSocketResolver.cpp
-		rdma/Poller.cpp
+		net-api/rdma/address/InetAddress.cpp
+		net-api/rdma/address/InetSocketAddress.cpp
+		net-api/rdma/buffer_manager/IBBufferManager.cpp
+		net-api/rdma/infiniband/IBAcceptor.cpp
+		net-api/rdma/infiniband/IBCommon.cpp
+		net-api/rdma/infiniband/IBConnection.cpp
+		net-api/rdma/infiniband/IBConnector.cpp
+		net-api/rdma/infiniband/IBCxxCompatibleWrapper.c
+		net-api/rdma/infiniband/IBDeviceResource.cpp
+		net-api/rdma/infiniband/IBDeviceResourceManager.cpp
+		net-api/rdma/infiniband/IBFactory.cpp
+		net-api/rdma/resolver/InetSocketResolver.cpp
+		net-api/rdma/Poller.cpp
 		)
 ELSE()
     MESSAGE(STATUS "RDMA not available, disabling build for RDMA part in libzillians-common-net-api")
@@ -83,8 +83,8 @@ IF(RDMA_FOUND)
     TARGET_LINK_LIBRARIES(zillians-common-net-api 
         zillians-common-core-api
         zillians-common-util-api
-#    	rdmacm_custom_build ibverbs_custom_build mthca_custom_build
-        rdmacm ibverbs
+    	rdmacm_custom_build ibverbs_custom_build mthca_custom_build
+#        rdmacm ibverbs
     	${ZILLIANS_DEP_LIBS}
     	${EV_LIBRARIES}
     	${TICPP_LIBRARIES}

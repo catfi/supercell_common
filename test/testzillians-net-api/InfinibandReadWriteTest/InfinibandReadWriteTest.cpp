@@ -170,13 +170,13 @@ public:
 	{
 		LOG4CXX_INFO(mLogger, "connected to server, connection ptr = " << connection.get());
 
-		SharedPtr<Buffer> b = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE);
+		SharedPtr<Buffer> b = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE/2);
 		uint64 key = connection->registerDirect(b);
 		LOG4CXX_INFO(mLogger, "buffer registered, key = " << key);
 
 		LOG4CXX_INFO(mLogger, "preparing the source buffer...");
-		sourceBuffer = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE);
-		for(int32 i=0;i<TEST_DIRECT_BUFFER_SIZE/sizeof(int32);++i)
+		sourceBuffer = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE/2);
+		for(int32 i=0;i<(TEST_DIRECT_BUFFER_SIZE/2)/sizeof(int32);++i)
 		{
 			sourceBuffer->write(i);
 		}
@@ -212,17 +212,19 @@ public:
 
 			// prepare the source buffer
 			LOG4CXX_INFO(mLogger, "preparing the source buffer...");
-			SharedPtr<Buffer> b = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE);
+			SharedPtr<Buffer> b = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE/2);
+
+			b->wpos(b->allocatedSize());
 
 			// send direct via RDMA WRITE
 			tbb::tick_count start, end;
 
 			start = tbb::tick_count::now();
-			connection->write(sink_id, 0, b, TEST_DIRECT_BUFFER_SIZE);
+			connection->write(sink_id, 0, b, TEST_DIRECT_BUFFER_SIZE/2);
 			end = tbb::tick_count::now();
 
 			double ms = (end-start).seconds()*1000.0;
-			LOG4CXX_INFO(mLogger, "Writing " <<  TEST_DIRECT_BUFFER_SIZE << " bytes to server takes " << ms << " ms, bandwidth = " << (double)(TEST_DIRECT_BUFFER_SIZE / MB) / (ms*1000.0) << " MB/s");
+			LOG4CXX_INFO(mLogger, "Writing " <<  TEST_DIRECT_BUFFER_SIZE/2 << " bytes to server takes " << ms << " ms, bandwidth = " << (double)((TEST_DIRECT_BUFFER_SIZE/2) / MB) / (ms*1000.0) << " MB/s");
 
 			connection->close();
 		}
