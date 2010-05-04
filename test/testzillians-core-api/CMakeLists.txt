@@ -20,6 +20,7 @@
 #
 
 #ADD_SUBDIRECTORY(BufferManagerTest)
+ADD_SUBDIRECTORY(AdvancedThreadingTest)
 ADD_SUBDIRECTORY(BufferTest)
 ADD_SUBDIRECTORY(ScalablePoolAllocatorTest)
 #ADD_SUBDIRECTORY(CallbackTest)

@@ -1,6 +1,6 @@
 # 
 # Zillians MMO
-# Copyright (C) 2007-2009 Zillians.com, Inc.
+# Copyright (C) 2007-2010 Zillians.com, Inc.
 # For more information see http:#www.zillians.com
 #
 # Zillians MMO is the library and runtime for massive multiplayer online game
@@ -24,7 +24,7 @@ IF(RDMA_FOUND)
     INCLUDE_DIRECTORIES(${rdmacm_custom_build_SOURCE_DIR}/include/)
 ENDIF()
 
-INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
+INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
 
 SET(ZILLIANS_TEMPORARY_BUILD_LIST "")
 
