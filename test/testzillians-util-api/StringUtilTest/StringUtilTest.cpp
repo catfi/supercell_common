@@ -22,6 +22,7 @@
 
 #include "core-api/Prerequisite.h"
 #include "util-api/StringUtil.h"
+#include <tr1/unordered_set>
 
 #define BOOST_TEST_MODULE StringUtilTest
 #define BOOST_TEST_MAIN
@@ -371,5 +372,32 @@ BOOST_AUTO_TEST_CASE( WideTokenizerCase9 )
 	BOOST_CHECK(compare_result(output, result));
 }
 
+BOOST_AUTO_TEST_CASE( StringHashCase1 )
+{
+	string value1 = "ABCDEFG";
+	string value2 = "ABCDEFGH";
+
+	std::tr1::unordered_set<std::string> str_hash;
+
+	str_hash.insert(value1);
+	str_hash.insert(value2);
+
+	BOOST_CHECK(str_hash.count(value1) == 1);
+	BOOST_CHECK(str_hash.count(value2) == 1);
+}
+
+BOOST_AUTO_TEST_CASE( WStringHashCase1 )
+{
+	wstring value1 = L"ABCDEFG";
+	wstring value2 = L"ABCDEFGH";
+
+	std::tr1::unordered_set<std::wstring> str_hash;
+
+	str_hash.insert(value1);
+	str_hash.insert(value2);
+
+	BOOST_CHECK(str_hash.count(value1) == 1);
+	BOOST_CHECK(str_hash.count(value2) == 1);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
