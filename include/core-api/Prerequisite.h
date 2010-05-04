@@ -30,7 +30,7 @@
 #include "core-api/SharedPtr.h"
 #include "core-api/Buffer.h"
 
-//#if BUILD_WITH_BOOST
+#if BUILD_WITH_BOOST
 #include <boost/assert.hpp>
 #include <boost/algorithm/minmax.hpp>
 #include <boost/shared_ptr.hpp>
@@ -56,7 +56,20 @@
 #include <boost/lambda/construct.hpp>
 #include <boost/lambda/exceptions.hpp>
 #include <boost/lambda/algorithm.hpp>
-//#endif
+#endif
+
+// C++0x threading provided by Just Software Solution (UK)
+#if BUILD_WITH_JUSTTHREAD
+#include <chrono>
+#include <condition_variable>
+#include <atomic>
+#include <thread>
+#include <mutex>
+#include <ratio>
+#include <system_error>
+#include <future>
+#include <exception_ptr>
+#endif
 
 #if BUILD_WITH_LOG4CXX
 #include <log4cxx/logger.h>

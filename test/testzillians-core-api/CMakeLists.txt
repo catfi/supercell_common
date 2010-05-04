@@ -20,7 +20,10 @@
 #
 
 #ADD_SUBDIRECTORY(BufferManagerTest)
-ADD_SUBDIRECTORY(AdvancedThreadingTest)
+IF(JUSTTHREAD_FOUND)
+    ADD_SUBDIRECTORY(AdvancedThreadingTest)
+ENDIF()
+
 ADD_SUBDIRECTORY(BufferTest)
 ADD_SUBDIRECTORY(ScalablePoolAllocatorTest)
 #ADD_SUBDIRECTORY(CallbackTest)
