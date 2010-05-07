@@ -52,13 +52,13 @@ public:
 
 public:
 #ifndef __GXX_EXPERIMENTAL_CXX0X__
-	Transaction& add(ActionRoutine action, RollbackRoutine rollback)
+	inline Transaction& add(ActionRoutine action, RollbackRoutine rollback)
 	{
 		mTransactions.push_back(std::make_pair(action, rollback));
 		return *this;
 	}
 #else
-	Transaction& add(ActionRoutine&& action, RollbackRoutine&& rollback)
+	inline Transaction& add(ActionRoutine&& action, RollbackRoutine&& rollback)
 	{
 		mTransactions.push_back(std::make_pair(std::forward<ActionRoutine>(action), std::forward<RollbackRoutine>(rollback)));
 		return *this;
@@ -66,7 +66,7 @@ public:
 #endif
 
 public:
-	bool next(bool blocking = false)
+	inline bool next(bool blocking = false)
 	{
 		if(mProgramCounter == -1)
 			return true;
@@ -86,19 +86,37 @@ public:
 		}
 	}
 
-	bool waitForComplete()
+	inline void rollback()
+	{
+		std::lock_guard<std::mutex> lock(mRunLock);
+
+		int rollbackCounter = (mProgramCounter == -1) ? mTransactions.size() - 1 : mProgramCounter;
+		while(rollbackCounter >= 0)
+		{
+			mTransactions[rollbackCounter].second(mTransactionState);
+			--rollbackCounter;
+		}
+		mProgramCounter = 0;
+	}
+
+	inline bool waitForCompletion()
 	{
 		return mResult.get();
 	}
 
-	void reset()
+	inline void reset()
 	{
 		std::lock_guard<std::mutex> lock(mRunLock);
 		mProgramCounter = 0;
 	}
 
+	inline TransactionState& currentState()
+	{
+		return mTransactionState;
+	}
+
 private:
-	bool run()
+	inline bool run()
 	{
 		// how to deal with race condition here? (i.e. running an action which returns false but the next() call happened before the end of the current thread context)
 		// for example, we send a message and wait for its return, but the return happened before the end of current thread, so next() is called here, which creates a new thread
@@ -121,7 +139,14 @@ private:
 				int rollbackCounter = mProgramCounter;
 				while(rollbackCounter >= 0)
 				{
-					mTransactions[rollbackCounter].second(mTransactionState);
+					try
+					{
+						mTransactions[rollbackCounter].second(mTransactionState);
+					}
+					catch(...)
+					{
+						// log here since we failed to rollback
+					}
 					--rollbackCounter;
 				}
 				mProgramCounter = 0;
