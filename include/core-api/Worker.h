@@ -25,6 +25,7 @@
 
 #include "core-api/Prerequisite.h"
 #include "core-api/ConditionVariable.h"
+#include "core-api/Singleton.h"
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -68,11 +69,9 @@ public:
 	/**
 	 * @brief Destroy a worker object.
 	 */
-	~Worker()
+	virtual ~Worker()
 	{
-		mTerminated = true;
-		mIoService.stop();
-		mThread.join();
+		stop();
 		for(uint32 i=0;i<MAXIMUM_CONCURRENT_CALLS;++i)
 		{
 			SAFE_DELETE(mConditions[i]);
@@ -113,6 +112,25 @@ public:
 		}
 	}
 
+	template<typename CompletionHandler>
+	inline int async(CompletionHandler handler)
+	{
+		void (Worker::*f)(uint32 /*key*/, boost::tuple<CompletionHandler> /*handler*/) = &Worker::wrap<CompletionHandler>;
+
+		uint32 key = 0; mAvailableConditionSlots.pop(key);
+		fprintf(stderr, "DEBUG: get condition key = %d\n", key);
+
+		mConditions[key]->reset();
+		mIoService.post(boost::bind(f, this, key, boost::make_tuple(handler)));
+		return key;
+	}
+
+	inline void wait(int key)
+	{
+		uint32 dummy = 0;
+		mConditions[key]->wait(dummy);
+	}
+
 	/**
 	 * @brief Post the given handler to job queue of the worker and return.
 	 *
@@ -125,30 +143,23 @@ public:
 	 * must be: @code void handler(); @endcode
 	 */
 	template<typename CompletionHandler>
-	inline void post(CompletionHandler handler)
+	inline void post(CompletionHandler handler, bool blocking = false)
 	{
-		mIoService.post(handler);
+		if(blocking)
+		{
+			void (Worker::*f)(uint32 /*key*/, boost::tuple<CompletionHandler> /*handler*/) = &Worker::wrap<CompletionHandler>;
+
+			uint32 key = 0; mAvailableConditionSlots.pop(key);
+			mIoService.post(boost::bind(f, this, key, boost::make_tuple(handler)));
+			uint32 dummy = 0; mConditions[key]->wait(dummy);
+		}
+		else
+		{
+			mIoService.post(handler);
+		}
 	}
 
-private:
-	/**
-	 * @brief Wrap the given handler with synchronous acknowledgment.
-	 *
-	 * @param key The acknowledgment key, which is basically the
-	 * index of used condition variable.
-	 *
-	 * @param handler The handler to be called. he worker will a copy of
-	 * the handler object as required. The function signature of the handler
-	 * must be: @code void handler(); @endcode
-	 */
-	template<typename CompletionHandler>
-	inline void wrap(uint32 key, boost::tuple<CompletionHandler> handler)
-	{
-		boost::get<0>(handler)();
-		mConditions[key]->signal(1);
-		mAvailableConditionSlots.push(key);
-	}
-
+public:
 	/**
 	 * @brief The internal thread run procedure.
 	 */
@@ -170,12 +181,73 @@ private:
 		}
 	}
 
+	void stop()
+	{
+		if(!mTerminated)
+		{
+			mTerminated = true;
+			mIoService.stop();
+			mThread.join();
+		}
+	}
+
+protected:
+	/**
+	 * @brief Wrap the given handler with synchronous acknowledgment.
+	 *
+	 * @param key The acknowledgment key, which is basically the
+	 * index of used condition variable.
+	 *
+	 * @param handler The handler to be called. he worker will a copy of
+	 * the handler object as required. The function signature of the handler
+	 * must be: @code void handler(); @endcode
+	 */
+	template<typename CompletionHandler>
+	inline void wrap(uint32 key, boost::tuple<CompletionHandler> handler)
+	{
+		fprintf(stderr, "DEBUG: calling on condition key = %d\n", key);
+		boost::get<0>(handler)();
+		fprintf(stderr, "DEBUG: signaling condition key = %d\n", key);
+		mConditions[key]->signal(0);
+		mAvailableConditionSlots.push(key);
+	}
+
 protected:
 	bool mTerminated;
 	boost::asio::io_service mIoService;
 	boost::thread mThread;
 	tbb::concurrent_bounded_queue<uint32> mAvailableConditionSlots;
 	boost::array<zillians::ConditionVariable<uint32>*, MAXIMUM_CONCURRENT_CALLS> mConditions;
+};
+
+class GlobalWorker : public Worker, public Singleton<GlobalWorker>
+{
+public:
+	explicit GlobalWorker(std::size_t defaultWokerSize = 16)
+	{
+		for(int i=0;i<defaultWokerSize;++i)
+		{
+			boost::thread *t = new boost::thread(boost::bind(&Worker::run, this));
+			mWorkerThreads.push_back(t);
+		}
+	}
+
+	virtual ~GlobalWorker()
+	{
+		stop();
+		for(std::vector<boost::thread*>::iterator i = mWorkerThreads.begin(); i != mWorkerThreads.end(); ++i)
+		{
+			if((*i)->joinable())
+			{
+				(*i)->join();
+			}
+			delete (*i);
+		}
+		mWorkerThreads.clear();
+	}
+
+private:
+	std::vector<boost::thread*> mWorkerThreads;
 };
 
 }

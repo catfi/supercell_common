@@ -27,6 +27,10 @@
 #define SharedPtr boost::shared_ptr
 #define WeakPtr boost::weak_ptr
 
+using boost::static_pointer_cast;
+using boost::const_pointer_cast;
+using boost::dynamic_pointer_cast;
+
 /**
  * @brief Allow direct comparison of shared_ptr and its wrapping type (for "equal to" operator)
  */
