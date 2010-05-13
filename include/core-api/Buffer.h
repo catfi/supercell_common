@@ -30,6 +30,7 @@
 #include <boost/mpl/or.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/array.hpp>
+#include <boost/thread.hpp>
 
 namespace zillians {
 
@@ -277,6 +278,40 @@ public:
 		mAllocatedSize = size;
 		mReadPos = mWritePos = 0;
 		mReadPosMarked = mWritePosMarked = 0;
+	}
+
+	/**
+	 * @brief Consutrct a clone of given buffer
+	 *
+	 * @param buffer The buffer to be cloned
+	 * @return
+	 */
+	Buffer(const Buffer& buffer)
+	{
+		if(buffer.mOwner)
+		{
+			mOwner = true;
+			mReadOnly = false;
+			mData = new char[buffer.mAllocatedSize];
+			mAllocatedSize = buffer.mAllocatedSize;
+			mReadPos = buffer.mReadPos;
+			mWritePos = buffer.mWritePos;
+			mReadPosMarked = buffer.mReadPosMarked;
+			mWritePosMarked = buffer.mWritePosMarked;
+
+			::memcpy(mData, buffer.mData, buffer.mAllocatedSize);
+		}
+		else
+		{
+			mOwner = false;
+			mReadOnly = buffer.mReadOnly;
+			mData = buffer.mData;
+			mAllocatedSize = buffer.mAllocatedSize;
+			mReadPos = buffer.mReadPos;
+			mWritePos = buffer.mWritePos;
+			mReadPosMarked = buffer.mReadPosMarked;
+			mWritePosMarked = buffer.mWritePosMarked;
+		}
 	}
 
 	/**
@@ -1119,8 +1154,11 @@ public:
 			value.assign(code, boost::system::get_system_category()); break;
 		case 1:
 			value.assign(code, boost::system::get_generic_category()); break;
+		case 2:
+			value.assign(code, boost::system::get_posix_category()); break;
 		default:
-			BOOST_ASSERT(false); break;
+			BOOST_ASSERT("reading unknown boost::system::error_code category code" && 0);
+			break;
 		}
 	}
 
@@ -1530,11 +1568,21 @@ public:
 		int32 cat = 0;
 
 		if(category == boost::system::get_system_category())
+		{
 			cat = 0;
+		}
 		else if(category == boost::system::get_generic_category())
+		{
 			cat = 1;
-		else
+		}
+		else if(category == boost::system::get_posix_category())
+		{
 			cat = 2;
+		}
+		else
+		{
+			BOOST_ASSERT("writing unknown boost::system::error_code category" && 0);
+		}
 
 		writeDirect(cat);
 	}
@@ -1822,6 +1870,105 @@ inline std::istream& operator >> (std::istream& stream, Buffer& b)
 	b.wskip(size);
 	return stream;
 }
+
+class ThreadLocalBufferWrapper
+{
+	struct spec_type { enum type { size_only, non_const_buffer_with_size, const_buffer_with_size }; };
+	struct
+	{
+		spec_type::type type;
+		union
+		{
+			struct
+			{
+				std::size_t size;
+			} size_only;
+
+			struct
+			{
+				byte* buffer;
+				std::size_t size;
+			} non_const_buffer_with_size;
+
+			struct
+			{
+				const byte* buffer;
+				std::size_t size;
+			} const_buffer_with_size;
+		} def;
+	} spec;
+
+public:
+	ThreadLocalBufferWrapper(std::size_t size)// : data(boost::bind(finalize, _1, true))
+	{
+		spec.type = spec_type::size_only;
+		spec.def.size_only.size = size;
+	}
+
+	ThreadLocalBufferWrapper(byte* data, std::size_t size)// : data(boost::bind(finalize, _1, true))
+	{
+		spec.type = spec_type::non_const_buffer_with_size;
+		spec.def.non_const_buffer_with_size.buffer = data;
+		spec.def.non_const_buffer_with_size.size = size;
+	}
+
+	ThreadLocalBufferWrapper(const byte* data, std::size_t size)// : data(boost::bind(finalize, _1, true))
+	{
+		spec.type = spec_type::const_buffer_with_size;
+		spec.def.const_buffer_with_size.buffer = data;
+		spec.def.const_buffer_with_size.size = size;
+	}
+
+	~ThreadLocalBufferWrapper()
+	{
+	}
+
+public:
+	Buffer* get()
+	{
+		Buffer* ptr = data.get();
+		if(!ptr)
+		{
+			switch(spec.type)
+			{
+			case spec_type::size_only:
+				ptr = new Buffer(spec.def.size_only.size);
+				break;
+			case spec_type::non_const_buffer_with_size:
+				ptr = new Buffer(spec.def.non_const_buffer_with_size.buffer, spec.def.non_const_buffer_with_size.size);
+				break;
+			case spec_type::const_buffer_with_size:
+				ptr = new Buffer(spec.def.const_buffer_with_size.buffer, spec.def.const_buffer_with_size.size);
+				break;
+			}
+			data.reset(ptr);
+		}
+
+		return ptr;
+	}
+
+	Buffer* operator-> ()
+	{
+		return get();
+	}
+
+	Buffer& operator* ()
+	{
+		return *get();
+	}
+
+private:
+	static void finalize(Buffer* buffer, bool need_cleanup)
+	{
+		if(need_cleanup && buffer != NULL)
+		{
+			delete buffer;
+		}
+	}
+
+private:
+	boost::thread_specific_ptr<Buffer> data;
+};
 
 }
 

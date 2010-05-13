@@ -21,4 +21,10 @@
 
 ADD_SUBDIRECTORY(libzillians-common-core-api)
 ADD_SUBDIRECTORY(libzillians-common-net-api)
+ADD_SUBDIRECTORY(libzillians-common-networking)
+
+IF(COROSYNC_FOUND)
+    ADD_SUBDIRECTORY(libzillians-common-networking-cpg)
+ENDIF(COROSYNC_FOUND)
+
 ADD_SUBDIRECTORY(libzillians-common-util-api)

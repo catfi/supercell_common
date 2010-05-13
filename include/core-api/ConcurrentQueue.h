@@ -23,78 +23,97 @@
 #ifndef ZILLIANS_CONCURRENTQUEUE_H_
 #define ZILLIANS_CONCURRENTQUEUE_H_
 
+#include "core-api/Prerequisite.h"
+
 namespace zillians {
 
-template <typename T, int N>
-class ConcurrentQueue
+template<typename T>
+class ConcurrentQueue : public boost::noncopyable
 {
-public:
-	ConcurrentQueue()
+	struct prevent_spurious_wakeup_predicate
 	{
-		mBegin = new Chunk;
-		mBeginPos = 0;
-
-		mBack = NULL;
-		mBackPos = 0;
-
-		mEnd = mBegin;
-		mEndPos = 0;
-	}
-
-	~ConcurrentQueue()
-	{
-		while(true)
-		{
-			if(mBegin == mEnd)
-			{
-				delete mBegin;
-				break;
-			}
-
-			Chunk* current = mBegin;
-			mBegin = mBegin->next;
-			delete current;
-		}
-	}
-
-	inline T& front()
-	{
-		return mBegin->values[mBeginPos];
-	}
-
-	inline T& back()
-	{
-		return mBack->value[mBackPos];
-	}
-
-	inline void push()
-	{
-
-	}
-
-	inline void pop()
-	{
-
-	}
-
-private:
-	struct Chunk
-	{
-		T values[N];
-		Chunk* next;
+		prevent_spurious_wakeup_predicate(std::queue<T>& q) : _q(q) { }
+		bool operator () () const { return !_q.empty(); }
+		typename std::queue<T>& _q;
 	};
 
-	Chunk* mBegin;
-	int mBeginPos;
-	Chunk* mBack;
-	int mBackPos;
-	Chunk* mEnd;
-	int mEndPos;
+public:
+	ConcurrentQueue()
+	{ }
 
-	// forbid object copy constructor and copy operator
+	~ConcurrentQueue()
+	{ }
+
+public:
+    void push(T const& data)
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        mQueue.push(data);
+        lock.unlock();
+        mConditionVariable.notify_one();
+    }
+
+    void clear()
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        while(!mQueue.empty())
+        	mQueue.pop();
+    }
+
+    bool empty() const
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        return mQueue.empty();
+    }
+
+    bool try_pop(T& value)
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        if(mQueue.empty())
+        {
+            return false;
+        }
+
+        value = mQueue.front();
+        mQueue.pop();
+        return true;
+    }
+
+    void wait_and_pop(T& value)
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        prevent_spurious_wakeup_predicate p(mQueue);
+    	mConditionVariable.wait(lock, p);
+
+        value = mQueue.front();
+        mQueue.pop();
+    }
+
+    bool timed_wait_and_pop(T& value, const boost::system_time& absolute)
+    {
+    	boost::mutex::scoped_lock lock(mMutex);
+    	prevent_spurious_wakeup_predicate p(mQueue);
+    	mConditionVariable.timed_wait(lock, absolute, p);
+
+    	value = mQueue.front();
+        mQueue.pop();
+    }
+
+    template<typename DurationType>
+    bool timed_wait_and_pop(T& value, const DurationType& relative)
+    {
+    	boost::mutex::scoped_lock lock(mMutex);
+    	prevent_spurious_wakeup_predicate p(mQueue);
+    	mConditionVariable.timed_wait(lock, relative, p);
+
+    	value = mQueue.front();
+        mQueue.pop();
+    }
+
 private:
-	ConcurrentQueue(const ConcurrentQueue&);
-	void operator = (const ConcurrentQueue&);
+    std::queue<T> mQueue;
+    mutable boost::mutex mMutex;
+    boost::condition_variable mConditionVariable;
 };
 
 }

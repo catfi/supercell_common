@@ -23,6 +23,10 @@
 #ifndef ZILLIANS_CONDITIONVARIABLE_H_
 #define ZILLIANS_CONDITIONVARIABLE_H_
 
+#define ZILLIANS_CONDITIONVARIABLE_CHOOSE_IMPL	2
+
+#if (ZILLIANS_CONDITIONVARIABLE_CHOOSE_IMPL == 0)
+
 #include <tbb/concurrent_queue.h>
 
 namespace zillians {
@@ -69,8 +73,140 @@ public:
 
 private:
 	tbb::concurrent_bounded_queue<T> mQueue;
+
 };
 
 }
+
+#elif (ZILLIANS_CONDITIONVARIABLE_CHOOSE_IMPL == 1)
+
+#include "core-api/Prerequisite.h"
+
+namespace zillians {
+
+template <typename T>
+class ConditionVariable : public boost::noncopyable
+{
+	struct prevent_spurious_wakeup_predicate
+	{
+		prevent_spurious_wakeup_predicate(bool& result) : _result(result) { }
+		bool operator () () const { return !_result; }
+		bool& _result;
+	};
+
+public:
+	ConditionVariable() : mSignaled(false)
+	{  }
+
+	void reset()
+	{
+        boost::mutex::scoped_lock lock(mMutex);
+        mSignaled = false;
+        lock.unlock();
+        mConditionVariable.notify_one();
+	}
+
+	void signal(const T& result)
+	{
+        boost::mutex::scoped_lock lock(mMutex);
+        mValue = result;
+        mSignaled = true;
+        lock.unlock();
+        mConditionVariable.notify_one();
+	}
+
+	bool try_wait(T& result)
+	{
+        boost::mutex::scoped_lock lock(mMutex);
+        if(!mSignaled)
+            return false;
+
+        result = mValue;
+        return true;
+	}
+
+	void wait(T& result)
+	{
+        boost::mutex::scoped_lock lock(mMutex);
+		prevent_spurious_wakeup_predicate p(mSignaled);
+		mConditionVariable.wait(lock, p);
+
+        result = mValue;
+	}
+
+	void timed_wait(T& result, const boost::system_time& absolute)
+	{
+    	boost::mutex::scoped_lock lock(mMutex);
+    	prevent_spurious_wakeup_predicate p(mSignaled);
+    	mConditionVariable.timed_wait(lock, absolute, p);
+
+    	result = mValue;
+	}
+
+    template<typename DurationType>
+    bool timed_wait(T& result, const DurationType& relative)
+    {
+    	boost::mutex::scoped_lock lock(mMutex);
+    	prevent_spurious_wakeup_predicate p(mSignaled);
+    	mConditionVariable.timed_wait(lock, relative, p);
+
+    	result = mValue;
+    }
+
+private:
+	bool mSignaled;
+	T mValue;
+    mutable boost::mutex mMutex;
+    boost::condition_variable mConditionVariable;
+};
+
+}
+
+#elif (ZILLIANS_CONDITIONVARIABLE_CHOOSE_IMPL == 2)
+
+#include "core-api/ConcurrentQueue.h"
+
+namespace zillians {
+
+template <typename T>
+class ConditionVariable
+{
+public:
+	ConditionVariable()
+	{ }
+
+	void reset()
+	{
+		mQueue.clear();
+	}
+
+	void wait(T& result)
+	{
+		mQueue.wait_and_pop(result);
+	}
+
+	void timed_wait(T& result, const boost::system_time& absolute)
+	{
+		mQueue.timed_wait(result, absolute);
+	}
+
+    template<typename DurationType>
+    bool timed_wait(T& result, const DurationType& relative)
+    {
+    	mQueue.timed_wait(result, relative);
+    }
+
+	void signal(const T& result)
+	{
+		mQueue.push(result);
+	}
+
+private:
+	ConcurrentQueue<T> mQueue;
+};
+
+}
+
+#endif
 
 #endif/*ZILLIANS_CONDITIONVARIABLE_H_*/

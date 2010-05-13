@@ -25,7 +25,6 @@
 
 #include "core-api/Common.h"
 #include "core-api/FastCallback.h"
-#include "core-api/Future.h"
 #include "core-api/ObjectPool.h"
 #include "core-api/SharedPtr.h"
 #include "core-api/Buffer.h"
