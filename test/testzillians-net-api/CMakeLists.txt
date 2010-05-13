@@ -32,7 +32,7 @@ IF(TICPP_FOUND)
 ENDIF()
 
 IF(COROSYNC_FOUND)
-    ADD_SUBDIRECTORY(CloseProcessGroupTest)
+#    ADD_SUBDIRECTORY(CloseProcessGroupTest)
 ENDIF()
 
 ADD_SUBDIRECTORY(SessionBasicTest)
