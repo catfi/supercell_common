@@ -168,6 +168,9 @@ private:
 
 namespace zillians {
 
+/**
+ * ConditionVariable is a condition variable without spurious-wakeup.
+ */
 template <typename T>
 class ConditionVariable
 {

@@ -27,6 +27,11 @@
 
 namespace zillians {
 
+/**
+ * @brief ConcurrentQueue is a fast concurrent queue supporting multiple producers multiple consumers
+ *
+ * ConcurrentQueue is built entirely on boost thread library, so it's basically 100% cross-platform compatible
+ */
 template<typename T>
 class ConcurrentQueue : public boost::noncopyable
 {

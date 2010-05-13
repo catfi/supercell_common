@@ -118,7 +118,6 @@ public:
 		void (Worker::*f)(uint32 /*key*/, boost::tuple<CompletionHandler> /*handler*/) = &Worker::wrap<CompletionHandler>;
 
 		uint32 key = 0; mAvailableConditionSlots.pop(key);
-		fprintf(stderr, "DEBUG: get condition key = %d\n", key);
 
 		mConditions[key]->reset();
 		mIoService.post(boost::bind(f, this, key, boost::make_tuple(handler)));
@@ -205,9 +204,7 @@ protected:
 	template<typename CompletionHandler>
 	inline void wrap(uint32 key, boost::tuple<CompletionHandler> handler)
 	{
-		fprintf(stderr, "DEBUG: calling on condition key = %d\n", key);
 		boost::get<0>(handler)();
-		fprintf(stderr, "DEBUG: signaling condition key = %d\n", key);
 		mConditions[key]->signal(0);
 		mAvailableConditionSlots.push(key);
 	}
@@ -220,6 +217,9 @@ protected:
 	boost::array<zillians::ConditionVariable<uint32>*, MAXIMUM_CONCURRENT_CALLS> mConditions;
 };
 
+/**
+ * GlobalWorker is a singleton version of Worker, so anyone can invoke functions asynchronously without having to new a Worker instance
+ */
 class GlobalWorker : public Worker, public Singleton<GlobalWorker>
 {
 public:
