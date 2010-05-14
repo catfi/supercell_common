@@ -24,6 +24,7 @@ INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
 ADD_EXECUTABLE(TransactionTest TransactionTest.cpp)
 
 TARGET_LINK_LIBRARIES(TransactionTest 
-    zillians-common-core-api)
+    zillians-common-core-api
+    ${JUSTTHREAD_LIBRARIES_STATIC})
 
 ADD_TEST(TransactionTest ${EXECUTABLE_OUTPUT_PATH}/TransactionTest)
