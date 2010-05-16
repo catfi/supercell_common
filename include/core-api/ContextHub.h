@@ -64,6 +64,9 @@ public:
 	ContextHub()
 	{ }
 
+	virtual ~ContextHub()
+	{ }
+
 public:
 	/**
 	 * Save an object of type T into the universal storage.
@@ -139,6 +142,100 @@ private:
 };
 
 template<bool TransferOwnershipDefault> tbb::atomic<uint32> ContextHub<TransferOwnershipDefault>::msContextIndexer;
+
+
+/**
+ * NamedContextHub provides name to context pointer mapping.
+ *
+ * NamedContextHub is an alternative version of ContexHub in which
+ * an optional key (string) can be provided as the identifier of the
+ * context pointer. By default, the key is the name (typeid) of the
+ * given type object.
+ */
+template<bool TransferOwnershipDefault>
+class NamedContextHub
+{
+private:
+	struct NullDeleter
+	{
+	    void operator() (void const *) const
+	    { }
+	};
+
+public:
+	NamedContextHub()
+	{ }
+
+	virtual ~NamedContextHub()
+	{ }
+
+public:
+	/**
+	 * Save an object of type T into the universal storage.
+	 *
+	 * @note If the TransferOwnership template parameter is set, the ownership of the given object is transferred to this ContextHub instance.
+	 *
+	 * @param ctx The given object of type T
+	 */
+	template <typename T, bool TransferOwnership = TransferOwnershipDefault>
+	inline void set(T* ctx, const std::string& name = typeid(T).name())
+	{
+		if(TransferOwnership)
+		{
+			refSharedContext<T>(name) = boost::shared_ptr<T>(ctx);
+		}
+		else
+		{
+			refSharedContext<T>(name) = boost::shared_ptr<T>(ctx, NullDeleter());
+		}
+	}
+
+	/**
+	 * Retrieve the object according to the given type T.
+	 *
+	 * @return The pointer to the stored object. Return null pointer if it's not set previously.
+	 */
+	template <typename T>
+	inline T* get(const std::string& name = typeid(T).name())
+	{
+		return boost::static_pointer_cast<T>(refSharedContext<T>(name)).get();
+	}
+
+	/**
+	 * Remove the previously stored object instance of type T.
+	 *
+	 * @note If the TransferOwnership template parameter is set, ContextHub will automatically destroy the object; otherwise
+	 */
+	template <typename T>
+	inline void reset(const std::string& name = typeid(T).name())
+	{
+		refSharedContext<T>(name).reset();
+	}
+
+private:
+	/**
+	 * The magic trick to store and access context object by using static
+	 * initialization to identify the index of a specific type.
+	 *
+	 * @return The reference to the shared pointer
+	 */
+	template <typename T>
+	inline boost::shared_ptr<void>& refSharedContext(const std::string& name)
+	{
+		std::map< std::string, boost::shared_ptr<void> >::iterator it = mSharedContextObjects.find(name);
+		if(UNLIKELY(it == mSharedContextObjects.end()))
+		{
+			mSharedContextObjects[name] = boost::shared_ptr<void>();
+			return mSharedContextObjects[name];
+		}
+		else
+		{
+			return it->second;
+		}
+	}
+
+	std::map< std::string, boost::shared_ptr<void> > mSharedContextObjects;
+};
 
 }
 #endif/*ZILLIANS_CONTEXTHUB_H_*/

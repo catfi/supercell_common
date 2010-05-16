@@ -57,19 +57,6 @@
 #include <boost/lambda/algorithm.hpp>
 #endif
 
-// C++0x threading provided by Just Software Solution (UK)
-#if BUILD_WITH_JUSTTHREAD
-#include <chrono>
-#include <condition_variable>
-#include <atomic>
-#include <thread>
-#include <mutex>
-#include <ratio>
-#include <system_error>
-#include <future>
-#include <exception_ptr>
-#endif
-
 #if BUILD_WITH_LOG4CXX
 #include <log4cxx/logger.h>
 #include <log4cxx/basicconfigurator.h>

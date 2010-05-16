@@ -131,4 +131,108 @@ BOOST_AUTO_TEST_CASE( ContextHubTestCase2 )
 	BOOST_CHECK(dtor_counter == 12);
 }
 
+BOOST_AUTO_TEST_CASE( ContextHubTestCase3 )
+{
+	NamedContextHub<true> hub;
+
+	int ctor_counter = 0;
+	int dtor_counter = 0;
+
+	CA* a = new CA(ctor_counter, dtor_counter);
+	CB* b = new CB(ctor_counter, dtor_counter);
+	CC* c = new CC(ctor_counter, dtor_counter);
+	CD* d = new CD(ctor_counter, dtor_counter);
+	CE* e = new CE(ctor_counter, dtor_counter);
+	CF* f = new CF(ctor_counter, dtor_counter);
+
+	BOOST_CHECK(ctor_counter == 6);
+	BOOST_CHECK(dtor_counter == 0);
+
+	hub.set(a, "CA");
+	hub.set(b, "CB");
+	hub.set(c, "CC");
+	hub.set(d, "CD");
+	hub.set(e, "CE");
+	hub.set(f, "CF");
+
+	CA* ta = NULL; BOOST_CHECK_NO_THROW(ta = hub.get<CA>("CA")); BOOST_CHECK(a == ta);
+	CB* tb = NULL; BOOST_CHECK_NO_THROW(tb = hub.get<CB>("CB")); BOOST_CHECK(b == tb);
+	CC* tc = NULL; BOOST_CHECK_NO_THROW(tc = hub.get<CC>("CC")); BOOST_CHECK(c == tc);
+	CD* td = NULL; BOOST_CHECK_NO_THROW(td = hub.get<CD>("CD")); BOOST_CHECK(d == td);
+	CE* te = NULL; BOOST_CHECK_NO_THROW(te = hub.get<CE>("CE")); BOOST_CHECK(e == te);
+	CF* tf = NULL; BOOST_CHECK_NO_THROW(tf = hub.get<CF>("CF")); BOOST_CHECK(f == tf);
+
+	BOOST_CHECK_NO_THROW(hub.set<CA>(new CA(ctor_counter, dtor_counter), "CA"));
+	BOOST_CHECK_NO_THROW(hub.set<CB>(new CB(ctor_counter, dtor_counter), "CB"));
+	BOOST_CHECK_NO_THROW(hub.set<CC>(new CC(ctor_counter, dtor_counter), "CC"));
+	BOOST_CHECK_NO_THROW(hub.set<CD>(new CD(ctor_counter, dtor_counter), "CD"));
+	BOOST_CHECK_NO_THROW(hub.set<CE>(new CE(ctor_counter, dtor_counter), "CE"));
+	BOOST_CHECK_NO_THROW(hub.set<CF>(new CF(ctor_counter, dtor_counter), "CF"));
+
+	BOOST_CHECK(ctor_counter == 12);
+	BOOST_CHECK(dtor_counter == 6);
+
+	BOOST_CHECK_NO_THROW(hub.reset<CA>("CA"));
+	BOOST_CHECK_NO_THROW(hub.reset<CB>("CB"));
+	BOOST_CHECK_NO_THROW(hub.reset<CC>("CC"));
+	BOOST_CHECK_NO_THROW(hub.reset<CD>("CD"));
+	BOOST_CHECK_NO_THROW(hub.reset<CE>("CE"));
+	BOOST_CHECK_NO_THROW(hub.reset<CF>("CF"));
+
+	BOOST_CHECK(ctor_counter == 12);
+	BOOST_CHECK(dtor_counter == 12);
+}
+
+BOOST_AUTO_TEST_CASE( ContextHubTestCase4 )
+{
+	NamedContextHub<true> hub;
+
+	int ctor_counter = 0;
+	int dtor_counter = 0;
+
+	CA* a = new CA(ctor_counter, dtor_counter);
+	CB* b = new CB(ctor_counter, dtor_counter);
+	CC* c = new CC(ctor_counter, dtor_counter);
+	CD* d = new CD(ctor_counter, dtor_counter);
+	CE* e = new CE(ctor_counter, dtor_counter);
+	CF* f = new CF(ctor_counter, dtor_counter);
+
+	BOOST_CHECK(ctor_counter == 6);
+	BOOST_CHECK(dtor_counter == 0);
+
+	hub.set(a);
+	hub.set(b);
+	hub.set(c);
+	hub.set(d);
+	hub.set(e);
+	hub.set(f);
+
+	CA* ta = NULL; BOOST_CHECK_NO_THROW(ta = hub.get<CA>()); BOOST_CHECK(a == ta);
+	CB* tb = NULL; BOOST_CHECK_NO_THROW(tb = hub.get<CB>()); BOOST_CHECK(b == tb);
+	CC* tc = NULL; BOOST_CHECK_NO_THROW(tc = hub.get<CC>()); BOOST_CHECK(c == tc);
+	CD* td = NULL; BOOST_CHECK_NO_THROW(td = hub.get<CD>()); BOOST_CHECK(d == td);
+	CE* te = NULL; BOOST_CHECK_NO_THROW(te = hub.get<CE>()); BOOST_CHECK(e == te);
+	CF* tf = NULL; BOOST_CHECK_NO_THROW(tf = hub.get<CF>()); BOOST_CHECK(f == tf);
+
+	BOOST_CHECK_NO_THROW(hub.set<CA>(new CA(ctor_counter, dtor_counter)));
+	BOOST_CHECK_NO_THROW(hub.set<CB>(new CB(ctor_counter, dtor_counter)));
+	BOOST_CHECK_NO_THROW(hub.set<CC>(new CC(ctor_counter, dtor_counter)));
+	BOOST_CHECK_NO_THROW(hub.set<CD>(new CD(ctor_counter, dtor_counter)));
+	BOOST_CHECK_NO_THROW(hub.set<CE>(new CE(ctor_counter, dtor_counter)));
+	BOOST_CHECK_NO_THROW(hub.set<CF>(new CF(ctor_counter, dtor_counter)));
+
+	BOOST_CHECK(ctor_counter == 12);
+	BOOST_CHECK(dtor_counter == 6);
+
+	BOOST_CHECK_NO_THROW(hub.reset<CA>());
+	BOOST_CHECK_NO_THROW(hub.reset<CB>());
+	BOOST_CHECK_NO_THROW(hub.reset<CC>());
+	BOOST_CHECK_NO_THROW(hub.reset<CD>());
+	BOOST_CHECK_NO_THROW(hub.reset<CE>());
+	BOOST_CHECK_NO_THROW(hub.reset<CF>());
+
+	BOOST_CHECK(ctor_counter == 12);
+	BOOST_CHECK(dtor_counter == 12);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
