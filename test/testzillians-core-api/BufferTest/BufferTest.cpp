@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE( CharArrayEncodingAndDecodingTest )
 	char* data = new char[4096];
 	Buffer *b = new Buffer((byte*)data, 4096);
 
-	char* input[4] = {"1", "22", "333", "444"};
+	const char* input[4] = {"1", "22", "333", "444"};
 	for(int i=0;i<4;++i)
 		(*b) << input[i];
 
@@ -743,5 +743,27 @@ BOOST_AUTO_TEST_CASE( UInt64ByteOrderingTest )
 	BOOST_CHECK(value_in_hex[6] == 0xBB);
 	BOOST_CHECK(value_in_hex[7] == 0xFF);
 }
+
+BOOST_AUTO_TEST_CASE( SerializableBufferTest )
+{
+	std::map<std::string, Buffer> input;
+	std::map<std::string, Buffer> output;
+	Buffer a(32); int input_data_a = 1234; BOOST_REQUIRE_NO_THROW(a << input_data_a);
+	Buffer b(32); float input_data_b = 23145.0f; BOOST_REQUIRE_NO_THROW(b << input_data_b);
+	Buffer c(32); double input_data_c = 65655.0; BOOST_REQUIRE_NO_THROW(c << input_data_c);
+	input.insert(std::make_pair("test_key_a", a));
+	input.insert(std::make_pair("test_key_b", b));
+	input.insert(std::make_pair("test_key_c", c));
+
+
+	Buffer t(256);
+	BOOST_REQUIRE_NO_THROW(t << input);
+	BOOST_REQUIRE_NO_THROW(t >> output);
+
+	int output_data_a; BOOST_REQUIRE_NO_THROW(output["test_key_a"] >> output_data_a); BOOST_CHECK(input_data_a == output_data_a);
+	float output_data_b; BOOST_REQUIRE_NO_THROW(output["test_key_b"] >> output_data_b); BOOST_CHECK(input_data_b == output_data_b);
+	double output_data_c; BOOST_REQUIRE_NO_THROW(output["test_key_c"] >> output_data_c); BOOST_CHECK(input_data_c == output_data_c);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

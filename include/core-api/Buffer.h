@@ -32,6 +32,10 @@
 #include <boost/array.hpp>
 #include <boost/thread.hpp>
 
+#ifndef ZILLIANS_BUFFER_DEFAULT_SIZE
+#define ZILLIANS_BUFFER_DEFAULT_SIZE	128
+#endif
+
 namespace zillians {
 
 namespace detail {
@@ -96,6 +100,31 @@ struct is_std_string< std::basic_string<_CharT, _Traits, _Alloc> >
 	enum { value = true };
 };
 
+uint32 round_up_to_nearest_power_of_two(uint32 v)
+{
+	v--;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+	v++;
+	return v;
+}
+
+uint64 round_up_to_nearest_power_of_two(uint64 v)
+{
+	v--;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+	v |= v >> 32;
+	v++;
+	return v;
+}
+
 }
 
 /**
@@ -149,38 +178,39 @@ class Buffer : public ConcurrentObjectPool<Buffer>
 	struct is_builtin_types
 	{
 		enum { value =
-			boost::is_same<T, bool>::value ||
-			boost::is_same<T, char>::value ||
-			boost::is_same<T, short>::value ||
-			boost::is_same<T, int>::value ||
-			boost::is_same<T, long>::value ||
-			boost::is_same<T, long long>::value ||
-			boost::is_same<T, unsigned char>::value ||
-			boost::is_same<T, unsigned short>::value ||
-			boost::is_same<T, unsigned int>::value ||
-			boost::is_same<T, unsigned long>::value ||
-			boost::is_same<T, unsigned long long>::value ||
-			boost::is_same<T, int8>::value ||
-			boost::is_same<T, uint8>::value ||
-			boost::is_same<T, int16>::value ||
-			boost::is_same<T, uint16>::value ||
-			boost::is_same<T, int32>::value ||
-			boost::is_same<T, uint32>::value ||
-			boost::is_same<T, int64>::value ||
-			boost::is_same<T, uint64>::value ||
-			boost::is_same<T, std::size_t>::value ||
-			boost::is_same<T, float>::value ||
-			boost::is_same<T, double>::value ||
-			boost::is_same<T, std::string>::value ||
-			boost::is_same<T, UUID>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, bool>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, char>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, short>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, int>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, long>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, long long>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, unsigned char>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, unsigned short>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, unsigned int>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, unsigned long>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, unsigned long long>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, int8>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, uint8>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, int16>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, uint16>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, int32>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, uint32>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, int64>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, uint64>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, std::size_t>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, float>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, double>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, std::string>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, UUID>::value ||
 			boost::is_same<T, char*>::value ||
+			boost::is_same<T, const char*>::value ||
 			boost::is_array<T>::value ||
 			detail::is_vector<T>::value ||
 			detail::is_std_list<T>::value ||
 			detail::is_std_map<T>::value ||
 			detail::is_boost_array<T>::value ||
-			boost::is_same<T, boost::system::error_code>::value ||
-			boost::is_same<T, Buffer>::value
+			boost::is_same<typename boost::remove_const<T>::type, boost::system::error_code>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, Buffer>::value
 			};
 	};
 
@@ -223,6 +253,16 @@ class Buffer : public ConcurrentObjectPool<Buffer>
 	};
 
 public:
+	Buffer()
+	{
+		mOwner = true; mReadOnly = false; mOnDemand = true;
+		mData = NULL;
+		mAllocatedSize = 0;
+		mReadPos = mWritePos = 0;
+		mReadPosMarked = mWritePosMarked = 0;
+
+	}
+
 	/**
 	 * Construct a Buffer object with specific size.
 	 *
@@ -233,8 +273,9 @@ public:
 	 */
 	Buffer(std::size_t size)
 	{
-		mOwner = true; mReadOnly = false;
-		mData = new char[size];
+		BOOST_ASSERT(size > 0);
+		mOwner = true; mReadOnly = false; mOnDemand = false;
+		mData = (byte*)malloc(size);
 		mAllocatedSize = size;
 		mReadPos = mWritePos = 0;
 		mReadPosMarked = mWritePosMarked = 0;
@@ -251,7 +292,7 @@ public:
 	 */
 	Buffer(byte* data, std::size_t size)
 	{
-		mOwner = false; mReadOnly = false;
+		mOwner = false; mReadOnly = false; mOnDemand = false;
 		mData = data;
 		mAllocatedSize = size;
 		mReadPos = mWritePos = 0;
@@ -273,7 +314,7 @@ public:
 	 */
 	Buffer(const byte* data, std::size_t size)
 	{
-		mOwner = false; mReadOnly = true;
+		mOwner = false; mReadOnly = true; mOnDemand = false;
 		mData = (byte*)data;
 		mAllocatedSize = size;
 		mReadPos = mWritePos = 0;
@@ -292,7 +333,54 @@ public:
 		{
 			mOwner = true;
 			mReadOnly = false;
-			mData = new char[buffer.mAllocatedSize];
+			mOnDemand = buffer.mOnDemand;
+			mData = (byte*)malloc(buffer.mAllocatedSize);
+			mAllocatedSize = buffer.mAllocatedSize;
+			mReadPos = buffer.mReadPos;
+			mWritePos = buffer.mWritePos;
+			mReadPosMarked = buffer.mReadPosMarked;
+			mWritePosMarked = buffer.mWritePosMarked;
+
+			::memcpy(mData, buffer.mData, buffer.mAllocatedSize);
+		}
+		else
+		{
+			mOwner = false;
+			mReadOnly = buffer.mReadOnly;
+			mOnDemand = buffer.mOnDemand;
+			mData = buffer.mData;
+			mAllocatedSize = buffer.mAllocatedSize;
+			mReadPos = buffer.mReadPos;
+			mWritePos = buffer.mWritePos;
+			mReadPosMarked = buffer.mReadPosMarked;
+			mWritePosMarked = buffer.mWritePosMarked;
+		}
+	}
+
+	/**
+	 * @brief Destruct the Buffer object.
+	 */
+	~Buffer()
+	{
+		if(mOwner && mData)
+		{
+			free((void*)mData); mData = NULL;
+		}
+	}
+
+public:
+	Buffer& operator = (const Buffer& buffer)
+	{
+		if(mOwner)
+		{
+			SAFE_DELETE_ARRAY(mData);
+		}
+
+		if(buffer.mOwner)
+		{
+			mOwner = true;
+			mReadOnly = false;
+			mData = (byte*)malloc(buffer.mAllocatedSize);
 			mAllocatedSize = buffer.mAllocatedSize;
 			mReadPos = buffer.mReadPos;
 			mWritePos = buffer.mWritePos;
@@ -312,17 +400,8 @@ public:
 			mReadPosMarked = buffer.mReadPosMarked;
 			mWritePosMarked = buffer.mWritePosMarked;
 		}
-	}
 
-	/**
-	 * @brief Destruct the Buffer object.
-	 */
-	~Buffer()
-	{
-		if(mOwner)
-		{
-			SAFE_DELETE_ARRAY(mData);
-		}
+		return *this;
 	}
 
 public:
@@ -1637,7 +1716,15 @@ public:
 	inline void writeDirect(const T& t)
 	{
 		BOOST_ASSERT(!mReadOnly);
-		BOOST_ASSERT(mAllocatedSize >= mWritePos + sizeof(T));
+		if(!mOnDemand)
+		{
+			BOOST_ASSERT(mAllocatedSize >= mWritePos + sizeof(T));
+		}
+		else if(mAllocatedSize < mWritePos + sizeof(T))
+		{
+			std::size_t s = mWritePos + sizeof(T);
+			resize(detail::round_up_to_nearest_power_of_two(s));
+		}
 
 		setDirect(t, mWritePos);
 
@@ -1653,7 +1740,15 @@ public:
 	inline void writeArray(const char* source, std::size_t size)
 	{
 		BOOST_ASSERT(!mReadOnly);
-		BOOST_ASSERT(mAllocatedSize >= mWritePos + size);
+		if(!mOnDemand)
+		{
+			BOOST_ASSERT(mAllocatedSize >= mWritePos + size);
+		}
+		else if(mAllocatedSize < mWritePos + size)
+		{
+			std::size_t s = mWritePos + size;
+			resize(detail::round_up_to_nearest_power_of_two(s));
+		}
 
 		setArray(source, mWritePos, size);
 
@@ -1755,6 +1850,15 @@ public:
 		source.rskip(size);
 	}
 
+	inline void resize(std::size_t size)
+	{
+		BOOST_ASSERT(mOnDemand);
+		BOOST_ASSERT(size > mAllocatedSize);
+
+		mData = (byte*)realloc((void*)mData, size);
+		mAllocatedSize = size;
+	}
+
 public:
 	/**
 	 * @brief Directly byte-level access to the buffer.
@@ -1843,6 +1947,7 @@ private:
 
 	bool mOwner;
 	bool mReadOnly;
+	bool mOnDemand;
 
 	std::size_t mReadPos;
 	std::size_t mWritePos;
