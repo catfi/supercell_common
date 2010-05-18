@@ -41,13 +41,13 @@ namespace zillians {
 namespace detail {
 
 template<typename T>
-struct is_vector
+struct is_std_vector
 {
 	enum { value = false };
 };
 
 template<typename T>
-struct is_vector<std::vector<T> >
+struct is_std_vector<std::vector<T> >
 {
 	enum { value = true };
 };
@@ -160,7 +160,7 @@ class Buffer : public ConcurrentObjectPool<Buffer>
 		enum { value =
 			boost::is_same<T, std::string>::value ||
 			boost::is_same<T, char*>::value ||
-			detail::is_vector<T>::value ||
+			detail::is_std_vector<T>::value ||
 			detail::is_std_list<T>::value ||
 			detail::is_std_map<T>::value ||
 			boost::is_same<T, Buffer>::value
@@ -205,7 +205,7 @@ class Buffer : public ConcurrentObjectPool<Buffer>
 			boost::is_same<T, char*>::value ||
 			boost::is_same<T, const char*>::value ||
 			boost::is_array<T>::value ||
-			detail::is_vector<T>::value ||
+			detail::is_std_vector<T>::value ||
 			detail::is_std_list<T>::value ||
 			detail::is_std_map<T>::value ||
 			detail::is_boost_array<T>::value ||
@@ -357,6 +357,34 @@ public:
 		}
 	}
 
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	Buffer(Buffer&& buffer)
+	{
+		if(this == &buffer)
+			return;
+
+		mOwner = buffer.mOwner;
+		mReadOnly = buffer.mReadOnly;
+		mOnDemand = buffer.mOnDemand;
+		mData = buffer.mData;
+		mAllocatedSize = buffer.mAllocatedSize;
+		mReadPos = buffer.mReadPos;
+		mWritePos = buffer.mWritePos;
+		mReadPosMarked = buffer.mReadPosMarked;
+		mWritePosMarked = buffer.mWritePosMarked;
+
+		buffer.mOwner = false;
+		buffer.mReadOnly = false;
+		buffer.mOnDemand = false;
+		buffer.mData = NULL;
+		buffer.mAllocatedSize = 0;
+		buffer.mReadPos = 0;
+		buffer.mWritePos = 0;
+		buffer.mReadPosMarked = 0;
+		buffer.mWritePosMarked = 0;
+	}
+#endif
+
 	/**
 	 * @brief Destruct the Buffer object.
 	 */
@@ -371,9 +399,9 @@ public:
 public:
 	Buffer& operator = (const Buffer& buffer)
 	{
-		if(mOwner)
+		if(mOwner && mData)
 		{
-			SAFE_DELETE_ARRAY(mData);
+			free((void*)mData); mData = NULL;
 		}
 
 		if(buffer.mOwner)
@@ -403,6 +431,41 @@ public:
 
 		return *this;
 	}
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	Buffer& operator = (Buffer&& buffer)
+	{
+		if(this == &buffer)
+			return *this;
+
+		if(mOwner && mData)
+		{
+			free((void*)mData); mData = NULL;
+		}
+
+		mOwner = buffer.mOwner;
+		mReadOnly = buffer.mReadOnly;
+		mOnDemand = buffer.mOnDemand;
+		mData = buffer.mData;
+		mAllocatedSize = buffer.mAllocatedSize;
+		mReadPos = buffer.mReadPos;
+		mWritePos = buffer.mWritePos;
+		mReadPosMarked = buffer.mReadPosMarked;
+		mWritePosMarked = buffer.mWritePosMarked;
+
+		buffer.mOwner = false;
+		buffer.mReadOnly = false;
+		buffer.mOnDemand = false;
+		buffer.mData = NULL;
+		buffer.mAllocatedSize = 0;
+		buffer.mReadPos = 0;
+		buffer.mWritePos = 0;
+		buffer.mReadPosMarked = 0;
+		buffer.mWritePosMarked = 0;
+
+		return *this;
+	}
+#endif
 
 public:
 	/**
@@ -927,6 +990,11 @@ public:
 			mBuffer.read(v);
 		}
 
+		inline void skip(std::size_t size)
+		{
+			mBuffer.rskip(size);
+		}
+
 		Buffer& buffer() { return mBuffer; }
 
 		Buffer& mBuffer;
@@ -1349,6 +1417,11 @@ public:
 		inline void operator & (const T& v)
 		{
 			mBuffer.write(v);
+		}
+
+		inline void skip(std::size_t size)
+		{
+			mBuffer.wskip(size);
 		}
 
 		Buffer& buffer() { return mBuffer; }
