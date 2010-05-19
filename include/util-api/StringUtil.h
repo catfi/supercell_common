@@ -74,8 +74,113 @@ public:
 	}
 };
 
+/*
+struct StringHasher
+{
+	inline static size_t hash(const std::string& str)
+	{
+		size_t s;
+		const char* data = str.data();
+		for(size_t i = 0; i < str.length(); ++i)
+		{
+			s += data[i];
+		}
+		return s;
+	}
+
+	inline static bool equal( const std::string& x, const std::string& y )
+    {
+    	return (x == y);
+    }
+};
+
+extern std::size_t hash_value(const std::string& __x);
+
+#ifdef __PLATFORM_LINUX__
+namespace __gnu_cxx
+{
+	template<>
+	struct hash<std::string>
+	{
+		size_t operator()(const std::string& __x) const
+		{
+			return StringHasher::hash(__x);
+		}
+	};
+}
+#else
+namespace stdext
+{
+	template<>
+	struct hash_compare<std::string>
+	{
+		size_t operator()(const std::string& __x) const
+		{
+			return StringHasher::hash(__x);
+		}
+
+		bool operator()(const std::string& v1, const std::string& v2) const
+		{
+			return (v1 == v2) ? true : false;
+		}
+	};
+}
+#endif
 
 
+struct WStringHasher
+{
+	inline static size_t hash(const std::wstring& str)
+	{
+		size_t s;
+		const wchar_t* data = str.data();
+		for(size_t i = 0; i < str.length(); ++i)
+		{
+			s += data[i];
+		}
+		return s;
+	}
+
+	inline static bool equal( const std::wstring& x, const std::wstring& y )
+    {
+    	return (x == y);
+    }
+};
+
+extern std::size_t hash_value(const std::wstring& __x);
+
+#ifdef __PLATFORM_LINUX__
+namespace __gnu_cxx
+{
+	template<>
+	struct hash<std::wstring>
+	{
+		size_t operator()(const std::wstring& __x) const
+		{
+			return WStringHasher::hash(__x);
+		}
+	};
+}
+#else
+namespace stdext
+{
+	template<>
+	struct hash_compare<std::wstring>
+	{
+		size_t operator()(const std::wstring& __x) const
+		{
+			return WStringHasher::hash(__x);
+		}
+
+		bool operator()(const std::wstring& v1, const std::wstring& v2) const
+		{
+			return (v1 == v2) ? true : false;
+		}
+	};
+}
+#endif
+
+*/
 }
 
 #endif/*ZILLIANS_STRINGUTIL_H_*/

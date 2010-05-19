@@ -24,6 +24,7 @@
 #include "core-api/ObjectPool.h"
 #include "core-api/SharedPtr.h"
 #include "util-api/UUIDUtil.h"
+#include "util-api/BitTrickUtil.h"
 
 #include <boost/type_traits.hpp>
 #include <boost/mpl/bool.hpp>
@@ -99,31 +100,6 @@ struct is_std_string< std::basic_string<_CharT, _Traits, _Alloc> >
 {
 	enum { value = true };
 };
-
-uint32 round_up_to_nearest_power_of_two(uint32 v)
-{
-	v--;
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
-	v++;
-	return v;
-}
-
-uint64 round_up_to_nearest_power_of_two(uint64 v)
-{
-	v--;
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
-	v |= v >> 32;
-	v++;
-	return v;
-}
 
 }
 
@@ -360,9 +336,6 @@ public:
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 	Buffer(Buffer&& buffer)
 	{
-		if(this == &buffer)
-			return;
-
 		mOwner = buffer.mOwner;
 		mReadOnly = buffer.mReadOnly;
 		mOnDemand = buffer.mOnDemand;
@@ -1796,7 +1769,7 @@ public:
 		else if(mAllocatedSize < mWritePos + sizeof(T))
 		{
 			std::size_t s = mWritePos + sizeof(T);
-			resize(detail::round_up_to_nearest_power_of_two(s));
+			resize(round_up_to_nearest_power_of_two(s));
 		}
 
 		setDirect(t, mWritePos);
@@ -1820,7 +1793,7 @@ public:
 		else if(mAllocatedSize < mWritePos + size)
 		{
 			std::size_t s = mWritePos + size;
-			resize(detail::round_up_to_nearest_power_of_two(s));
+			resize(round_up_to_nearest_power_of_two(s));
 		}
 
 		setArray(source, mWritePos, size);

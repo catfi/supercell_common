@@ -27,5 +27,6 @@ ADD_LIBRARY(zillians-common-core-api
     )
     
 TARGET_LINK_LIBRARIES(zillians-common-core-api
+    zillians-common-util-api
 	${ZILLIANS_DEP_LIBS}
 	)

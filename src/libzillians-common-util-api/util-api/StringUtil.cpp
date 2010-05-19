@@ -130,4 +130,15 @@ std::vector<std::wstring> StringUtil::tokenize(const std::wstring& str, const st
 	return tokens;
 }// tokenize(wstring)
 
+/*
+std::size_t hash_value(const std::string& __x)
+{
+	return StringHasher::hash(__x);
+}
+
+std::size_t hash_value(const std::wstring& __x)
+{
+	return WStringHasher::hash(__x);
+}
+*/
 }

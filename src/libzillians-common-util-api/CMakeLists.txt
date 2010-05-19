@@ -22,6 +22,7 @@
 INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
 
 ADD_LIBRARY(zillians-common-util-api
+    util-api/BitTrickUtil.cpp
 	util-api/StringUtil.cpp
 	util-api/UUIDUtil.cpp
     )
