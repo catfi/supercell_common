@@ -765,5 +765,92 @@ BOOST_AUTO_TEST_CASE( SerializableBufferTest )
 	double output_data_c; BOOST_REQUIRE_NO_THROW(output["test_key_c"] >> output_data_c); BOOST_CHECK(input_data_c == output_data_c);
 }
 
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+BOOST_AUTO_TEST_CASE( BufferMoveSemanticsTest )
+{
+	Buffer a(128);
+	Buffer b = a;
+
+	byte* rptr_a = a.rptr();
+	byte* rptr_b = b.rptr();
+	BOOST_CHECK(rptr_a != rptr_b);
+
+	Buffer c = std::move(a);
+	byte* rptr_c = c.rptr();
+	BOOST_CHECK(rptr_c == rptr_a);
+
+	c = std::move(c);
+	byte* rptr_c_copy_self = c.rptr();
+	BOOST_CHECK(rptr_c == rptr_c_copy_self);
+
+	Buffer d(256); d = std::move(c);
+	BOOST_CHECK(d.allocatedSize() == 128);
+}
+#endif
+
+struct ArbitraryContext
+{
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar & dummy1;
+		ar & dummy2;
+		ar & dummy3;
+		ar & dummy4;
+		ar & dummy5;
+	}
+
+	inline bool operator== (const ArbitraryContext& other) const
+	{
+		if(other.dummy1 != dummy1)	return false;
+		if(other.dummy2 != dummy2)	return false;
+		if(other.dummy3 != dummy3)	return false;
+		if(other.dummy4 != dummy4)	return false;
+		if(other.dummy5 != dummy5)	return false;
+		return true;
+	}
+
+	int dummy1;
+	float dummy2;
+	double dummy3;
+	bool dummy4;
+	std::string dummy5;
+};
+
+BOOST_AUTO_TEST_CASE( BufferOnDemandResizingTest )
+{
+	ArbitraryContext input;
+	input.dummy1 = 123;
+	input.dummy2 = 456.0f;
+	input.dummy3 = 789.0;
+	input.dummy4 = false;
+	input.dummy5 = "TEST!!!!";
+
+	{
+		Buffer b;
+		b << input;
+
+		BOOST_CHECK(b.dataSize() >= Buffer::probeSize(input));
+		BOOST_CHECK(b.allocatedSize() >= Buffer::probeSize(input));
+
+		ArbitraryContext output;
+		b >> output;
+
+		BOOST_CHECK(input == output);
+	}
+
+	{
+		Buffer b;
+		b << input << input;
+
+		BOOST_CHECK(b.dataSize() >= Buffer::probeSize(input) * 2);
+		BOOST_CHECK(b.allocatedSize() >= Buffer::probeSize(input) * 2);
+
+		ArbitraryContext output;
+		b >> output >> output;
+
+		BOOST_CHECK(input == output);
+	}
+}
 
 BOOST_AUTO_TEST_SUITE_END()
