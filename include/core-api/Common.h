@@ -37,6 +37,7 @@
 #include <map>
 #include <queue>
 #include <list>
+#include <algorithm>
 
 #ifdef _WIN32
 #include <xutility>
