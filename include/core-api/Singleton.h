@@ -51,7 +51,13 @@ public:
 #endif
 	}
 
-	~Singleton() { }
+	~Singleton()
+	{
+		if(AUTO)
+		{
+			SAFE_DELETE(mInstance);
+		}
+	}
 
 public:
 	static T* instance()
