@@ -53,7 +53,7 @@ ELSE()
     MESSAGE(STATUS "TICPP not available, disabling build for Scylla part in libzillians-common-net-api")
 ENDIF()
 	
-IF(RDMA_FOUND)
+IF(RDMA_FOUND AND FALSE)
 	LIST(APPEND TEMPORARY_BUILD_LIST
 		net-api/rdma/address/InetAddress.cpp
 		net-api/rdma/address/InetSocketAddress.cpp
