@@ -59,19 +59,73 @@
 #define SAFE_DELETE_ARRAY(x) { if(!!(x)) delete[] (x); x = NULL; }
 
 //////////////////////////////////////////////////////////////////////////
-// GNU GCC branch prediction optimization
-// TODO: find cooresponding pragma in MSVC and other compiler
-//#ifdef __GNUC__
-//	#define LIKELY(x)   __builtin_expect(!!(x), 1)
-//	#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+/// Macros to support C++ visibility (supported after GCC 4.0 to reduce DSO performance)
+#if defined _WIN32 || defined __CYGWIN__
+	#ifdef BUILD_SHARED_LIBS
+		#ifdef __GNUC__
+			#define ZILLIANS_API __attribute__((dllexport))
+		#else
+			#define ZILLIANS_API __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+		#endif
+	#elif defined __GNUC__
+		#define ZILLIANS_API __attribute__((dllimport))
+	#else
+		#define ZILLIANS_API __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+	#endif
+	#define DLL_LOCAL
+#else
+	#if __GNUC__ >= 4
+		#define ZILLIANS_API 	__attribute__ ((visibility("default")))
+		#define ZILLIANS_LOCAL  __attribute__ ((visibility("hidden")))
+	#else
+		#define ZILLIANS_API
+		#define ZILLIANS_LOCAL
+	#endif
+#endif
+
+// Generic helper definitions for shared library support
+//#if defined _WIN32 || defined __CYGWIN__
+//	#define ZILLIANS_HELPER_DLL_IMPORT __declspec(dllimport)
+//	#define ZILLIANS_HELPER_DLL_EXPORT __declspec(dllexport)
+//	#define ZILLIANS_HELPER_DLL_LOCAL
 //#else
-	#define LIKELY(x) (x)
-	#define UNLIKELY(x) (x)
+//	#if __GNUC__ >= 4
+//		#define ZILLIANS_HELPER_DLL_IMPORT __attribute__ ((visibility("default")))
+//		#define ZILLIANS_HELPER_DLL_EXPORT __attribute__ ((visibility("default")))
+//		#define ZILLIANS_HELPER_DLL_LOCAL  __attribute__ ((visibility("hidden")))
+//	#else
+//		#define ZILLIANS_HELPER_DLL_IMPORT
+//		#define ZILLIANS_HELPER_DLL_EXPORT
+//		#define ZILLIANS_HELPER_DLL_LOCAL
+//	#endif
+//#endif
+//
+//#ifdef ZILLIANS_BUILD_DLL
+//  #ifdef ZILLIANS_DLL_EXPORTS
+//    #define API_DECL ZILLIANS_HELPER_DLL_EXPORT
+//  #else
+//    #define API_DECL ZILLIANS_HELPER_DLL_IMPORT
+//  #endif
+//  #define API_LOCAL_DECL ZILLIANS_HELPER_DLL_LOCAL
+//#else
+//  #define API_DECL
+//  #define API_LOCAL_DECL
 //#endif
 
 //////////////////////////////////////////////////////////////////////////
-/// Enable/Disable template separation model compiliation
-/// NOTE: currently there's no GNU compiler support for separation compiliation model
+// GNU GCC branch prediction optimization
+// TODO: find cooresponding pragma in MSVC and other compiler
+#ifdef __GNUC__
+	#define LIKELY(x)   __builtin_expect(!!(x), 1)
+	#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+	#define LIKELY(x) (x)
+	#define UNLIKELY(x) (x)
+#endif
+
+//////////////////////////////////////////////////////////////////////////
+/// Enable/Disable template separation model compilation
+/// NOTE: currently there's no GNU compiler support for separation compilation model
 //#define ZN_ENABLE_TEMPLATE_SEPARATION_MODEL
 
 //////////////////////////////////////////////////////////////////////////
