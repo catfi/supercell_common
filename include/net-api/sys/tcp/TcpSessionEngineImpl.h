@@ -39,7 +39,7 @@ namespace zillians { namespace net { namespace sys {
 template <>
 class SessionEngineT< boost::asio::ip::tcp >
 {
-private:
+public:
 	typedef boost::asio::ip::tcp Protocol;
 	typedef boost::asio::io_service IoService;
 	typedef Protocol::endpoint Endpoint;
@@ -50,6 +50,8 @@ private:
 
 	typedef boost::function< void (Session&) > CloseCallback;
 	typedef boost::function< void (Session&, const boost::system::error_code&) > ErrorCallback;
+
+private:
 	struct DispatcherContext
 	{
 		SharedPtr<Buffer> buffer;
