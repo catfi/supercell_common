@@ -37,7 +37,7 @@ log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("zillians.common.core-api.B
 
 volatile bool gTerminated = false;
 
-void ThreadReader(volatile int* counter, SharedPtr<BiMap<int, UUID> > map)
+void ThreadReader(volatile int* counter, boost::shared_ptr<BiMap<int, UUID> > map)
 {
 	LOG4CXX_INFO(logger, "Thread ID: " << tbb::this_tbb_thread::get_id());
 
@@ -67,7 +67,7 @@ void ThreadReader(volatile int* counter, SharedPtr<BiMap<int, UUID> > map)
 	LOG4CXX_INFO(logger, "Thread " << tbb::this_tbb_thread::get_id() << ": found: " << NUM_LOOKUP - missed << " missed: " << missed);
 }
 
-void ThreadWriter(volatile int* counter, SharedPtr<BiMap<int, UUID> > map)
+void ThreadWriter(volatile int* counter, boost::shared_ptr<BiMap<int, UUID> > map)
 {
 	while (!gTerminated)
 	{
@@ -89,7 +89,7 @@ int main()
 	srand(time(NULL));
 	log4cxx::BasicConfigurator::configure();
 	std::list<tbb::tbb_thread*> threads;
-	SharedPtr<BiMap<int, UUID> > map = SharedPtr<BiMap<int, UUID> >(new BiMap<int, UUID>());
+	boost::shared_ptr<BiMap<int, UUID> > map = boost::shared_ptr<BiMap<int, UUID> >(new BiMap<int, UUID>());
 	volatile int counter = 0;
 
 	LOG4CXX_INFO(logger, "NUM_THREAD: " << NUM_THREAD);

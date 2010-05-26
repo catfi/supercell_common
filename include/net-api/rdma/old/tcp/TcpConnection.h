@@ -48,25 +48,25 @@ public:
 	//////////////////////////////////////////////////////////////////////
 	//// Public Interfaces
 	//////////////////////////////////////////////////////////////////////
-	static SharedPtr<TcpConnection> create(TcpNetEngine* engine, handle_t id)
+	static shared_ptr<TcpConnection> create(TcpNetEngine* engine, handle_t id)
 	{
-		SharedPtr<TcpConnection> p(new TcpConnection(engine, id));
+		shared_ptr<TcpConnection> p(new TcpConnection(engine, id));
 		p->mWeakThis = p;
 		return p;
 	}
 
 	inline HandleType getHandle() {	return mSocket; }
 
-	SharedPtr<Buffer> createBuffer(size_t size);
-	bool send(uint32 type, SharedPtr<Buffer> buffer);
+	shared_ptr<Buffer> createBuffer(size_t size);
+	bool send(uint32 type, shared_ptr<Buffer> buffer);
 
 	void close();
 
 	void setTimeout(int32 ms);
 
 	inline void resetContext() { mContext.reset(); }
-	inline void setContext(SharedPtr<void> context) { mContext = context; }
-	inline SharedPtr<void> getContext() { return mContext; }
+	inline void setContext(shared_ptr<void> context) { mContext = context; }
+	inline shared_ptr<void> getContext() { return mContext; }
 
 	//////////////////////////////////////////////////////////////////////
 	//// Parameter Adjust
@@ -75,8 +75,8 @@ public:
 	void setMaxSendInFlight(int32 maxSendInFlight);
 
 private:
-	bool directSend(uint32 type, SharedPtr<Buffer> buffer);
-	bool queueSend(uint32 type, SharedPtr<Buffer> buffer);
+	bool directSend(uint32 type, shared_ptr<Buffer> buffer);
+	bool queueSend(uint32 type, shared_ptr<Buffer> buffer);
 
 public:
 	void handleDeviceRead(ev::io &w, int revent);
@@ -90,7 +90,7 @@ private:
 	bool requestSend();
 
 private:
-	void start(SharedPtr<Poller> poller);
+	void start(shared_ptr<Poller> poller);
 	void stop();
 
 private:
@@ -98,7 +98,7 @@ private:
 	{
 		uint32 processed;
 		byte header[TCP_DEFAULT_BUFFER_HEADER_SIZE];
-		SharedPtr<Buffer> buffer;
+		shared_ptr<Buffer> buffer;
 	};
 
 	typedef std::vector<SendRequest> RequestQueue;
@@ -121,17 +121,17 @@ private:
 	TcpNetEngine* mEngine;
 	WeakPtr<TcpConnection> mWeakThis;
 
-    SharedPtr<Poller> mPoller;
+	shared_ptr<Poller> mPoller;
     bool mConnected;
 
-    SharedPtr<Buffer> mReadBuffer;
+    shared_ptr<Buffer> mReadBuffer;
 
     handle_t mSocket;
 
     uint32 mMaxIOVCount;
 	iovec* mIOV;
 
-	SharedPtr<void> mContext;
+	shared_ptr<void> mContext;
 };
 
 } }

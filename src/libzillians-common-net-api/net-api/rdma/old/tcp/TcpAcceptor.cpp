@@ -45,7 +45,7 @@ TcpAcceptor::~TcpAcceptor()
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool TcpAcceptor::accept(SharedPtr<Poller> poller, SharedPtr<InetSocketAddress> address, AcceptorCallback callback)
+bool TcpAcceptor::accept(shared_ptr<Poller> poller, shared_ptr<InetSocketAddress> address, AcceptorCallback callback)
 {
 	if(mAcceptInfo.handle != INVALID_HANDLE)
 	{
@@ -136,14 +136,14 @@ void TcpAcceptor::handleChannelEvent(ev::io &w, int revent)
 	if(UNLIKELY(conn_id == -1))
 	{
 		TCP_ERROR("accept failed, early TCP socket termination with invalid conn id, err = " << strerror(errno));
-		mAcceptorCallback(SharedPtr<TcpConnection>(), errno);
+		mAcceptorCallback(shared_ptr<TcpConnection>(), errno);
 		errno = 0;
 		return;
 	}
 	else if(UNLIKELY(errno > 0))
 	{
 		TCP_ERROR("accept failed, early TCP socket termination, err = " << strerror(errno));
-		mAcceptorCallback(SharedPtr<TcpConnection>(), errno);
+		mAcceptorCallback(shared_ptr<TcpConnection>(), errno);
 		::close(conn_id);
 		errno = 0;
 		return;
@@ -153,13 +153,13 @@ void TcpAcceptor::handleChannelEvent(ev::io &w, int revent)
 	if(fcntl(conn_id, F_SETFL, (fcntl(conn_id, F_GETFL, 0)) | O_NONBLOCK) == -1)
 	{
 		TCP_ERROR("fail to enable non-blocking I/O, err = " << strerror(errno));
-		mAcceptorCallback(SharedPtr<TcpConnection>(), errno);
+		mAcceptorCallback(shared_ptr<TcpConnection>(), errno);
 		::close(conn_id);
 		errno = 0;
 		return;
 	}
 
-	SharedPtr<TcpConnection> connection = TcpConnection::create(mEngine, conn_id);
+	shared_ptr<TcpConnection> connection = TcpConnection::create(mEngine, conn_id);
 	mEngine->addConnection(connection);
 
 	connection->start(mAcceptInfo.poller);
@@ -197,7 +197,7 @@ void TcpAcceptor::cancel()
 		mStatus = CANCELING;
 
 		// notify TcpNetEngine about the completion
-		SharedPtr<TcpAcceptor> shared_from_this(mWeakThis);
+		shared_ptr<TcpAcceptor> shared_from_this(mWeakThis);
 		mEngine->acceptorCompleted(shared_from_this);
 
 		cleanup();

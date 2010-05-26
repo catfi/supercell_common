@@ -46,23 +46,23 @@ class IBNetEngine;
 class IBConnector
 {
 public:
-	typedef boost::function2<void, SharedPtr< IBConnection >, int > ConnectorCallback;
+	typedef boost::function2<void, shared_ptr< IBConnection >, int > ConnectorCallback;
 
 public:
 	IBConnector(IBNetEngine* engine);
 	~IBConnector();
 
 public:
-	static SharedPtr<IBConnector> create(void* e)
+	static shared_ptr<IBConnector> create(void* e)
 	{
 		IBNetEngine* engine = reinterpret_cast<IBNetEngine*>(e);
-		SharedPtr<IBConnector> p(new IBConnector(engine));
+		shared_ptr<IBConnector> p(new IBConnector(engine));
 		p->mWeakThis = p;
 		return p;
 	}
 
 public:
-	bool connect(SharedPtr<Poller> poller, SharedPtr<InetSocketAddress> address, ConnectorCallback callback);
+	bool connect(shared_ptr<Poller> poller, shared_ptr<InetSocketAddress> address, ConnectorCallback callback);
 	void cancel();
 
 public:
@@ -99,9 +99,9 @@ private:
 	{
 		ev::io watcher;
 		ev::timer timeout;
-		SharedPtr<Poller> poller;
-		SharedPtr<rdma_event_channel> rchannel;
-		SharedPtr<rdma_cm_id> id;
+		shared_ptr<Poller> poller;
+		shared_ptr<rdma_event_channel> rchannel;
+		shared_ptr<rdma_cm_id> id;
 	} mConnectInfo;
 
 	WeakPtr<IBConnector> mWeakThis;

@@ -28,7 +28,7 @@ namespace zillians { namespace messaging {
 bool MessagingEngine::Remote::Remote()
 { }
 
-bool MessagingEngine::Remote::write(SharedPtr<Buffer> buffer)
+bool MessagingEngine::Remote::write(shared_ptr<Buffer> buffer)
 {
 	bool result = true;
 
@@ -65,7 +65,7 @@ bool MessagingEngine::Remote::write(SharedPtr<Buffer> buffer)
 	result = connection->writeDirect(wposCache, wposKey, 0);
 }
 
-bool MessagingEngine::Remote::sendControl(int32 type, SharedPtr<Buffer> buffer)
+bool MessagingEngine::Remote::sendControl(int32 type, shared_ptr<Buffer> buffer)
 {
 	return connection->send(type, buffer);
 }
@@ -74,7 +74,7 @@ bool MessagingEngine::Remote::sendControl(int32 type, SharedPtr<Buffer> buffer)
 std::size_t MessagingEngine::Local::Local()
 { }
 
-std::size_t MessagingEngine::Local::read(SharedPtr<Buffer> buffer)
+std::size_t MessagingEngine::Local::read(shared_ptr<Buffer> buffer)
 {
 	volatile uint64* wptr = wpos->rptr();
 	uint64 wposCurrent = *wptr;
@@ -100,7 +100,7 @@ std::size_t MessagingEngine::Local::read(SharedPtr<Buffer> buffer)
 	}
 }
 
-std::size_t MessagingEngine::Local::peek(SharedPtr<Buffer> buffer)
+std::size_t MessagingEngine::Local::peek(shared_ptr<Buffer> buffer)
 {
 
 }
@@ -124,11 +124,11 @@ void MessagingEngine::Local::getAvailableBufferRanges(std::vector<std::pair<void
 MessagingEngine::MessagingEngine(const std::string& localEndPoint)
 {
 	// create dispatcher
-	mDispatcher = SharedPtr<IBDispatcher>(new IBDispatcher());
+	mDispatcher = shared_ptr<IBDispatcher>(new IBDispatcher());
 
 	// register all internal message types
 	{
-		SharedPtr<IBDataHandlerBinder> dataHandler(
+		shared_ptr<IBDataHandlerBinder> dataHandler(
 				new IBDataHandlerBinder(
 						boost::bind(
 								MessagingEngine::handleQueueInfoExchangeRequest, this,
@@ -140,7 +140,7 @@ MessagingEngine::MessagingEngine(const std::string& localEndPoint)
 	}
 
 	{
-		SharedPtr<IBDataHandlerBinder> dataHandler(
+		shared_ptr<IBDataHandlerBinder> dataHandler(
 				new IBDataHandlerBinder(
 						boost::bind(
 								MessagingEngine::handleQueueInfoExchangeResponse, this,
@@ -152,7 +152,7 @@ MessagingEngine::MessagingEngine(const std::string& localEndPoint)
 	}
 
 	{
-		SharedPtr<IBDataHandlerBinder> dataHandler(
+		shared_ptr<IBDataHandlerBinder> dataHandler(
 				new IBDataHandlerBinder(
 						boost::bind(
 								MessagingEngine::handleEnableAtomicMsgRequest, this,
@@ -164,7 +164,7 @@ MessagingEngine::MessagingEngine(const std::string& localEndPoint)
 	}
 
 	{
-		SharedPtr<IBDataHandlerBinder> dataHandler(
+		shared_ptr<IBDataHandlerBinder> dataHandler(
 				new IBDataHandlerBinder(
 						boost::bind(
 								MessagingEngine::handleEnableAtomicMsgResponse, this,
@@ -176,10 +176,10 @@ MessagingEngine::MessagingEngine(const std::string& localEndPoint)
 	}
 
 	// create poller to poll for event for RDMA
-	mPoller     = SharedPtr<Poller>(new Poller(ev_loop_new(0)));
+	mPoller     = shared_ptr<Poller>(new Poller(ev_loop_new(0)));
 
 	// create RDMA engine with the dispatcher and poller
-	mEngine     = SharedPtr<IBNetEngine>(new IBNetEngine());
+	mEngine     = shared_ptr<IBNetEngine>(new IBNetEngine());
 	mEngine->setDispatcher(mDispatcher);
 
 	// start accepting connection using the default RDMA engine and poller
@@ -200,7 +200,7 @@ MessagingEngine::~MessagingEngine()
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool MessagingEngine::createRemote(const std::string& name, /*OUT*/ SharedPtr<Remote>& remote)
+bool MessagingEngine::createRemote(const std::string& name, /*OUT*/ shared_ptr<Remote>& remote)
 {
 	// create a connection context, which will be associated with the newly created connection later, and store some info there
 	ConnectionContext *context = new ConnectionContext;
@@ -216,7 +216,7 @@ bool MessagingEngine::createRemote(const std::string& name, /*OUT*/ SharedPtr<Re
 
 	if(result)
 	{
-		hash_map<std::string, SharedPtr<Remote> >::iterator it = mRemoteInfos.find(name);
+		hash_map<std::string, shared_ptr<Remote> >::iterator it = mRemoteInfos.find(name);
 
 		BOOST_ASSERT(it != mRemoteInfos.end());
 
@@ -228,15 +228,15 @@ bool MessagingEngine::createRemote(const std::string& name, /*OUT*/ SharedPtr<Re
 	return result;
 }
 
-bool MessagingEngine::createLocal(const std::string& name, SharedPtr<Buffer> buffer, /*OUT*/ SharedPtr<Local>& local)
+bool MessagingEngine::createLocal(const std::string& name, shared_ptr<Buffer> buffer, /*OUT*/ shared_ptr<Local>& local)
 {
 	// check for duplicated local queue name
-	hash_map<std::string, SharedPtr<Local> >::const_iterator it = mLocalInfos.find(name);
+	hash_map<std::string, shared_ptr<Local> >::const_iterator it = mLocalInfos.find(name);
 	if(it != mLocalInfos.end())
 		return false;
 
 	// create local queue
-	local = SharedPtr<Local>(new Local);
+	local = shared_ptr<Local>(new Local);
 	local->name = name;
 	local->rpos = IBBufferManager::instance()->createBuffer(sizeof(uint64));
 	local->wpos = IBBufferManager::instance()->createBuffer(sizeof(uint64));
@@ -253,7 +253,7 @@ bool MessagingEngine::createLocal(const std::string& name, SharedPtr<Buffer> buf
 }
 
 //////////////////////////////////////////////////////////////////////////
-void MessagingEngine::registerDefaultControlHandler(SharedPtr<ControlHandler> Handler)
+void MessagingEngine::registerDefaultControlHandler(shared_ptr<ControlHandler> Handler)
 {
 	mControlHandler.def = Handler;
 }
@@ -263,7 +263,7 @@ void MessagingEngine::unregisterDefaultControlHandler()
 	mControlHandler.def.reset();
 }
 
-void MessagingEngine::registerControlHandler(int32 type, SharedPtr<ControlHandler> Handler)
+void MessagingEngine::registerControlHandler(int32 type, shared_ptr<ControlHandler> Handler)
 {
 	mControlHandler.map[type] = Handler;
 }
@@ -282,18 +282,18 @@ void MessagingEngine::unregisterControlHandler(int32 type)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void MessagingEngine::handleAcceptorCompleted(SharedPtr<IBConnection> connection, int err)
+void MessagingEngine::handleAcceptorCompleted(shared_ptr<IBConnection> connection, int err)
 {
 
 }
 
-void MessagingEngine::handleConnectorCompleted(SharedPtr<IBConnection> connection, int err, ConnectionContext *context)
+void MessagingEngine::handleConnectorCompleted(shared_ptr<IBConnection> connection, int err, ConnectionContext *context)
 {
 	// if the connection was established successfully
 	if(err == 0)
 	{
 		// prepare the "queue info exchange request message"
-		SharedPtr<Buffer> buffer = IBBufferManager::instance()->createBuffer(Buffer::probeSize(QueueInfoExchangeMsg::Request));
+		shared_ptr<Buffer> buffer = IBBufferManager::instance()->createBuffer(Buffer::probeSize(QueueInfoExchangeMsg::Request));
 
 		QueueInfoExchangeMsg::Request req;
 		req.queueIndex = remoteQueueIndex;
@@ -308,18 +308,18 @@ void MessagingEngine::handleConnectorCompleted(SharedPtr<IBConnection> connectio
 	}
 }
 
-void MessagingEngine::handleConnected(SharedPtr<IBConnection> connection)
+void MessagingEngine::handleConnected(shared_ptr<IBConnection> connection)
 {
 	// do nothing
 }
 
-void MessagingEngine::handleDisconnected(SharedPtr<IBConnection> connection)
+void MessagingEngine::handleDisconnected(shared_ptr<IBConnection> connection)
 {
 	// do nothing
 }
 
 //////////////////////////////////////////////////////////////////////////
-void MessagingEngine::handleQueueInfoExchangeRequest(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<IBConnection> connection)
+void MessagingEngine::handleQueueInfoExchangeRequest(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<IBConnection> connection)
 {
 	BOOST_ASSERT(type == QueueInfoExchangeMsg::Request::TYPE);
 
@@ -332,7 +332,7 @@ void MessagingEngine::handleQueueInfoExchangeRequest(uint32 type, SharedPtr<Buff
 	hash_map<uint32, Local*>::iterator it = mLocalInfos.find(req.queueName);
 	if(it != mLocalInfos.end())
 	{
-		SharedPtr<Buffer> buffer = IBBufferManager::instance()->createBuffer(Buffer::probeSize(QueueInfoExchangeMsg::Request));
+		shared_ptr<Buffer> buffer = IBBufferManager::instance()->createBuffer(Buffer::probeSize(QueueInfoExchangeMsg::Request));
 
 		// register RMDA direct buffer and obtain sink id
 		it->second->bufferKey = connection->registrerDirect(it->second->buffer);
@@ -352,7 +352,7 @@ void MessagingEngine::handleQueueInfoExchangeRequest(uint32 type, SharedPtr<Buff
 		// failed to find the corresponding local queue info, send response back
 
 		// prepare the "queue info exchange response message"
-		SharedPtr<Buffer> buffer = IBBufferManager::instance()->createBuffer(Buffer::probeSize(QueueInfoExchangeMsg::Request));
+		shared_ptr<Buffer> buffer = IBBufferManager::instance()->createBuffer(Buffer::probeSize(QueueInfoExchangeMsg::Request));
 
 		QueueInfoExchangeMsg::Response res;
 		res.success = false;
@@ -364,7 +364,7 @@ void MessagingEngine::handleQueueInfoExchangeRequest(uint32 type, SharedPtr<Buff
 	}
 }
 
-void MessagingEngine::handleQueueInfoExchangeResponse(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<IBConnection> connection)
+void MessagingEngine::handleQueueInfoExchangeResponse(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<IBConnection> connection)
 {
 	// extract the "queue info exchange response message"
 	QueueInfoExchangeMsg::Response res;
@@ -377,7 +377,7 @@ void MessagingEngine::handleQueueInfoExchangeResponse(uint32 type, SharedPtr<Buf
 		// if the remote queue is found and request is handled successfully, create the remote queue info and save it into container
 		ConnectionContext* context = connection->get<ConnectionContext>();
 
-		SharedPtr<Remote> info(new Remote);
+		shared_ptr<Remote> info(new Remote);
 		info->name = context->name;
 		info->connection = connection;
 		info->bufferKey = res.bufferKey;

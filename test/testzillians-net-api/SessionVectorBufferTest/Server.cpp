@@ -124,13 +124,13 @@ void handle_message_write(const boost::system::error_code& ec)
 	//LOG4CXX_DEBUG(gLogger, "client #" << ctx->id << " complete message write");
 }
 
-void handle_buffer_read(TcpSession& session, uint32 type, SharedPtr<Buffer>& buffer, std::size_t size)
+void handle_buffer_read(TcpSession& session, uint32 type, shared_ptr<Buffer>& buffer, std::size_t size)
 {
 	client_context* ctx = session.getContext<client_context>();
 
 	try
 	{
-		std::vector< SharedPtr<Buffer> > buffers;
+		std::vector< shared_ptr<Buffer> > buffers;
 		buffers.push_back(buffer);
 		buffers.push_back(buffer);
 		session.writeAsync(type, buffers, boost::bind(handle_message_write, placeholders::error));

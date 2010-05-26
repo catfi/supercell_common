@@ -69,7 +69,7 @@ public:
 	~CloseProcessGroup();
 
 public:
-	bool send(uint32 type, SharedPtr<Buffer> buffer);
+	bool send(uint32 type, shared_ptr<Buffer> buffer);
 	bool join(const std::string& group);
 	bool leave(const std::string& group);
 	bool dispatch(bool blocking = true, bool one_or_all = true);

@@ -43,33 +43,33 @@ void RdmaNetEngineTestServer::run(std::string &address)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void RdmaNetEngineTestServer::onConnected(SharedPtr<RdmaConnection> connection)
+void RdmaNetEngineTestServer::onConnected(shared_ptr<RdmaConnection> connection)
 {
 	LOG4CXX_DEBUG(mLogger, "CONNECTED");
 
 	BufferInfo info;
 	info.length = 8192*1024;
 
-	SharedPtr<Buffer> rb = connection->createBuffer(info.length);
+	shared_ptr<Buffer> rb = connection->createBuffer(info.length);
 	info.id = connection->registrerDirect(rb);
 
-	SharedPtr<Buffer> b = connection->createBuffer(sizeof(info));
+	shared_ptr<Buffer> b = connection->createBuffer(sizeof(info));
 	b->writeAny(info);
 	connection->send(5, b);
 }
 
-void RdmaNetEngineTestServer::onDisconnected(SharedPtr<RdmaConnection> connection)
+void RdmaNetEngineTestServer::onDisconnected(shared_ptr<RdmaConnection> connection)
 {
 	LOG4CXX_DEBUG(mLogger, "DISCONNECTED");
 }
 
-void RdmaNetEngineTestServer::onError(SharedPtr<RdmaConnection> connection, int code)
+void RdmaNetEngineTestServer::onError(shared_ptr<RdmaConnection> connection, int code)
 {
 	printf("ERROR\n");
 }
 
 //////////////////////////////////////////////////////////////////////////
-void RdmaNetEngineTestServer::handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection)
+void RdmaNetEngineTestServer::handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection)
 {
 	LOG4CXX_DEBUG(mLogger, "type = " << type << ", length = " << b->dataSize());
 

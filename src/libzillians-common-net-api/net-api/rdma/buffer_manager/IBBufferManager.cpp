@@ -49,19 +49,19 @@ IBBufferManager::~IBBufferManager()
 }
 
 //////////////////////////////////////////////////////////////////////////
-SharedPtr<Buffer> IBBufferManager::createBuffer(size_t size)
+shared_ptr<Buffer> IBBufferManager::createBuffer(size_t size)
 {
 	Buffer* buffer = allocateBuffer(size);
 
 	if(!buffer)
-		return SharedPtr<Buffer>();
+		return shared_ptr<Buffer>();
 	else
-		return SharedPtr<Buffer>(buffer, boost::bind(&IBBufferManager::returnBuffer, this, _1));
+		return shared_ptr<Buffer>(buffer, boost::bind(&IBBufferManager::returnBuffer, this, _1));
 }
 
-SharedPtr<Buffer> IBBufferManager::sliceBuffer(SharedPtr<Buffer> original, size_t size)
+shared_ptr<Buffer> IBBufferManager::sliceBuffer(shared_ptr<Buffer> original, size_t size)
 {
-	SharedPtr<Buffer> new_buffer(new Buffer(original->rptr(), size));
+	shared_ptr<Buffer> new_buffer(new Buffer(original->rptr(), size));
 
 	if(size == 0)
 	{
@@ -81,9 +81,9 @@ SharedPtr<Buffer> IBBufferManager::sliceBuffer(SharedPtr<Buffer> original, size_
 	return new_buffer;
 }
 
-SharedPtr<Buffer> IBBufferManager::cloneBuffer(SharedPtr<Buffer> original)
+shared_ptr<Buffer> IBBufferManager::cloneBuffer(shared_ptr<Buffer> original)
 {
-	SharedPtr<Buffer> new_buffer(new Buffer(original->mData, original->mAllocatedSize));
+	shared_ptr<Buffer> new_buffer(new Buffer(original->mData, original->mAllocatedSize));
 
 	new_buffer->rpos(original->rpos());
 	new_buffer->wpos(original->wpos());

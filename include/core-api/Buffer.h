@@ -107,7 +107,7 @@ struct is_std_string< std::basic_string<_CharT, _Traits, _Alloc> >
  * @brief BufferContext allows user structure to be associated with (or
  * super-imposed on) Buffer object.
  */
-typedef SharedPtr<void> BufferContext;
+typedef shared_ptr<void> BufferContext;
 
 /**
  * @brief Buffer is a generic buffer implementation with super-imposed context
@@ -1955,7 +1955,7 @@ public:
 	/**
 	 * @brief Get the context object associated with the Buffer object.
 	 *
-	 * @return The context object in SharedPtr<void> form.
+	 * @return The context object in shared_ptr<void> form.
 	 */
 	inline BufferContext getContext()
 	{
@@ -1965,7 +1965,7 @@ public:
 	/**
 	 * @brief Set the context object associated with the Buffer object.
 	 *
-	 * @param c The context object in SharedPtr<void> form.
+	 * @param c The context object in shared_ptr<void> form.
 	 */
 	inline void setContext(BufferContext c)
 	{

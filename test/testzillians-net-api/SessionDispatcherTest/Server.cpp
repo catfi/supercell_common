@@ -160,7 +160,7 @@ void handle_message_read(TcpSession& session, move_message& message)
 	}
 }
 
-void handle_buffer_read(TcpSession& session, uint32 type, SharedPtr<Buffer>& buffer, std::size_t size)
+void handle_buffer_read(TcpSession& session, uint32 type, shared_ptr<Buffer>& buffer, std::size_t size)
 {
 	client_context* ctx = session.getContext<client_context>();
 

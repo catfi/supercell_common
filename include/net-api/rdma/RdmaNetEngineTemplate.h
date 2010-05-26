@@ -39,9 +39,9 @@ class RdmaNetEngineTemplate
 {
 public:
 	typedef typename Connection::HandleType HandleType;
-	typedef boost::function2<void, SharedPtr< Connection >, int > ConnectorCallback;
-	typedef boost::function2<void, SharedPtr< Connection >, int > AcceptorCallback;
-	typedef boost::function2<void, SharedPtr< Connection >, int > ConnectionErrorCallback;
+	typedef boost::function2<void, shared_ptr< Connection >, int > ConnectorCallback;
+	typedef boost::function2<void, shared_ptr< Connection >, int > AcceptorCallback;
+	typedef boost::function2<void, shared_ptr< Connection >, int > ConnectionErrorCallback;
 
 public:
 	RdmaNetEngineTemplate() : mAddressResolver(new InetSocketResolver())
@@ -55,17 +55,17 @@ public:
 	}
 
 public:
-	SharedPtr< Future<Connector> > connect(SharedPtr<Poller> poller, std::string address, ConnectorCallback callback)
+	shared_ptr< Future<Connector> > connect(shared_ptr<Poller> poller, std::string address, ConnectorCallback callback)
 	{
 		BOOST_ASSERT(mDispatcher.get() != NULL);
 
-		SharedPtr<Connector> connector = Connector::create(this);
+		shared_ptr<Connector> connector = Connector::create(this);
 
 		// try to resolve address
-		SharedPtr<InetSocketAddress> inetAddress = mAddressResolver->resolve(address);
+		shared_ptr<InetSocketAddress> inetAddress = mAddressResolver->resolve(address);
 		if(!inetAddress)
 		{
-			return SharedPtr< Future<Connector> >();
+			return shared_ptr< Future<Connector> >();
 		}
 
 		// insert the connector
@@ -77,22 +77,22 @@ public:
 		connector->connect(poller, inetAddress, callback);
 
 		// return the future object (future template)
-		SharedPtr< Future<Connector> > f(new Future<Connector>(connector));
+		shared_ptr< Future<Connector> > f(new Future<Connector>(connector));
 
 		return f;
 	}
 
-	SharedPtr< Future<Acceptor> > accept(SharedPtr<Poller> poller, std::string address, AcceptorCallback callback)
+	shared_ptr< Future<Acceptor> > accept(shared_ptr<Poller> poller, std::string address, AcceptorCallback callback)
 	{
 		BOOST_ASSERT(mDispatcher.get() != NULL);
 
-		SharedPtr<Acceptor> acceptor = Acceptor::create(this);
+		shared_ptr<Acceptor> acceptor = Acceptor::create(this);
 
 		// try to resolve address
-		SharedPtr<InetSocketAddress> inetAddress = mAddressResolver->resolve(address);
+		shared_ptr<InetSocketAddress> inetAddress = mAddressResolver->resolve(address);
 		if(!inetAddress)
 		{
-			return SharedPtr< Future<Acceptor> >();
+			return shared_ptr< Future<Acceptor> >();
 		}
 
 		// insert the acceptor
@@ -104,15 +104,15 @@ public:
 		acceptor->accept(poller, inetAddress, callback);
 
 		// return the future object (future template)
-		SharedPtr< Future<Acceptor> > f(new Future<Acceptor>(acceptor));
+		shared_ptr< Future<Acceptor> > f(new Future<Acceptor>(acceptor));
 		return f;
 	}
 
-	inline SharedPtr<Dispatcher> getDispatcher()					{ return mDispatcher; }
-	inline void setDispatcher(SharedPtr<Dispatcher> dispatcher)		{ mDispatcher = dispatcher; }
+	inline shared_ptr<Dispatcher> getDispatcher()					{ return mDispatcher; }
+	inline void setDispatcher(shared_ptr<Dispatcher> dispatcher)		{ mDispatcher = dispatcher; }
 
-	inline SharedPtr<BufferManager> getBufferManager()				{ return mBufferManager; }
-	inline void setBufferManager(SharedPtr<BufferManager> manager)	{ mBufferManager = manager; }
+	inline shared_ptr<BufferManager> getBufferManager()				{ return mBufferManager; }
+	inline void setBufferManager(shared_ptr<BufferManager> manager)	{ mBufferManager = manager; }
 
 public:
 	void shutdown()
@@ -138,7 +138,7 @@ public:
 	}
 
 public:
-	void connectorCompleted(SharedPtr<Connector> connector)
+	void connectorCompleted(shared_ptr<Connector> connector)
 	{
 		// remove the connector object from the connector container
 		typename tConnectorContainer::accessor a;
@@ -148,7 +148,7 @@ public:
 		mConnectorContainer.erase(a);
 	}
 
-	void acceptorCompleted(SharedPtr<Acceptor> acceptor)
+	void acceptorCompleted(shared_ptr<Acceptor> acceptor)
 	{
 		// remove the acceptor object from the acceptor container
 		typename tAcceptorContainer::accessor a;
@@ -159,7 +159,7 @@ public:
 	}
 
 public:
-	void addConnection(SharedPtr<Connection> connection)
+	void addConnection(shared_ptr<Connection> connection)
 	{
 		typename tConnectionContainer::accessor a;
 
@@ -168,7 +168,7 @@ public:
 		a->second = connection;
 	}
 
-	SharedPtr<Connection> getConnection(HandleType handle)
+	shared_ptr<Connection> getConnection(HandleType handle)
 	{
 		typename tConnectionContainer::accessor a;
 
@@ -177,7 +177,7 @@ public:
 		return a->second;
 	}
 
-	void removeConnection(SharedPtr<Connection> connection)
+	void removeConnection(shared_ptr<Connection> connection)
 	{
 		typename tConnectionContainer::accessor a;
 
@@ -187,16 +187,16 @@ public:
 	}
 
 private:
-	SharedPtr<Dispatcher> mDispatcher;
-	SharedPtr<BufferManager> mBufferManager;
+	shared_ptr<Dispatcher> mDispatcher;
+	shared_ptr<BufferManager> mBufferManager;
 
-	SharedPtr<InetSocketResolver> mAddressResolver;
+	shared_ptr<InetSocketResolver> mAddressResolver;
 	bool mStopped;
 
 private:
-	typedef tbb::concurrent_hash_map< HandleType, SharedPtr<Connection> > tConnectionContainer;
-	typedef tbb::concurrent_hash_map< Connector*, SharedPtr<Connector> > tConnectorContainer;
-	typedef tbb::concurrent_hash_map< Acceptor*, SharedPtr<Acceptor> > tAcceptorContainer;
+	typedef tbb::concurrent_hash_map< HandleType, shared_ptr<Connection> > tConnectionContainer;
+	typedef tbb::concurrent_hash_map< Connector*, shared_ptr<Connector> > tConnectorContainer;
+	typedef tbb::concurrent_hash_map< Acceptor*, shared_ptr<Acceptor> > tAcceptorContainer;
 
 	tConnectionContainer mConnectionContainer;
 	tConnectorContainer mConnectorContainer;

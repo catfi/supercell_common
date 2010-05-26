@@ -30,14 +30,14 @@ using namespace zillians::net;
 
 struct SingletonPool
 {
-	SharedPtr<RdmaDeviceResourceManager> device_resource_manager;
-	SharedPtr<RdmaBufferManager> buffer_manager;
+	shared_ptr<RdmaDeviceResourceManager> device_resource_manager;
+	shared_ptr<RdmaBufferManager> buffer_manager;
 } gSingletonPool;
 
 void initSingleton()
 {
-	gSingletonPool.device_resource_manager = SharedPtr<RdmaDeviceResourceManager>(new RdmaDeviceResourceManager());
-	gSingletonPool.buffer_manager = SharedPtr<RdmaBufferManager>(new RdmaBufferManager(POOL_SIZE));
+	gSingletonPool.device_resource_manager = shared_ptr<RdmaDeviceResourceManager>(new RdmaDeviceResourceManager());
+	gSingletonPool.buffer_manager = shared_ptr<RdmaBufferManager>(new RdmaBufferManager(POOL_SIZE));
 }
 
 void finiSingleton()
@@ -50,12 +50,12 @@ void printUsage()
 	fprintf(stderr, "%s <server|client> <listen_address|connecting_address>\n", "RdmaChatRoomTest");
 }
 
-void ConnectorHandler(SharedPtr<RdmaConnection> connection, int err)
+void ConnectorHandler(shared_ptr<RdmaConnection> connection, int err)
 {
 	printf("ConnectorHandler: err = %d\n", err);
 }
 
-void AcceptorHandler(SharedPtr<RdmaConnection> connection, int err)
+void AcceptorHandler(shared_ptr<RdmaConnection> connection, int err)
 {
 	printf("AcceptorHandler: err = %d\n", err);
 }
@@ -78,16 +78,16 @@ int main(int argc, char** argv)
 
 	// start and run the network engine
 	{
-		SharedPtr<RdmaDispatcher> dispatcher(new RdmaDispatcher());
-		SharedPtr<Poller> poller(new Poller(ev_loop_new(0)));
-		SharedPtr<RdmaNetEngine> netEngine(new RdmaNetEngine());
+		shared_ptr<RdmaDispatcher> dispatcher(new RdmaDispatcher());
+		shared_ptr<Poller> poller(new Poller(ev_loop_new(0)));
+		shared_ptr<RdmaNetEngine> netEngine(new RdmaNetEngine());
 
 		ev::io stdinWatcher;
 		stdinWatcher.set(fileno(stdin), ev::READ);
 
 		if(strcmp(argv[1], "server") == 0)
 		{
-			SharedPtr<RdmaChatRoomTestServer> server(new RdmaChatRoomTestServer());
+			shared_ptr<RdmaChatRoomTestServer> server(new RdmaChatRoomTestServer());
 
 			dispatcher->registerDefaultDataHandler(server);
 			dispatcher->registerConnectionHandler(server);
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 
 		else if(strcmp(argv[1], "client") == 0)
 		{
-			SharedPtr<RdmaChatRoomTestClient> client(new RdmaChatRoomTestClient());
+			shared_ptr<RdmaChatRoomTestClient> client(new RdmaChatRoomTestClient());
 
 			dispatcher->registerDefaultDataHandler(client);
 			dispatcher->registerConnectionHandler(client);

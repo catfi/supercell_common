@@ -35,7 +35,7 @@ public:
 	virtual ~ChannelEngine() { }
 
 public:
-	virtual SharedPtr<Channel> findChannel(const UUID& destination) = 0;
+	virtual shared_ptr<Channel> findChannel(const UUID& destination) = 0;
 
 public:
 	typedef boost::function< void (const UUID& indentfier) > ChannelOnlineListener;
@@ -49,7 +49,7 @@ public:
 	virtual void unregisterChannelListener(const UUID& destination) = 0;
 
 public:
-	typedef boost::function< void (SharedPtr<Channel>, uint32, SharedPtr<Buffer>) > DataHandler;
+	typedef boost::function< void (shared_ptr<Channel>, uint32, shared_ptr<Buffer>) > DataHandler;
 
 	virtual void registerDefaultDataHandler(DataHandler handler) = 0;
 	virtual void unregisterDefaultDataHandler() = 0;

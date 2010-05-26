@@ -53,14 +53,14 @@ void IBDeviceResourceManager::regGlobalMemoryRegion(byte* address, size_t size)
 	mGlobalMemoryRegion.size = size;
 }
 
-SharedPtr<IBDeviceResource> IBDeviceResourceManager::getResource(ibv_context* context)
+shared_ptr<IBDeviceResource> IBDeviceResourceManager::getResource(ibv_context* context)
 {
 	// TODO check if std::map allow concurrent read access
 	tResourceMap::iterator it = mResourceMap.find(context);
 
 	if(it == mResourceMap.end())
 	{
-		SharedPtr<IBDeviceResource> resource(new IBDeviceResource(context));
+		shared_ptr<IBDeviceResource> resource(new IBDeviceResource(context));
 
 		if(mGlobalMemoryRegion.address != NULL && mGlobalMemoryRegion.size > 0)
 			resource->regGlobalMemoryRegion(mGlobalMemoryRegion.address, mGlobalMemoryRegion.size);

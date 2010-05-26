@@ -32,9 +32,9 @@ namespace zillians { namespace net { namespace rdma {
 template <typename Connection>
 struct ConnectionHandlerTemplate
 {
-	virtual void onConnected(SharedPtr<Connection> connection) = 0;
-	virtual void onDisconnected(SharedPtr<Connection> connection) = 0;
-	virtual void onError(SharedPtr<Connection> connection, int code) = 0;
+	virtual void onConnected(shared_ptr<Connection> connection) = 0;
+	virtual void onDisconnected(shared_ptr<Connection> connection) = 0;
+	virtual void onError(shared_ptr<Connection> connection, int code) = 0;
 };
 
 template <typename Connection>
@@ -53,25 +53,25 @@ struct ConnectionHandlerBinder : public ConnectionHandlerTemplate<Connection>
 		}
 	};
 
-	typedef typename boost::function< void (SharedPtr<Connection> connection) > on_connected_handler_type;
-	typedef typename boost::function< void (SharedPtr<Connection> connection) > on_disconnected_handler_type;
-	typedef typename boost::function< void (SharedPtr<Connection> connection, int) > on_error_handler_type;
+	typedef typename boost::function< void (shared_ptr<Connection> connection) > on_connected_handler_type;
+	typedef typename boost::function< void (shared_ptr<Connection> connection) > on_disconnected_handler_type;
+	typedef typename boost::function< void (shared_ptr<Connection> connection, int) > on_error_handler_type;
 
 	ConnectionHandlerBinder(on_connected_handler_type on_connected, on_disconnected_handler_type on_disconnected, on_error_handler_type on_error) :
 		connected_handler(on_connected), disconnected_handler(on_disconnected), error_handler(on_error)
 	{ }
 
-	virtual void onConnected(SharedPtr<Connection> connection)
+	virtual void onConnected(shared_ptr<Connection> connection)
 	{
 		connected_handler(connection);
 	}
 
-	virtual void onDisconnected(SharedPtr<Connection> connection)
+	virtual void onDisconnected(shared_ptr<Connection> connection)
 	{
 		disconnected_handler(connection);
 	}
 
-	virtual void onError(SharedPtr<Connection> connection, int code)
+	virtual void onError(shared_ptr<Connection> connection, int code)
 	{
 		error_handler(connection, code);
 	}

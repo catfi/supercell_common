@@ -53,25 +53,25 @@ ELSE()
     MESSAGE(STATUS "TICPP not available, disabling build for Scylla part in libzillians-common-net-api")
 ENDIF()
 	
-IF(RDMA_FOUND AND FALSE)
-	LIST(APPEND TEMPORARY_BUILD_LIST
-		net-api/rdma/address/InetAddress.cpp
-		net-api/rdma/address/InetSocketAddress.cpp
-		net-api/rdma/buffer_manager/IBBufferManager.cpp
-		net-api/rdma/infiniband/IBAcceptor.cpp
-		net-api/rdma/infiniband/IBCommon.cpp
-		net-api/rdma/infiniband/IBConnection.cpp
-		net-api/rdma/infiniband/IBConnector.cpp
-		net-api/rdma/infiniband/IBCxxCompatibleWrapper.c
-		net-api/rdma/infiniband/IBDeviceResource.cpp
-		net-api/rdma/infiniband/IBDeviceResourceManager.cpp
-		net-api/rdma/infiniband/IBFactory.cpp
-		net-api/rdma/resolver/InetSocketResolver.cpp
-		net-api/rdma/Poller.cpp
-		)
-ELSE()
-    MESSAGE(STATUS "RDMA not available, disabling build for RDMA part in libzillians-common-net-api")
-ENDIF(RDMA_FOUND)
+#IF(RDMA_FOUND)
+#	LIST(APPEND TEMPORARY_BUILD_LIST
+#		net-api/rdma/address/InetAddress.cpp
+#		net-api/rdma/address/InetSocketAddress.cpp
+#		net-api/rdma/buffer_manager/IBBufferManager.cpp
+#		net-api/rdma/infiniband/IBAcceptor.cpp
+#		net-api/rdma/infiniband/IBCommon.cpp
+#		net-api/rdma/infiniband/IBConnection.cpp
+#		net-api/rdma/infiniband/IBConnector.cpp
+#		net-api/rdma/infiniband/IBCxxCompatibleWrapper.c
+#		net-api/rdma/infiniband/IBDeviceResource.cpp
+#		net-api/rdma/infiniband/IBDeviceResourceManager.cpp
+#		net-api/rdma/infiniband/IBFactory.cpp
+#		net-api/rdma/resolver/InetSocketResolver.cpp
+#		net-api/rdma/Poller.cpp
+#		)
+#ELSE()
+#    MESSAGE(STATUS "RDMA not available, disabling build for RDMA part in libzillians-common-net-api")
+#ENDIF(RDMA_FOUND)
 	 
 ADD_LIBRARY(zillians-common-net-api
 	${TEMPORARY_BUILD_LIST}

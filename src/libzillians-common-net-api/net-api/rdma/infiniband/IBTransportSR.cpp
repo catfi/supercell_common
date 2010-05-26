@@ -34,12 +34,12 @@ IBTransportSR::~IBTransportSR()
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool IBTransportSR::sendAsync(uint32 type, SharedPtr<Buffer>, CompletionHandler handler)
+bool IBTransportSR::sendAsync(uint32 type, shared_ptr<Buffer>, CompletionHandler handler)
 {
 
 }
 
-bool IBTransportSR::receiveAsync(SharedPtr<Buffer>, CompletionHandler handler)
+bool IBTransportSR::receiveAsync(shared_ptr<Buffer>, CompletionHandler handler)
 {
 
 }

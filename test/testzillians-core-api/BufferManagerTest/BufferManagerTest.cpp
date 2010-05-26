@@ -114,8 +114,8 @@ int testCudaBufMgr()
  */
 int testRun()
 {
-	std::vector<SharedPtr<zillians::Buffer> > Bufs;
-	SharedPtr<zillians::Buffer> buf;
+	std::vector<shared_ptr<zillians::Buffer> > Bufs;
+	shared_ptr<zillians::Buffer> buf;
 	byte* testData = new byte[TEST_BLOCK_SIZE];
 	byte* testOut = new byte[TEST_BLOCK_SIZE];
 	int ret = 0;
@@ -168,12 +168,12 @@ int testRun()
 	{
 		int rnd = rand() % TEST_BLOCK_SIZE;
 		//zillians::Buffer* pBuf = g_BufferMgr->allocateBuffer(rnd);
-		SharedPtr<zillians::Buffer> pBuf = g_BufferMgr->createBuffer(rnd);
+		shared_ptr<zillians::Buffer> pBuf = g_BufferMgr->createBuffer(rnd);
 		if(pBuf == NULL) { break; }
 		pBuf->set(testData, 0, rnd);
 		Bufs.push_back(pBuf);
 	}
-	for(std::vector<SharedPtr<zillians::Buffer> >::iterator it = Bufs.begin(); it != Bufs.end(); ++it)
+	for(std::vector<shared_ptr<zillians::Buffer> >::iterator it = Bufs.begin(); it != Bufs.end(); ++it)
 	{
 		size_t sz = (*it)->allocatedSize();
 		memset(testOut, 0, sz);

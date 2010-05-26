@@ -37,9 +37,9 @@ public:
 	virtual ~TcpBufferManager();
 
 public:
-	virtual SharedPtr<Buffer> createBuffer(size_t size);
-	virtual SharedPtr<Buffer> sliceBuffer(SharedPtr<Buffer> original, size_t size = 0);
-	virtual SharedPtr<Buffer> cloneBuffer(SharedPtr<Buffer> original);
+	virtual shared_ptr<Buffer> createBuffer(size_t size);
+	virtual shared_ptr<Buffer> sliceBuffer(shared_ptr<Buffer> original, size_t size = 0);
+	virtual shared_ptr<Buffer> cloneBuffer(shared_ptr<Buffer> original);
 
 public:
 	Buffer* allocateBuffer(size_t size);

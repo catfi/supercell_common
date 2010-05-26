@@ -28,13 +28,13 @@ namespace zillians { namespace net { namespace rdma {
 class IBFactory
 {
 public:
-	static SharedPtr<ibv_context>			createDeviceContext(ibv_device* device);
-	static SharedPtr<rdma_event_channel>	createEventChannel();
-	static SharedPtr<rdma_cm_id> 			createManagementId(rdma_event_channel* ec, void* context, rdma_port_space ps);
-	static SharedPtr<ibv_pd>				createProtectionDomain(ibv_context* c);
-	static SharedPtr<ibv_comp_channel>		createCompletionChannel(ibv_context* c);
-	static SharedPtr<ibv_cq> 				createCompletionQueue(ibv_context* c, int cqe, void* context, ibv_comp_channel* cc);
-	static SharedPtr<ibv_mr>				createMemoryRegion(ibv_pd* pd, void* addr, size_t size);
+	static shared_ptr<ibv_context>			createDeviceContext(ibv_device* device);
+	static shared_ptr<rdma_event_channel>	createEventChannel();
+	static shared_ptr<rdma_cm_id> 			createManagementId(rdma_event_channel* ec, void* context, rdma_port_space ps);
+	static shared_ptr<ibv_pd>				createProtectionDomain(ibv_context* c);
+	static shared_ptr<ibv_comp_channel>		createCompletionChannel(ibv_context* c);
+	static shared_ptr<ibv_cq> 				createCompletionQueue(ibv_context* c, int cqe, void* context, ibv_comp_channel* cc);
+	static shared_ptr<ibv_mr>				createMemoryRegion(ibv_pd* pd, void* addr, size_t size);
 
 	static void destroyDeviceContext(ibv_context* context);
 	static void destroyEventChannel(rdma_event_channel* ec);

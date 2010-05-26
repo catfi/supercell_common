@@ -34,8 +34,6 @@
 using namespace zillians;
 using namespace std;
 
-
-
 BOOST_AUTO_TEST_SUITE( BufferTest )
 
 BOOST_AUTO_TEST_CASE( StringEncodingAndDecodingTest )
@@ -450,10 +448,10 @@ BOOST_AUTO_TEST_CASE( SerializableEncodingAndDecodingTest3 )
 
 //BOOST_AUTO_TEST_CASE( BufferCollectionTest1 )
 //{
-//	SharedPtr<Buffer> a0(new Buffer(1024));
-//	SharedPtr<Buffer> a1(new Buffer(1024));
-//	SharedPtr<Buffer> a2(new Buffer(1024));
-//	SharedPtr<Buffer> a3(new Buffer(1024));
+//	shared_ptr<Buffer> a0(new Buffer(1024));
+//	shared_ptr<Buffer> a1(new Buffer(1024));
+//	shared_ptr<Buffer> a2(new Buffer(1024));
+//	shared_ptr<Buffer> a3(new Buffer(1024));
 //
 //	for(int32 i=0;i<1024/sizeof(int32);++i)
 //	{
@@ -476,7 +474,7 @@ BOOST_AUTO_TEST_CASE( SerializableEncodingAndDecodingTest3 )
 //		a3->write(x);
 //	}
 //
-//	SharedPtr<BufferCollection> collection(new BufferCollection);
+//	shared_ptr<BufferCollection> collection(new BufferCollection);
 //	collection->add(a0);
 //	collection->add(a1);
 //	collection->add(a2);
@@ -488,7 +486,7 @@ BOOST_AUTO_TEST_CASE( SerializableEncodingAndDecodingTest3 )
 //
 //	BOOST_CHECK_NO_THROW(collection->rrev(4096));
 //
-//	SharedPtr<Buffer> b(new Buffer(4096));
+//	shared_ptr<Buffer> b(new Buffer(4096));
 //	b->write(*collection);
 //
 //	BOOST_REQUIRE_THROW(collection->rskip(1024), std::out_of_range);
@@ -531,7 +529,7 @@ BOOST_AUTO_TEST_CASE( SerializableEncodingAndDecodingTest3 )
 
 BOOST_AUTO_TEST_CASE( MapReadWriteTest1 )
 {
-	SharedPtr<Buffer> b(new Buffer(4096));
+	boost::shared_ptr<Buffer> b(new Buffer(4096));
 
 	std::map<std::string, std::string> input;
 	input["A_KEY"] = "A_VALUE";
@@ -563,7 +561,7 @@ BOOST_AUTO_TEST_CASE( MapReadWriteTest1 )
 
 BOOST_AUTO_TEST_CASE( MapReadWriteTest2 )
 {
-	SharedPtr<Buffer> b(new Buffer(4096));
+	boost::shared_ptr<Buffer> b(new Buffer(4096));
 
 	std::map<long, std::string> input;
 	input[100]   = "A_VALUE";
@@ -595,7 +593,7 @@ BOOST_AUTO_TEST_CASE( MapReadWriteTest2 )
 
 BOOST_AUTO_TEST_CASE( MapReadWriteTest3 )
 {
-	SharedPtr<Buffer> b(new Buffer(4096));
+	boost::shared_ptr<Buffer> b(new Buffer(4096));
 
 	std::map<long, long> input;
 	input[100]   = 456;
@@ -627,7 +625,7 @@ BOOST_AUTO_TEST_CASE( MapReadWriteTest3 )
 
 BOOST_AUTO_TEST_CASE( ErrorCodeSerializationTest1 )
 {
-	SharedPtr<Buffer> b(new Buffer(4096));
+	boost::shared_ptr<Buffer> b(new Buffer(4096));
 
 	{
 		boost::system::error_code input; // the default error code is success without error
@@ -683,7 +681,7 @@ BOOST_AUTO_TEST_CASE( ErrorCodeSerializationTest1 )
 
 BOOST_AUTO_TEST_CASE( StringStreamReadWriteTest1 )
 {
-	SharedPtr<Buffer> br(new Buffer(4096));
+	boost::shared_ptr<Buffer> br(new Buffer(4096));
 
 	SerializableObject1 obj1;
 	obj1.x = 1024;
@@ -700,7 +698,7 @@ BOOST_AUTO_TEST_CASE( StringStreamReadWriteTest1 )
 
 	BOOST_CHECK(ss.str().length() > 0);
 
-	SharedPtr<Buffer> bw(new Buffer(4096));
+	boost::shared_ptr<Buffer> bw(new Buffer(4096));
 
 	ss >> (*bw);
 

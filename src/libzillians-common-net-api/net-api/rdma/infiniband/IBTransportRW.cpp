@@ -33,7 +33,7 @@ IBTransportRW::~IBTransportRW()
 { }
 
 //////////////////////////////////////////////////////////////////////////
-uint64 IBTransportRW::registerDirect(SharedPtr<Buffer> buffer, bool pinned)
+uint64 IBTransportRW::registerDirect(shared_ptr<Buffer> buffer, bool pinned)
 {
 	// hold the buffer into a temporary storage to keep the reference so that it wouldn't be freed
 	// register the buffer (pinned) and take buffer pointer as sink id
@@ -45,28 +45,28 @@ void IBTransportRW::unregisterDirect(uint64 sink)
 	// unregister the buffer (unpinned) and send unregisteration info to the remote
 }
 
-void IBTransportRW::write(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size)
+void IBTransportRW::write(uint64 sink, std::size_t offset, shared_ptr<Buffer> buffer, std::size_t size)
 {
 	// get the remote buffer pointer from sink id
 	// post RDMA write
 	// wait for completion by calling ibv_poll_cq(scq, 1, wc) (on the send completion queue)
 }
 
-void IBTransportRW::writeAsync(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size, CompletionHandler handler)
+void IBTransportRW::writeAsync(uint64 sink, std::size_t offset, shared_ptr<Buffer> buffer, std::size_t size, CompletionHandler handler)
 {
 	// get the buffer pointer from sink id
 	// post RDMA write
 	// insert the request info into the queue so that workCompleted() would handle it (and call the completion handler) later
 }
 
-void IBTransportRW::read(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size)
+void IBTransportRW::read(shared_ptr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size)
 {
 	// get the remote buffer pointer from sink id
 	// post RDMA read
 	// wait for completion by calling ibv_poll_cq(scq, 1, wc) (on the send completion queue)
 }
 
-void IBTransportRW::readAsync(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler)
+void IBTransportRW::readAsync(shared_ptr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler)
 {
 	// get the buffer pointer from sink id
 	// post RDMA read

@@ -29,6 +29,12 @@
 
 namespace zillians { namespace net { namespace sys {
 
+struct SessionTransport
+{
+	struct tcp { };
+	struct infiniband { };
+};
+
 template <typename Protocol> class SessionT;
 
 } } }

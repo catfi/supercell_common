@@ -90,7 +90,7 @@ private:
 	static void cleanupThreadData(ThreadData* data);
 
 private:
-	static SharedPtr<ThreadPool> mThreadPool;
+	static shared_ptr<ThreadPool> mThreadPool;
 	static tbb::spin_rw_mutex mLockThreadPool;
 	boost::thread_specific_ptr<ThreadData> mThreadData;
 
@@ -121,11 +121,11 @@ Map<TypeKey, TypeValue, ReadOverWrite>::Map()
 : mMergeInterval(100.0), //100ms
 mThreadData(&Map::cleanupThreadData)
 {
-	mThreadPool = SharedPtr<ThreadPool>(new ThreadPool());
+	mThreadPool = shared_ptr<ThreadPool>(new ThreadPool());
 }
 
 template<class TypeKey, class TypeValue>
-SharedPtr<typename Map<TypeKey, TypeValue, ReadOverWrite>::ThreadPool> Map<TypeKey, TypeValue, ReadOverWrite>::mThreadPool;
+shared_ptr<typename Map<TypeKey, TypeValue, ReadOverWrite>::ThreadPool> Map<TypeKey, TypeValue, ReadOverWrite>::mThreadPool;
 
 template<class TypeKey, class TypeValue>
 tbb::spin_rw_mutex Map<TypeKey, TypeValue, ReadOverWrite>::mLockThreadPool;

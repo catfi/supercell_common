@@ -19,18 +19,18 @@ public:
 	virtual ~RdmaChatRoomTestClient();
 
 public:
-	virtual void onConnected(SharedPtr<RdmaConnection> connection);
-	virtual void onDisconnected(SharedPtr<RdmaConnection> connection);
-	virtual void onError(SharedPtr<RdmaConnection> connection, int code);
+	virtual void onConnected(shared_ptr<RdmaConnection> connection);
+	virtual void onDisconnected(shared_ptr<RdmaConnection> connection);
+	virtual void onError(shared_ptr<RdmaConnection> connection, int code);
 
 public:
 	void handleStdin(ev::io &w, int revents);
-	virtual void handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection);
+	virtual void handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection);
 
 public:
 	string mUserName;
-	SharedPtr<RdmaConnection> mConnection;
-	SharedPtr<RdmaChatRoomTestMsg> mSendMsg;
+	shared_ptr<RdmaConnection> mConnection;
+	shared_ptr<RdmaChatRoomTestMsg> mSendMsg;
 
 	enum ChatRoomClientStatus
 	{

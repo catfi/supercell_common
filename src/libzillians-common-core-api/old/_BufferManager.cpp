@@ -69,11 +69,11 @@ BufferManager::~BufferManager()
 	SAFE_DELETE(mFreeBufferList);
 }
 
-SharedPtr<Buffer> BufferManager::allocateBuffer(size_t size)
+shared_ptr<Buffer> BufferManager::allocateBuffer(size_t size)
 {
 	// Lock this scope!!!
 	tbb::spin_mutex::scoped_lock lock(mLock);
-	SharedPtr<Buffer> retBuf(mFreeBufferList->front(), boost::bind(&BufferManager::returnBuffer, this, _1));
+	shared_ptr<Buffer> retBuf(mFreeBufferList->front(), boost::bind(&BufferManager::returnBuffer, this, _1));
 
 	//TODO: Allocate memory
 	byte* p = this->malloc(size);

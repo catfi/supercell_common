@@ -45,7 +45,7 @@ public:
 	}
 
 public:
-	uint64 registerDirect(SharedPtr<Buffer> buffer, bool pinned = true)
+	uint64 registerDirect(shared_ptr<Buffer> buffer, bool pinned = true)
 	{
 
 	}
@@ -55,22 +55,22 @@ public:
 
 	}
 
-	void write(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size)
+	void write(uint64 sink, std::size_t offset, shared_ptr<Buffer> buffer, std::size_t size)
 	{
 
 	}
 
-	void writeAsync(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size, CompletionHandler handler)
+	void writeAsync(uint64 sink, std::size_t offset, shared_ptr<Buffer> buffer, std::size_t size, CompletionHandler handler)
 	{
 
 	}
 
-	void read(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size)
+	void read(shared_ptr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size)
 	{
 
 	}
 
-	void readAsync(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler)
+	void readAsync(shared_ptr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler)
 	{
 
 	}
@@ -98,7 +98,7 @@ private:
 private:
 	IBConnection* mConnection;
 
-	typedef tbb::concurrent_hash_map<uint64, SharedPtr<Buffer> > BufferRefHolder;
+	typedef tbb::concurrent_hash_map<uint64, shared_ptr<Buffer> > BufferRefHolder;
 	ConcurrentBufferRefHolder mLocalConcurrentBufferHolder;
 	ConcurrentBufferRefHolder mRemoteConcurrentBufferHolder;
 };

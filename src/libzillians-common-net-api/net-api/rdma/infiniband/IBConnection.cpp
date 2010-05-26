@@ -297,7 +297,7 @@ const uint32 IBConnection::CONTROL_UNREG_DIRECT_BUFFER	= 7;//0x70000000;
 log4cxx::LoggerPtr IBConnection::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.rdma.infiniband.IBConnection"));
 
 //////////////////////////////////////////////////////////////////////////
-IBConnection::IBConnection(IBNetEngine* engine, SharedPtr<rdma_cm_id> id)
+IBConnection::IBConnection(IBNetEngine* engine, shared_ptr<rdma_cm_id> id)
 {
 	IB_DEBUG("CTOR");
 	mEngine = engine;
@@ -358,7 +358,7 @@ IBConnection::IBConnection(IBNetEngine* engine, SharedPtr<rdma_cm_id> id)
     // create the send/receive buffer and pre-post to receive
     for(int i=0;i<IB_DEFAULT_RECEIVE_BUFFER_COUNT;++i)
     {
-    	SharedPtr<Buffer> recvBuffer = createBuffer(IB_DEFAULT_RECEIVE_BUFFER_SIZE);
+    	shared_ptr<Buffer> recvBuffer = createBuffer(IB_DEFAULT_RECEIVE_BUFFER_SIZE);
 
     	//_HOLD_BUFFER(mRecvBufferHolder, recvBuffer.get(), recvBuffer);
 
@@ -374,7 +374,7 @@ IBConnection::IBConnection(IBNetEngine* engine, SharedPtr<rdma_cm_id> id)
     // create stocked buffer for control messages
     for(int i=0;i<IB_DEFAULT_CONTROL_BUFFER_COUNT;++i)
     {
-    	SharedPtr<Buffer> controlBuffer = createBuffer(IB_DEFAULT_CONTROL_BUFFER_SIZE);
+    	shared_ptr<Buffer> controlBuffer = createBuffer(IB_DEFAULT_CONTROL_BUFFER_SIZE);
     	mControlBufferQueue.push(controlBuffer);
     }
 }
@@ -406,11 +406,11 @@ IBConnection::~IBConnection()
 }
 
 //////////////////////////////////////////////////////////////////////////
-SharedPtr<Buffer> IBConnection::createBuffer(size_t size)
+shared_ptr<Buffer> IBConnection::createBuffer(size_t size)
 {
 	BOOST_ASSERT(mEngine->getBufferManager());
 
-	SharedPtr<Buffer> buffer = mEngine->getBufferManager()->createBuffer(size);
+	shared_ptr<Buffer> buffer = mEngine->getBufferManager()->createBuffer(size);
 
 	if(!buffer)
 	{
@@ -420,7 +420,7 @@ SharedPtr<Buffer> IBConnection::createBuffer(size_t size)
 	return buffer;
 }
 
-bool IBConnection::sendThrottled(uint32 type, SharedPtr<Buffer> buffer)
+bool IBConnection::sendThrottled(uint32 type, shared_ptr<Buffer> buffer)
 {
 	if(mSendThrottle.slow_down)
 	{
@@ -471,7 +471,7 @@ bool IBConnection::sendThrottled(uint32 type, SharedPtr<Buffer> buffer)
 	return true;
 }
 
-bool IBConnection::send(uint32 type, SharedPtr<Buffer> buffer)
+bool IBConnection::send(uint32 type, shared_ptr<Buffer> buffer)
 {
 	IB_DEBUG("send general message length = " << buffer->dataSize() << ", type = " << type << ", buffer = " << buffer.get());
 
@@ -508,7 +508,7 @@ bool IBConnection::send(uint32 type, SharedPtr<Buffer> buffer)
 }
 
 //////////////////////////////////////////////////////////////////////////
-uint64 IBConnection::registerDirect(SharedPtr<Buffer> buffer)
+uint64 IBConnection::registerDirect(shared_ptr<Buffer> buffer)
 {
 	// hold the buffer
 	_HOLD_BUFFER(mRemoteDirectBufferHolder, buffer.get(), buffer);
@@ -531,7 +531,7 @@ void IBConnection::unregisterDirect(uint64 sink_id)
 }
 
 
-bool IBConnection::write(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size)
+bool IBConnection::write(uint64 sink, std::size_t offset, shared_ptr<Buffer> buffer, std::size_t size)
 {
 	bool result = true;
 
@@ -571,7 +571,7 @@ bool IBConnection::write(uint64 sink, std::size_t offset, SharedPtr<Buffer> buff
 	return result;
 }
 
-bool IBConnection::writeAsync(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size, CompletionHandler handler)
+bool IBConnection::writeAsync(uint64 sink, std::size_t offset, shared_ptr<Buffer> buffer, std::size_t size, CompletionHandler handler)
 {
 	bool result = true;
 
@@ -600,7 +600,7 @@ bool IBConnection::writeAsync(uint64 sink, std::size_t offset, SharedPtr<Buffer>
 	return result;
 }
 
-bool IBConnection::read(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size)
+bool IBConnection::read(shared_ptr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size)
 {
 	bool result = true;
 
@@ -640,7 +640,7 @@ bool IBConnection::read(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offse
 	return result;
 }
 
-bool IBConnection::readAsync(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler)
+bool IBConnection::readAsync(shared_ptr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler)
 {
 	bool result = true;
 
@@ -668,41 +668,6 @@ bool IBConnection::readAsync(SharedPtr<Buffer> buffer, uint64 sink, std::size_t 
 
 	return result;
 }
-/*
-bool IBConnection::sendDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id)
-{
-	IB_DEBUG("send direct message length = " << buffer->dataSize() << ", type = " << type << ", buffer = " << buffer.get() << ", sink_id = " << sink_id);
-
-	if(buffer->dataSize() == 0)
-	{
-		IB_ERROR("[ERROR] zero size message send requested!");
-		return false;
-	}
-
-	tbb::queuing_mutex::scoped_lock lock(mSendLock);
-
-	if(requestSend())
-	{
-		return postDirect(type, buffer, sink_id);
-	}
-	else
-	{
-		SendRequest request;
-		request.req = SendRequest::DIRECT;
-		request.type = type;
-		request.buffer = buffer;
-		request.sink_id = sink_id;
-		bool result = mSendRequestQueue.try_push(request);
-
-		if(!result)
-		{
-			IB_ERROR("[ERROR] EXCEED MAXIMUM SENDS IN FLIGHT! (IB_DEFAULT_MAX_SEND_IN_FLIGHT = " << IB_DEFAULT_MAX_SEND_IN_FLIGHT << ")");
-		}
-
-		return result;
-	}
-}
-*/
 
 //////////////////////////////////////////////////////////////////////////
 void IBConnection::close()
@@ -983,7 +948,7 @@ void IBConnection::handleChannelEvent(ev::io& w, int revent)
 	{
 		case RDMA_CM_EVENT_DISCONNECTED:
 		{
-			SharedPtr<IBConnection> shared_from_this(mWeakThis);
+			shared_ptr<IBConnection> shared_from_this(mWeakThis);
 
 			err = rdma_ack_cm_event(event);
 
@@ -1068,33 +1033,10 @@ void IBConnection::handleSendCompletionControlBuffer(const ibv_wc &wc)
 
 	Buffer* b = reinterpret_cast<Buffer*>(wc.wr_id);
 
-	// NOTE here we dont update the buffer's wpos and rpos because these completed control buffer are probably going to be read on the next few lines
-	//b->rpos(0); b->wpos(wc.byte_len);
-
-	// get the buffer object
-	//SharedPtr<Buffer> sb;
-	//_GET_BUFFER(mSendBufferHolder, b, sb);
-
 	IB_DEBUG("[COMPLETION] [SEND] CONTROL BUFFER SEND, buffer = " << b);
-
-	// if the control type is CONTROL_SEND_DIRECT_SIGNAL, which implies the direct send has been completed, we need to unhold the direct send buffer
-	// TODO maybe we can remove this
-	/*
-	uint32 type = b->read<uint32>();
-	if(type == CONTROL_SEND_DIRECT_SIGNAL)
-	{
-		ControlSendDirectSignal signal;
-		b->read((byte*)&signal, sizeof(signal));
-
-		Buffer* bb = reinterpret_cast<Buffer*>(signal.source_id);
-		_UNHOLD_BUFFER(mLocalDirectBufferHolder, bb);
-	}*/
 
 	// push the control buffer back to "stocked control buffer container"
 	returnControlBuffer(info->buffer);
-
-	// remove the buffer from "send buffer reference holder"
-    //_UNHOLD_BUFFER(mSendBufferHolder, b);
 
 	// delete the completion info object
 	SAFE_DELETE(info);
@@ -1109,10 +1051,10 @@ void IBConnection::handleSendCompletionGeneralBuffer(const ibv_wc &wc)
 
 #ifdef IB_ENABLE_COMPLETION_DISPATCH
 	// dispatch completion
-	SharedPtr<Buffer> sb;
+	shared_ptr<Buffer> sb;
 
 	_GET_AND_UNHOLD_BUFFER(mSendBufferHolder, b, sb);
-	SharedPtr<IBConnection> shared_from_this(mWeakThis);
+	shared_ptr<IBConnection> shared_from_this(mWeakThis);
 
 	mEngine->getDispatcher()->dispatchCompletion(sb, shared_from_this);
 #else
@@ -1121,8 +1063,6 @@ void IBConnection::handleSendCompletionGeneralBuffer(const ibv_wc &wc)
 #endif
 	// delete the completion info object
 	SAFE_DELETE(info);
-
-
 }
 
 void IBConnection::handleRecvCompletionControlBuffer(const ibv_wc &wc)
@@ -1194,7 +1134,7 @@ void IBConnection::handleRecvCompletionGeneralBuffer(const ibv_wc &wc)
     IB_DEBUG("[COMPLETION] [RECV] GENERAL BUFFER RECV, buffer = " << b);
 
 	// dispatch buffer through IBDispatcher
-	SharedPtr<IBConnection> shared_from_this(mWeakThis);
+    shared_ptr<IBConnection> shared_from_this(mWeakThis);
 
 	// NOTE we store the type of general buffer in the imm field (in the host order but not in network order as we assume all machines are in little endian format)
 	uint32 type = wc.imm_data;
@@ -1206,7 +1146,7 @@ void IBConnection::handleRecvCompletionGeneralBuffer(const ibv_wc &wc)
 		IB_DEBUG("[COMPLETION] [RECV] buffer dispatched but still in use, create new buffer (use count = " << info->buffer.use_count() << ")");
 
 		// create another buffer
-		SharedPtr<Buffer> newBuffer = createBuffer(IB_DEFAULT_RECEIVE_BUFFER_SIZE);
+		shared_ptr<Buffer> newBuffer = createBuffer(IB_DEFAULT_RECEIVE_BUFFER_SIZE);
 
 		// replace the buffer
 		info->buffer = newBuffer;
@@ -1224,7 +1164,7 @@ void IBConnection::handleRecvCompletionGeneralBuffer(const ibv_wc &wc)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void IBConnection::start(SharedPtr<Poller> poller)
+void IBConnection::start(shared_ptr<Poller> poller)
 {
 	if(mWatchersStarted)
 	{
@@ -1263,7 +1203,7 @@ void IBConnection::stop()
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
-bool IBConnection::postGeneral(uint32 type, SharedPtr<Buffer> buffer)
+bool IBConnection::postGeneral(uint32 type, shared_ptr<Buffer> buffer)
 {
 	bool result = true;
 
@@ -1300,7 +1240,7 @@ bool IBConnection::postGeneral(uint32 type, SharedPtr<Buffer> buffer)
 	return true;
 }
 
-bool IBConnection::sendControl(SharedPtr<Buffer> buffer)
+bool IBConnection::sendControl(shared_ptr<Buffer> buffer)
 {
 	if(requestSend())
 	{
@@ -1315,7 +1255,7 @@ bool IBConnection::sendControl(SharedPtr<Buffer> buffer)
 	}
 }
 
-bool IBConnection::postControl(SharedPtr<Buffer> buffer)
+bool IBConnection::postControl(shared_ptr<Buffer> buffer)
 {
 	bool result = true;
 
@@ -1340,43 +1280,6 @@ bool IBConnection::postControl(SharedPtr<Buffer> buffer)
 
 	return true;
 }
-
-/*
-bool IBConnection::postDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id)
-{
-	bool result = true;
-
-	// lookup the remote address by id
-	uint32 rkey = mRemoteAccess.rkey;
-	uint64 address = 0;
-	uint64 source_id = reinterpret_cast<uint64>(buffer.get());
-	_GET_REF(mRemoteDirectBufferRefHolder, sink_id, address);
-
-	// check the address
-	if(address == 0)
-	{
-		IB_ERROR("[ERROR] [POST DIRECT] fail to get sink address");
-		return false;
-	}
-
-	// hold local buffer reference
-	_HOLD_BUFFER(mLocalDirectBufferHolder, buffer.get(), buffer);
-
-	// post RDMA WRITE
-	postWrite(address, rkey, buffer->dataSize(), buffer.get());
-
-	// send control message to signal remote about the completion (by id)
-	result = sendControlSendDirectSignal(source_id, sink_id, buffer->dataSize(), type);
-
-	// if something goes wrong, unhold the buffer
-	if(!result)
-	{
-		_UNHOLD_BUFFER(mLocalDirectBufferHolder, buffer.get());
-	}
-
-	return result;
-}
-*/
 
 //////////////////////////////////////////////////////////////////////////
 bool IBConnection::postRecv(Buffer* buffer, CompletionInfo* info)
@@ -1644,18 +1547,18 @@ void IBConnection::notifySend()
 }
 
 //////////////////////////////////////////////////////////////////////////
-SharedPtr<Buffer> IBConnection::getControlBuffer(bool blocking)
+shared_ptr<Buffer> IBConnection::getControlBuffer(bool blocking)
 {
 	if(blocking)
 	{
-		SharedPtr<Buffer> b;
+		shared_ptr<Buffer> b;
 		IB_DEBUG("[GET CONTROL BUFFER] get buffer (blocking), current buffer container size = " << mControlBufferQueue.size());
 		mControlBufferQueue.pop(b);
 		return b;
 	}
 	else
 	{
-		SharedPtr<Buffer> b;
+		shared_ptr<Buffer> b;
 		IB_DEBUG("[GET CONTROL BUFFER] get buffer, current buffer container size = " << mControlBufferQueue.size());
 		bool bufferAvailable = mControlBufferQueue.try_pop(b);
 		if(!bufferAvailable)
@@ -1681,7 +1584,7 @@ SharedPtr<Buffer> IBConnection::getControlBuffer(bool blocking)
 	}
 }
 
-void IBConnection::returnControlBuffer(SharedPtr<Buffer> buffer)
+void IBConnection::returnControlBuffer(shared_ptr<Buffer> buffer)
 {
 	mControlBufferQueue.try_push(buffer);
 }
@@ -1689,13 +1592,13 @@ void IBConnection::returnControlBuffer(SharedPtr<Buffer> buffer)
 //////////////////////////////////////////////////////////////////////////
 void IBConnection::forceAccessExchange()
 {
-	SharedPtr<ibv_mr> gmr = mDeviceResource->getGlobalMemoryRegion();
+	shared_ptr<ibv_mr> gmr = mDeviceResource->getGlobalMemoryRegion();
 	sendControlAccessExchange(reinterpret_cast<uint64>(gmr->addr), gmr->length, gmr->rkey);
 }
 
 bool IBConnection::sendControlAccessExchange(uint64 address, uint32 length, uint32 rkey)
 {
-	SharedPtr<Buffer> b = getControlBuffer();
+	shared_ptr<Buffer> b = getControlBuffer();
 	if(!b.get())
 	{
 		IB_ERROR("[ERROR] [SEND CONTROL] [ACCESS EXCHANGE] => FAILED, BUFFER NOT AVAILABLE");
@@ -1731,7 +1634,7 @@ void IBConnection::handleControlAccessExchange(Buffer* buffer)
 //////////////////////////////////////////////////////////////////////////
 bool IBConnection::postControlLargeBufferSend(Buffer* largeBuffer, uint32 type)
 {
-	SharedPtr<Buffer> b = getControlBuffer();
+	shared_ptr<Buffer> b = getControlBuffer();
 	if(!b.get())
 	{
 		IB_ERROR("[ERROR] [SEND CONTROL] [LARGE BUFFER SEND] => FAILED, BUFFER NOT AVAILABLE");
@@ -1787,7 +1690,7 @@ void IBConnection::handleControlLargeBufferSend(Buffer* buffer)
 
 bool IBConnection::sendControlLargeBufferAck(uint64 id, int32 result)
 {
-	SharedPtr<Buffer> b = getControlBuffer();
+	shared_ptr<Buffer> b = getControlBuffer();
 	if(!b)
 	{
 		IB_ERROR("[ERROR] [SEND CONTROL] [LARGE BUFFER ACK] => FAILED, BUFFER NOT AVAILABLE");
@@ -1822,7 +1725,7 @@ void IBConnection::handleControlLargeBufferAck(Buffer* buffer)
 //////////////////////////////////////////////////////////////////////////
 bool IBConnection::sendControlRegDirectBuffer(uint64 sink_id, uint64 address)
 {
-	SharedPtr<Buffer> b = getControlBuffer();
+	shared_ptr<Buffer> b = getControlBuffer();
 	if(!b.get())
 	{
 		IB_ERROR("[SEND CONTROL] [REG DIRECT BUFFER] => FAILED, BUFFER NOT AVAILABLE");
@@ -1857,7 +1760,7 @@ bool IBConnection::sendControlUnregDirectBuffer(uint64 sink_id)
 {
 	IB_DEBUG("[SEND CONTROL] [UNREG DIRECT BUFFER]");
 
-	SharedPtr<Buffer> b = getControlBuffer();
+	shared_ptr<Buffer> b = getControlBuffer();
 	if(!b.get())
 	{
 		IB_ERROR("[ERROR] [SEND CONTROL] [UNREG DIRECT BUFFER] => FAILED, BUFFER NOT AVAILABLE");
@@ -1930,7 +1833,7 @@ bool IBConnection::sendControlSendDirectSignal(uint64 source_id, uint64 sink_id,
 	bool result = true;
 
 	// send control message to signal remote about the completion (by id)
-	SharedPtr<Buffer> b = getControlBuffer();
+	shared_ptr<Buffer> b = getControlBuffer();
 	if(!b.get())
 	{
 		IB_ERROR("[ERROR] [SendDirectImpl] => FAILED, CONTROL BUFFER NOT AVAILABLE");
@@ -1963,9 +1866,9 @@ void IBConnection::handleControlSendDirectSignal(Buffer* buffer)
 	b->rpos(0); b->wpos(signal.length);
 
 	// dispatch to upper application
-	SharedPtr<IBConnection> shared_from_this(mWeakThis);
+	shared_ptr<IBConnection> shared_from_this(mWeakThis);
 
-	SharedPtr<Buffer> sb;
+	shared_ptr<Buffer> sb;
 	_GET_BUFFER(mRemoteDirectBufferHolder, b, sb);
 
 	mEngine->getDispatcher()->dispatchDataEvent(signal.type, sb, shared_from_this);
@@ -2037,7 +1940,7 @@ bool IBConnection::postControlCreditUpdate()
 {
 	IB_DEBUG("[SEND CONTROL] [CREDIT UPDATE]");
 
-	SharedPtr<Buffer> b = getControlBuffer();
+	shared_ptr<Buffer> b = getControlBuffer();
 	if(!b.get())
 	{
 		IB_DEBUG("[SEND CONTROL] [CREDIT UPDATE] => FAILED, BUFFER NOT AVAILABLE");

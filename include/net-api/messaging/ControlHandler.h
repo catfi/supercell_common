@@ -27,7 +27,7 @@ namespace zillians { namespace messaging {
 
 struct ControlHandler
 {
-	virtual void handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<Connection> connection) = 0;
+	virtual void handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<Connection> connection) = 0;
 };
 
 struct ControlHandlerBinder : public ControlHandler
@@ -45,11 +45,11 @@ struct ControlHandlerBinder : public ControlHandler
 		}
 	};
 
-	typedef typename boost::function< void (uint32, SharedPtr<Buffer>) > handler_type;
+	typedef typename boost::function< void (uint32, shared_ptr<Buffer>) > handler_type;
 
 	ControlHandlerBinder(handler_type h) : handler(h) { }
 
-	virtual void handle(uint32 type, SharedPtr<Buffer> b)
+	virtual void handle(uint32 type, shared_ptr<Buffer> b)
 	{
 		handler(type, b);
 	}

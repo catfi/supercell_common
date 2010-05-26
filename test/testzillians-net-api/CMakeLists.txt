@@ -24,7 +24,7 @@ IF(RDMA_FOUND)
 #    ADD_SUBDIRECTORY(InfinibandBasicSendReceiveTest)
 #    ADD_SUBDIRECTORY(InfinibandDirectSendTest)
 #    ADD_SUBDIRECTORY(InfinibandLargeSendTest)
-    ADD_SUBDIRECTORY(InfinibandReadWriteTest)
+#    ADD_SUBDIRECTORY(InfinibandReadWriteTest)
 ENDIF()
 
 IF(TICPP_FOUND)

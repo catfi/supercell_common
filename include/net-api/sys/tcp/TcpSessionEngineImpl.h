@@ -37,7 +37,7 @@ namespace zillians { namespace net { namespace sys {
  * This is a SessionEngineT specialization for boost::asio::ip::tcp (which is basically TCP)
  */
 template <>
-class SessionEngineT< boost::asio::ip::tcp >
+class SessionEngineT< SessionTransport::tcp >
 {
 public:
 	typedef boost::asio::ip::tcp Protocol;
@@ -45,7 +45,7 @@ public:
 	typedef Protocol::endpoint Endpoint;
 	typedef Protocol::acceptor Acceptor;
 	typedef Protocol::resolver Resolver;
-	typedef SessionT<Protocol> Session;
+	typedef SessionT< SessionTransport::tcp > Session;
 	typedef DispatcherT<Session> Dispatcher;
 
 	typedef boost::function< void (Session&) > CloseCallback;
@@ -54,7 +54,7 @@ public:
 private:
 	struct DispatcherContext
 	{
-		SharedPtr<Buffer> buffer;
+		shared_ptr<Buffer> buffer;
 		bool dispatchEnabled;
 		CloseCallback onClose;
 		ErrorCallback onError;
@@ -576,7 +576,7 @@ private:
 };
 
 /// Pre-define TcpSessionEngine
-typedef SessionEngineT< boost::asio::ip::tcp > TcpSessionEngine;
+typedef SessionEngineT< SessionTransport::tcp > TcpSessionEngine;
 
 } } }
 

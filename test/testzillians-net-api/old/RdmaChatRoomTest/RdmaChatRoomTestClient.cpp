@@ -37,25 +37,25 @@ RdmaChatRoomTestClient::~RdmaChatRoomTestClient()
 {
 }
 
-void RdmaChatRoomTestClient::onConnected(SharedPtr<RdmaConnection> connection)
+void RdmaChatRoomTestClient::onConnected(shared_ptr<RdmaConnection> connection)
 {
 	mStatu = CONNECTED;
 	std::cout << "CONNECTED" << std::endl;
 	mConnection = connection;
 	std::cout << "UserName : ";
 	std::cin >> mUserName;
-	SharedPtr<RdmaChatRoomTestMsg> sendMsg(new RdmaChatRoomTestMsg());
+	shared_ptr<RdmaChatRoomTestMsg> sendMsg(new RdmaChatRoomTestMsg());
 	mSendMsg = sendMsg;
 	mSendMsg->createBuffer(mConnection);
 	mSendMsg->sendMsg(RdmaChatRoomTestMsg::LOGIN, mUserName, "", "");
 }
 
-void RdmaChatRoomTestClient::onDisconnected(SharedPtr<RdmaConnection> connection)
+void RdmaChatRoomTestClient::onDisconnected(shared_ptr<RdmaConnection> connection)
 {
 	std::cout << "DISCONNECTED" << std::endl;
 }
 
-void RdmaChatRoomTestClient::onError(SharedPtr<RdmaConnection> connection, int code)
+void RdmaChatRoomTestClient::onError(shared_ptr<RdmaConnection> connection, int code)
 {
 	std::cout << "ERROR" << std::endl;
 }
@@ -127,9 +127,9 @@ void RdmaChatRoomTestClient::handleStdin(ev::io &w, int revents)
 	}
 }
 
-void RdmaChatRoomTestClient::handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection)
+void RdmaChatRoomTestClient::handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection)
 {
-	SharedPtr<RdmaChatRoomTestMsg> msg(new RdmaChatRoomTestMsg());
+	shared_ptr<RdmaChatRoomTestMsg> msg(new RdmaChatRoomTestMsg());
 	msg->unpackMsg(type, b);
 
 	switch(type)

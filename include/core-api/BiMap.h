@@ -69,7 +69,7 @@ public:
 	TypeRight mapRight(TypeLeft lookup);
 
 private:
-	static SharedPtr<ThreadPool> mThreadPool;
+	static shared_ptr<ThreadPool> mThreadPool;
 	static tbb::spin_rw_mutex mLockThreadPool;
 	boost::thread_specific_ptr<ThreadData> mThreadData;
 
@@ -84,11 +84,11 @@ BiMap<TypeLeft, TypeRight>::BiMap()
 : mMergeInterval(100.0), //100ms
 mThreadData(&BiMap::cleanupThreadData)
 {
-	mThreadPool = SharedPtr<ThreadPool>(new ThreadPool());
+	mThreadPool = shared_ptr<ThreadPool>(new ThreadPool());
 }
 
 template<class TypeLeft, class TypeRight>
-SharedPtr<typename BiMap<TypeLeft, TypeRight>::ThreadPool> BiMap<TypeLeft, TypeRight>::mThreadPool;
+shared_ptr<typename BiMap<TypeLeft, TypeRight>::ThreadPool> BiMap<TypeLeft, TypeRight>::mThreadPool;
 
 template<class TypeLeft, class TypeRight>
 tbb::spin_rw_mutex BiMap<TypeLeft, TypeRight>::mLockThreadPool;

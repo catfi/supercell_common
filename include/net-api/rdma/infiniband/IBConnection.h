@@ -56,49 +56,49 @@ public:
 	typedef boost::function< void (int error) > CompletionHandler;
 
 public:
-	IBConnection(IBNetEngine* engine, SharedPtr<rdma_cm_id> id);
+	IBConnection(IBNetEngine* engine, shared_ptr<rdma_cm_id> id);
 	virtual ~IBConnection();
 
 	//////////////////////////////////////////////////////////////////////
 	//// Public Interfaces
 	//////////////////////////////////////////////////////////////////////
-	inline static SharedPtr<IBConnection> create(IBNetEngine* engine, SharedPtr<rdma_cm_id> id)
+	inline static shared_ptr<IBConnection> create(IBNetEngine* engine, shared_ptr<rdma_cm_id> id)
 	{
-		SharedPtr<IBConnection> p(new IBConnection(engine, id));
+		shared_ptr<IBConnection> p(new IBConnection(engine, id));
 		p->mWeakThis = p;
 		return p;
 	}
 
 	inline HandleType getHandle() {	return mVerbs.id.get(); }
 
-	SharedPtr<Buffer> createBuffer(size_t size);
+	shared_ptr<Buffer> createBuffer(size_t size);
 
-	bool sendThrottled(uint32 type, SharedPtr<Buffer> buffer);
-	bool send(uint32 type, SharedPtr<Buffer> buffer);
+	bool sendThrottled(uint32 type, shared_ptr<Buffer> buffer);
+	bool send(uint32 type, shared_ptr<Buffer> buffer);
 
-//	uint64 registrerDirect(SharedPtr<Buffer> buffer);
+//	uint64 registrerDirect(shared_ptr<Buffer> buffer);
 //	void unregisterDirect(uint64 sink_id);
-//	bool sendDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id);
+//	bool sendDirect(uint32 type, shared_ptr<Buffer> buffer, uint64 sink_id);
 
 	void close();
 
 	//////////////////////////////////////////////////////////////////////
 	//// RDMA Read/Write Semantics
 	//////////////////////////////////////////////////////////////////////
-	uint64 registerDirect(SharedPtr<Buffer> buffer);
+	uint64 registerDirect(shared_ptr<Buffer> buffer);
 	void unregisterDirect(uint64 sink);
 
-	bool write(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size);
-	bool writeAsync(uint64 sink, std::size_t offset, SharedPtr<Buffer> buffer, std::size_t size, CompletionHandler handler);
+	bool write(uint64 sink, std::size_t offset, shared_ptr<Buffer> buffer, std::size_t size);
+	bool writeAsync(uint64 sink, std::size_t offset, shared_ptr<Buffer> buffer, std::size_t size, CompletionHandler handler);
 
-	bool read(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size);
-	bool readAsync(SharedPtr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler);
+	bool read(shared_ptr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size);
+	bool readAsync(shared_ptr<Buffer> buffer, uint64 sink, std::size_t offset, std::size_t size, CompletionHandler handler);
 
 	//////////////////////////////////////////////////////////////////////
 	//// RDMA Send/Receive Semantics
 	//////////////////////////////////////////////////////////////////////
-	bool sendAsync(uint32 type, SharedPtr<Buffer>, CompletionHandler handler);
-	bool receiveAsync(SharedPtr<Buffer>, CompletionHandler handler);
+	bool sendAsync(uint32 type, shared_ptr<Buffer>, CompletionHandler handler);
+	bool receiveAsync(shared_ptr<Buffer>, CompletionHandler handler);
 
 	//////////////////////////////////////////////////////////////////////
 	//// Parameter Adjust
@@ -110,8 +110,8 @@ public:
 	//// Types & Containers
 	//////////////////////////////////////////////////////////////////////
     typedef tbb::concurrent_hash_map<uint64, uint64> RefHolder;
-    typedef tbb::concurrent_hash_map<uint64, SharedPtr<Buffer> > BufferRefHolder;
-	typedef tbb::concurrent_bounded_queue< SharedPtr<Buffer> > BufferQueue;
+    typedef tbb::concurrent_hash_map<uint64, shared_ptr<Buffer> > BufferRefHolder;
+	typedef tbb::concurrent_bounded_queue< shared_ptr<Buffer> > BufferQueue;
 
 	//////////////////////////////////////////////////////////////////////
 	//// Poller Handlers & Related
@@ -129,7 +129,7 @@ private:
 	void handleRecvCompletionControlBuffer(const ibv_wc &wc);
 	void handleRecvCompletionGeneralBuffer(const ibv_wc &wc);
 
-	void start(SharedPtr<Poller> poller);
+	void start(shared_ptr<Poller> poller);
 	void stop();
 
 
@@ -139,10 +139,10 @@ private:
 	IBConnection::BufferRefHolder mRecvBufferHolder;
 	IBConnection::BufferRefHolder mSendBufferHolder;
 
-	bool postGeneral(uint32 type, SharedPtr<Buffer> buffer);
-	bool sendControl(SharedPtr<Buffer> buffer);
-	bool postControl(SharedPtr<Buffer> buffer);
-	//bool postDirect(uint32 type, SharedPtr<Buffer> buffer, uint64 sink_id);
+	bool postGeneral(uint32 type, shared_ptr<Buffer> buffer);
+	bool sendControl(shared_ptr<Buffer> buffer);
+	bool postControl(shared_ptr<Buffer> buffer);
+	//bool postDirect(uint32 type, shared_ptr<Buffer> buffer, uint64 sink_id);
 
 	//////////////////////////////////////////////////////////////////////
 	//// Internal Control - Completion Info
@@ -151,7 +151,7 @@ private:
 	{
 		CompletionInfo() { }
 		~CompletionInfo() { buffer.reset(); handler.clear(); }
-		SharedPtr<Buffer> buffer;
+		shared_ptr<Buffer> buffer;
 		CompletionHandler handler;
 	};
 
@@ -178,8 +178,8 @@ private:
 	//// Control Buffers
 	//////////////////////////////////////////////////////////////////////
 	IBConnection::BufferQueue mControlBufferQueue;
-	SharedPtr<Buffer> getControlBuffer(bool blocking = false);
-	void returnControlBuffer(SharedPtr<Buffer> buffer);
+	shared_ptr<Buffer> getControlBuffer(bool blocking = false);
+	void returnControlBuffer(shared_ptr<Buffer> buffer);
 
 	//////////////////////////////////////////////////////////////////////
 	//// Internal Control - Remote Access Exchange
@@ -352,7 +352,7 @@ private:
     {
     	enum { GENERAL, /*DIRECT, */CONTROL } req;
     	uint32 type;
-    	SharedPtr<Buffer> buffer;
+    	shared_ptr<Buffer> buffer;
     	uint64 sink_id;
     };
 
@@ -405,12 +405,12 @@ private:
     //////////////////////////////////////////////////////////////////////
 	struct
 	{
-		SharedPtr<rdma_event_channel>	rchannel;
-		SharedPtr<rdma_cm_id>			id;
-		SharedPtr<ibv_pd> 				pd;
-		SharedPtr<ibv_comp_channel> 	cchannel;
-		SharedPtr<ibv_cq>				scq;
-		SharedPtr<ibv_cq> 				rcq;
+    	shared_ptr<rdma_event_channel>	rchannel;
+    	shared_ptr<rdma_cm_id>			id;
+    	shared_ptr<ibv_pd> 				pd;
+    	shared_ptr<ibv_comp_channel> 	cchannel;
+    	shared_ptr<ibv_cq>				scq;
+    	shared_ptr<ibv_cq> 				rcq;
 		tbb::queuing_mutex				send_lock;
 		tbb::queuing_mutex				recv_lock;
 	} mVerbs;
@@ -448,8 +448,8 @@ private:
 	IBNetEngine* mEngine;
     WeakPtr<IBConnection> mWeakThis;
 
-	SharedPtr<IBDeviceResource> mDeviceResource;
-    SharedPtr<Poller> mPoller;
+    shared_ptr<IBDeviceResource> mDeviceResource;
+    shared_ptr<Poller> mPoller;
     bool mConnected;
 
 	void ensureQueuePair();

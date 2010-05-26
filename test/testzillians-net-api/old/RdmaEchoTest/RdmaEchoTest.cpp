@@ -40,15 +40,15 @@ using namespace zillians::net;
 //////////////////////////////////////////////////////////////////////////
 struct SingletonPool
 {
-	SharedPtr<RdmaDeviceResourceManager> device_resource_manager;
-	SharedPtr<RdmaBufferManager> buffer_manager;
+	shared_ptr<RdmaDeviceResourceManager> device_resource_manager;
+	shared_ptr<RdmaBufferManager> buffer_manager;
 } gSingletonPool;
 
 //////////////////////////////////////////////////////////////////////////
 void initSingleton()
 {
-	gSingletonPool.device_resource_manager = SharedPtr<RdmaDeviceResourceManager>(new RdmaDeviceResourceManager());
-	gSingletonPool.buffer_manager = SharedPtr<RdmaBufferManager>(new RdmaBufferManager(256*1024*1024 + RDMA_MINIMAL_MEMORY_USAGE));
+	gSingletonPool.device_resource_manager = shared_ptr<RdmaDeviceResourceManager>(new RdmaDeviceResourceManager());
+	gSingletonPool.buffer_manager = shared_ptr<RdmaBufferManager>(new RdmaBufferManager(256*1024*1024 + RDMA_MINIMAL_MEMORY_USAGE));
 }
 
 void finiSingleton()
@@ -66,21 +66,21 @@ void printUsage()
 class ServerHandler : public RdmaDataHandler, public RdmaConnectionHandler
 {
 public:
-	ServerHandler(SharedPtr<Poller> poller)
+	ServerHandler(shared_ptr<Poller> poller)
 	{
 		mPoller = poller;
 		mConnectionCount = 0;
 	}
 
 public:
-	virtual void onConnected(SharedPtr<RdmaConnection> connection)
+	virtual void onConnected(shared_ptr<RdmaConnection> connection)
 	{
 		++mConnectionCount;
 		LOG4CXX_INFO(mLogger, "client connected, connection ptr = " << connection.get());
 		connection->setMaxSendInFlight(-1);
 	}
 
-	virtual void onDisconnected(SharedPtr<RdmaConnection> connection)
+	virtual void onDisconnected(shared_ptr<RdmaConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "client disconnected, connection ptr = " << connection.get());
 
@@ -92,19 +92,19 @@ public:
 		}
 	}
 
-	virtual void onError(SharedPtr<RdmaConnection> connection, int code)
+	virtual void onError(shared_ptr<RdmaConnection> connection, int code)
 	{
 		LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 	}
 
 public:
-	virtual void handle(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<RdmaConnection> connection)
+	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<RdmaConnection> connection)
 	{
 		connection->send(type, buffer);
 	}
 
 public:
-	SharedPtr<Poller> mPoller;
+	shared_ptr<Poller> mPoller;
 	int mConnectionCount;
 
 private:
@@ -122,25 +122,25 @@ public:
 	}
 
 public:
-	virtual void onConnected(SharedPtr<RdmaConnection> connection)
+	virtual void onConnected(shared_ptr<RdmaConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "connected to server, connection ptr = " << connection.get());
 	}
 
-	virtual void onDisconnected(SharedPtr<RdmaConnection> connection)
+	virtual void onDisconnected(shared_ptr<RdmaConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "disconnected from server, connection ptr = " << connection.get());
 	}
 
-	virtual void onError(SharedPtr<RdmaConnection> connection, int code)
+	virtual void onError(shared_ptr<RdmaConnection> connection, int code)
 	{
 		LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 	}
 
 public:
-	virtual void handle(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<RdmaConnection> connection)
+	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<RdmaConnection> connection)
 	{
-		SharedPtr<AckSlot> ack = boost::static_pointer_cast<AckSlot>(connection->getContext());
+		shared_ptr<AckSlot> ack = boost::static_pointer_cast<AckSlot>(connection->getContext());
 		ack->signal();
 	}
 
@@ -152,14 +152,14 @@ log4cxx::LoggerPtr ClientHandler::mLogger(log4cxx::Logger::getLogger("ClientHand
 
 enum {max_length = 1024};
 
-void poller_thread(SharedPtr<Poller> p)
+void poller_thread(shared_ptr<Poller> p)
 {
 	p->run();
 }
 
-void runner_thread(SharedPtr<RdmaConnection> connection, int tid, int count, double freq, double* latencies)
+void runner_thread(shared_ptr<RdmaConnection> connection, int tid, int count, double freq, double* latencies)
 {
-	SharedPtr<AckSlot> ack(new AckSlot);
+	shared_ptr<AckSlot> ack(new AckSlot);
 	connection->setContext(ack);
 
 	double latency_sum = 0.0;
@@ -171,8 +171,8 @@ void runner_thread(SharedPtr<RdmaConnection> connection, int tid, int count, dou
 	for(int i=0;i<max_length;++i)
 		request[i] = i%(std::numeric_limits<char>::max());
 
-	SharedPtr<Buffer> request_buffer(new Buffer(&request[0], max_length));
-	SharedPtr<Buffer> reply_buffer(new Buffer(&reply[0], max_length));
+	shared_ptr<Buffer> request_buffer(new Buffer(&request[0], max_length));
+	shared_ptr<Buffer> reply_buffer(new Buffer(&reply[0], max_length));
 
 	try
 	{
@@ -224,7 +224,7 @@ void runner_thread(SharedPtr<RdmaConnection> connection, int tid, int count, dou
 double* gLatencies = NULL;
 tbb::tbb_thread* gClientThreads = NULL;
 
-void connector_completion_handler(SharedPtr<RdmaConnection> connection, int err, int tid, int send_count)
+void connector_completion_handler(shared_ptr<RdmaConnection> connection, int err, int tid, int send_count)
 {
 	printf("ConnectorHandler: err = %d\n", err);
 
@@ -232,7 +232,7 @@ void connector_completion_handler(SharedPtr<RdmaConnection> connection, int err,
 	tbb::move(gClientThreads[tid], t);
 }
 
-void acceptor_completion_handler(SharedPtr<RdmaConnection> connection, int err)
+void acceptor_completion_handler(shared_ptr<RdmaConnection> connection, int err)
 {
 	printf("AcceptorHandler: err = %d\n", err);
 }
@@ -266,16 +266,16 @@ int main(int argc, char** argv)
 	// start and run the network engine
 	if(1)
 	{
-		SharedPtr<Poller> poller(new Poller(ev_loop_new(0)));
+		shared_ptr<Poller> poller(new Poller(ev_loop_new(0)));
 
-		SharedPtr<RdmaDispatcher> dispatcher(new RdmaDispatcher());
-		SharedPtr<RdmaNetEngine> engine(new RdmaNetEngine());
+		shared_ptr<RdmaDispatcher> dispatcher(new RdmaDispatcher());
+		shared_ptr<RdmaNetEngine> engine(new RdmaNetEngine());
 		engine->setDispatcher(dispatcher);
 		engine->setBufferManager(gSingletonPool.buffer_manager);
 
 		if(strcmp(argv[1], "server") == 0)
 		{
-			SharedPtr<ServerHandler> server(new ServerHandler(poller));
+			shared_ptr<ServerHandler> server(new ServerHandler(poller));
 			dispatcher->registerDataHandler(1000, server);
 			dispatcher->registerConnectionHandler(server);
 
@@ -296,7 +296,7 @@ int main(int argc, char** argv)
 			gClientThreads = new tbb::tbb_thread[thread_count];
 			gLatencies = new double[thread_count];
 
-			SharedPtr<ClientHandler> client(new ClientHandler());
+			shared_ptr<ClientHandler> client(new ClientHandler());
 			dispatcher->registerDataHandler(1000, client);
 			dispatcher->registerConnectionHandler(client);
 

@@ -33,7 +33,7 @@ public:
 	virtual ~HandlerTemplate() { }
 
 public:
-	virtual void handle(int32 type, SharedPtr<Buffer> b, SharedPtr<Connection> connection) = 0;
+	virtual void handle(int32 type, shared_ptr<Buffer> b, shared_ptr<Connection> connection) = 0;
 };
 
 } } }

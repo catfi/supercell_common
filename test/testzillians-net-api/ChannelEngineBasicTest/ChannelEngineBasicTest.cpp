@@ -80,10 +80,10 @@ public:
 class MyMessageFactory : public MessageFactory
 {
 public:
-	virtual SharedPtr<Message> create(uint32 type)
+	virtual shared_ptr<Message> create(uint32 type)
 	{
 		BOOST_ASSERT(type == MyMessage::TYPE);
-		return SharedPtr<Message>(new MyMessage);
+		return shared_ptr<Message>(new MyMessage);
 	}
 };
 
@@ -93,9 +93,9 @@ tbb::atomic<int> gReceiveCount;
 class MyMessageHandler : public MessageHandler
 {
 public:
-	virtual void onMessage(uint32 type, SharedPtr<Channel> channel, SharedPtr<Message> message)
+	virtual void onMessage(uint32 type, shared_ptr<Channel> channel, shared_ptr<Message> message)
 	{
-		SharedPtr<MyMessage> mymsg = boost::static_pointer_cast<MyMessage>(message);
+		shared_ptr<MyMessage> mymsg = boost::static_pointer_cast<MyMessage>(message);
 		LOG4CXX_INFO(mLogger, "from " << channel->getIdentifier() << ": " << mymsg->data);
 		if(gPassiveMode)
 		{
@@ -113,22 +113,22 @@ log4cxx::LoggerPtr MyMessageHandler::mLogger(log4cxx::Logger::getLogger("MyMessa
 
 
 //////////////////////////////////////////////////////////////////////////
-void ConnectorHandler(SharedPtr<RdmaConnection> connection, int err)
+void ConnectorHandler(shared_ptr<RdmaConnection> connection, int err)
 {
 	printf("ConnectorHandler: err = %d\n", err);
 }
 
-void AcceptorHandler(SharedPtr<RdmaConnection> connection, int err)
+void AcceptorHandler(shared_ptr<RdmaConnection> connection, int err)
 {
 	printf("AcceptorHandler: err = %d\n", err);
 }
 
-void EngineRunThreadProc(SharedPtr<ChannelEngine> engine)
+void EngineRunThreadProc(shared_ptr<ChannelEngine> engine)
 {
 	engine->run();
 }
 
-void CheckThreadProc(SharedPtr<ChannelEngine> engine)
+void CheckThreadProc(shared_ptr<ChannelEngine> engine)
 {
 	while(gReceiveCount < TEST_MESSAGE_COUNT)
 	{
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
 
 		gReceiveCount = 0;
 
-    	SharedPtr<ScyllaNodeDB> engineNodeDB(new ScyllaNodeDB());
+		shared_ptr<ScyllaNodeDB> engineNodeDB(new ScyllaNodeDB());
     	{
 			std::string nodeConfig = vm["config"].as<std::string>();
 			std::ifstream stream(nodeConfig.c_str());
@@ -217,10 +217,10 @@ int main(int argc, char** argv)
 			}
     	}
 
-    	SharedPtr<ScyllaChannelEngine> engine(new ScyllaChannelEngine(engineConfig, engineNodeDB));
+    	shared_ptr<ScyllaChannelEngine> engine(new ScyllaChannelEngine(engineConfig, engineNodeDB));
     	{
-    		SharedPtr<MyMessageFactory> fact(new MyMessageFactory);
-    		SharedPtr<MyMessageHandler> handler(new MyMessageHandler);
+    		shared_ptr<MyMessageFactory> fact(new MyMessageFactory);
+    		shared_ptr<MyMessageHandler> handler(new MyMessageHandler);
     		engine->registerMessageHandler(MyMessage::TYPE, fact, handler);
     	}
 
@@ -231,7 +231,7 @@ int main(int argc, char** argv)
     	{
     		gPassiveMode = false;
     		UUID target = vm["target"].as<std::string>();
-    		SharedPtr<Channel> channel;
+    		shared_ptr<Channel> channel;
     		try
     		{
     			channel = engine->createChannel(target);
@@ -244,7 +244,7 @@ int main(int argc, char** argv)
 
     		for(int i=0;i<TEST_MESSAGE_COUNT;++i)
     		{
-				SharedPtr<MyMessage> message(new MyMessage);
+    			shared_ptr<MyMessage> message(new MyMessage);
 				message->data = "HELLO!!!";
 				channel->send(message);
     		}

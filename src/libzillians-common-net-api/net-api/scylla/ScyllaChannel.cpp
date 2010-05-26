@@ -29,7 +29,7 @@ namespace zillians { namespace net {
 
 //////////////////////////////////////////////////////////////////////////
 
-ScyllaChannel::ScyllaChannel(CloseProcessGroup* cpg, SharedPtr<Worker> worker):
+ScyllaChannel::ScyllaChannel(CloseProcessGroup* cpg, shared_ptr<Worker> worker):
 	mCloseProcessGroup(cpg), mAcksendWorker(worker)
 {
 	mConditionVarArray = new ConditionVariable<boost::system::error_code>*[SCYLLACHANNEL_CVARRAY_SIZE];
@@ -53,12 +53,12 @@ ScyllaChannel::~ScyllaChannel()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void ScyllaChannel::send(uint32 type, SharedPtr<Buffer> buffer)
+void ScyllaChannel::send(uint32 type, shared_ptr<Buffer> buffer)
 {
 	mCloseProcessGroup->send(type, buffer);
 }
 
-void ScyllaChannel::acksend(uint32 type, SharedPtr<Buffer> buffer)
+void ScyllaChannel::acksend(uint32 type, shared_ptr<Buffer> buffer)
 {
 	uint32 cvId;
 	mConditionVarQueue.pop(cvId);
@@ -68,7 +68,7 @@ void ScyllaChannel::acksend(uint32 type, SharedPtr<Buffer> buffer)
 	ackMessage.mCvId = cvId;
 	ackMessage.mOriginalMessageType = type;
 	ackMessage.mOriginalMessageSize = buffer->dataSize();
-	SharedPtr<Buffer> buf(new Buffer(Buffer::probeSize(ackMessage) + ackMessage.mOriginalMessageSize));
+	shared_ptr<Buffer> buf(new Buffer(Buffer::probeSize(ackMessage) + ackMessage.mOriginalMessageSize));
 	buf->writeSerializable(ackMessage);
 	buf->append(*buffer);
 
@@ -83,7 +83,7 @@ void ScyllaChannel::acksend(uint32 type, SharedPtr<Buffer> buffer)
 	}
 }
 
-void ScyllaChannel::acksendAsync(uint32 type, SharedPtr<Buffer> buffer, AsyncSendCompletionHandler handler)
+void ScyllaChannel::acksendAsync(uint32 type, shared_ptr<Buffer> buffer, AsyncSendCompletionHandler handler)
 {
 	mAcksendWorker->dispatch(boost::bind(&ScyllaChannel::doAcksendAsync, this, type, buffer, handler));
 }
@@ -95,7 +95,7 @@ void ScyllaChannel::handleAckMessage(uint32 cvId, const boost::system::error_cod
 }
 
 //////////////////////////////////////////////////////////////////////////
-void ScyllaChannel::doAcksendAsync(uint32 type, SharedPtr<Buffer> buffer, AsyncSendCompletionHandler handler)
+void ScyllaChannel::doAcksendAsync(uint32 type, shared_ptr<Buffer> buffer, AsyncSendCompletionHandler handler)
 {
 	boost::system::error_code ec;
 	try

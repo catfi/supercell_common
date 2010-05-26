@@ -44,7 +44,7 @@ RdmaPerformanceTestServer::~RdmaPerformanceTestServer()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void RdmaPerformanceTestServer::onConnected(SharedPtr<RdmaConnection> connection)
+void RdmaPerformanceTestServer::onConnected(shared_ptr<RdmaConnection> connection)
 {
 	connection->setMaxSendInFlight(-1);
 	mConnection = connection;
@@ -54,18 +54,18 @@ void RdmaPerformanceTestServer::onConnected(SharedPtr<RdmaConnection> connection
 	LOG4CXX_INFO(mLogger ,"CONNECTED");
 }
 
-void RdmaPerformanceTestServer::onDisconnected(SharedPtr<RdmaConnection> connection)
+void RdmaPerformanceTestServer::onDisconnected(shared_ptr<RdmaConnection> connection)
 {
 	LOG4CXX_INFO(mLogger ,"DISCONNECTED");
 }
 
-void RdmaPerformanceTestServer::onError(SharedPtr<RdmaConnection> connection, int code)
+void RdmaPerformanceTestServer::onError(shared_ptr<RdmaConnection> connection, int code)
 {
 	LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 }
 
 //////////////////////////////////////////////////////////////////////////
-void RdmaPerformanceTestServer::handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection)
+void RdmaPerformanceTestServer::handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection)
 {
 
 	switch(type)
@@ -79,10 +79,10 @@ void RdmaPerformanceTestServer::handle(uint32 type, SharedPtr<Buffer> b, SharedP
 			BufferInfo info;
 			info.length = 8192*1024*10;
 
-			SharedPtr<Buffer> rb = connection->createBuffer(info.length);
+			shared_ptr<Buffer> rb = connection->createBuffer(info.length);
 			info.id = connection->registrerDirect(rb);
 
-			SharedPtr<Buffer> cb = connection->createBuffer(sizeof(info));
+			shared_ptr<Buffer> cb = connection->createBuffer(sizeof(info));
 			cb->writeAny(info);
 			connection->send(3, cb);
 
@@ -118,7 +118,7 @@ RdmaPerformanceTestClient::~RdmaPerformanceTestClient()
 
 //////////////////////////////////////////////////////////////////////////
 
-void RdmaPerformanceTestClient::onConnected(SharedPtr<RdmaConnection> connection)
+void RdmaPerformanceTestClient::onConnected(shared_ptr<RdmaConnection> connection)
 {
 	connection->setMaxSendInFlight(-1);
 	mConnection = connection;
@@ -129,18 +129,18 @@ void RdmaPerformanceTestClient::onConnected(SharedPtr<RdmaConnection> connection
 
 
 }
-void RdmaPerformanceTestClient::onDisconnected(SharedPtr<RdmaConnection> connection)
+void RdmaPerformanceTestClient::onDisconnected(shared_ptr<RdmaConnection> connection)
 {
 	LOG4CXX_INFO(mLogger,"DISCONNECTED" );
 }
 
-void RdmaPerformanceTestClient::onError(SharedPtr<RdmaConnection> connection, int code)
+void RdmaPerformanceTestClient::onError(shared_ptr<RdmaConnection> connection, int code)
 {
 	LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 }
 
 //////////////////////////////////////////////////////////////////////////
-void RdmaPerformanceTestClient::handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection)
+void RdmaPerformanceTestClient::handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection)
 {
 	switch(type)
 	{
@@ -165,7 +165,7 @@ void RdmaPerformanceTestClient::handle(uint32 type, SharedPtr<Buffer> b, SharedP
 		{
 			BufferInfo info;
 			b->readAny(info);
-			SharedPtr<Buffer> rb = connection->createBuffer(info.length);
+			shared_ptr<Buffer> rb = connection->createBuffer(info.length);
 			rb->wpos(rb->freeSize());
 			mSize = info.length;
 			mDirectSendstartTime = tbb::tick_count::now();
@@ -266,14 +266,14 @@ void RdmaPerformanceTestClient::doDirectSendTest()
 
 struct SingletonPool
 {
-	SharedPtr<RdmaDeviceResourceManager> device_resource_manager;
-	SharedPtr<RdmaBufferManager> buffer_manager;
+	shared_ptr<RdmaDeviceResourceManager> device_resource_manager;
+	shared_ptr<RdmaBufferManager> buffer_manager;
 } gSingletonPool;
 
 void initSingleton()
 {
-	gSingletonPool.device_resource_manager = SharedPtr<RdmaDeviceResourceManager>(new RdmaDeviceResourceManager());
-	gSingletonPool.buffer_manager = SharedPtr<RdmaBufferManager>(new RdmaBufferManager(800*MB + RDMA_MINIMAL_MEMORY_USAGE + 10*MB));
+	gSingletonPool.device_resource_manager = shared_ptr<RdmaDeviceResourceManager>(new RdmaDeviceResourceManager());
+	gSingletonPool.buffer_manager = shared_ptr<RdmaBufferManager>(new RdmaBufferManager(800*MB + RDMA_MINIMAL_MEMORY_USAGE + 10*MB));
 }
 
 void finiSingleton()
@@ -287,12 +287,12 @@ void printUsage()
 	fprintf(stderr, "%s <server|client> <listen_address|connecting_address> <MessageSize(MB)(MAX 500)>\n", "RdmaPerformanceTest");
 }
 
-void ConnectorHandler(SharedPtr<RdmaConnection> connection, int err)
+void ConnectorHandler(shared_ptr<RdmaConnection> connection, int err)
 {
 	printf("ConnectorHandler: err = %d\n", err);
 }
 
-void AcceptorHandler(SharedPtr<RdmaConnection> connection, int err)
+void AcceptorHandler(shared_ptr<RdmaConnection> connection, int err)
 {
 	printf("AcceptorHandler: err = %d\n", err);
 }
@@ -314,10 +314,10 @@ int main(int argc, char** argv)
 	initSingleton();
 
 
-	SharedPtr<RdmaDispatcher> d(new RdmaDispatcher());
-	SharedPtr<Poller> p(new Poller(ev_loop_new(0)));
+	shared_ptr<RdmaDispatcher> d(new RdmaDispatcher());
+	shared_ptr<Poller> p(new Poller(ev_loop_new(0)));
 
-	SharedPtr<RdmaNetEngine> engine(new RdmaNetEngine());
+	shared_ptr<RdmaNetEngine> engine(new RdmaNetEngine());
 
 	engine->setDispatcher(d);
 	engine->setBufferManager(gSingletonPool.buffer_manager);
@@ -325,7 +325,7 @@ int main(int argc, char** argv)
 
 	if(strcmp(argv[1], "server") == 0)
 	{
-		SharedPtr< RdmaPerformanceTestServer > Server( new RdmaPerformanceTestServer() );
+		shared_ptr< RdmaPerformanceTestServer > Server( new RdmaPerformanceTestServer() );
 
 
 
@@ -344,7 +344,7 @@ int main(int argc, char** argv)
 	else if(strcmp(argv[1], "client")==0)
 	{
 
-		SharedPtr<RdmaPerformanceTestClient> Client(new RdmaPerformanceTestClient());
+		shared_ptr<RdmaPerformanceTestClient> Client(new RdmaPerformanceTestClient());
 
 
 		d->registerDefaultDataHandler(Client);

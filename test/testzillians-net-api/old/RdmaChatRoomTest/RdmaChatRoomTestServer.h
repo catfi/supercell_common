@@ -11,7 +11,7 @@
 using namespace zillians;
 using namespace zillians::net;
 
-typedef map<string, SharedPtr<RdmaConnection> >::iterator myIterator;
+typedef map<string, shared_ptr<RdmaConnection> >::iterator myIterator;
 
 class RdmaChatRoomTestServer : public RdmaDataHandler, public RdmaConnectionHandler
 {
@@ -20,18 +20,18 @@ public:
 	virtual ~RdmaChatRoomTestServer();
 
 public:
-	virtual void onConnected(SharedPtr<RdmaConnection> connection);
-	virtual void onDisconnected(SharedPtr<RdmaConnection> connection);
-	virtual void onError(SharedPtr<RdmaConnection> connection, int code);
+	virtual void onConnected(shared_ptr<RdmaConnection> connection);
+	virtual void onDisconnected(shared_ptr<RdmaConnection> connection);
+	virtual void onError(shared_ptr<RdmaConnection> connection, int code);
 
 public:
 	void updateClientList();
 
 public:
 	void handleStdin(ev::io &w, int revents);
-	virtual void handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection);
+	virtual void handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection);
 
 public:
-	map<string, SharedPtr<RdmaConnection> > mConnectionContainer;
+	map<string, shared_ptr<RdmaConnection> > mConnectionContainer;
 	std::string mClientList;
 };

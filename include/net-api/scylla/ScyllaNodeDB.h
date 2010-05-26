@@ -36,9 +36,9 @@ public:
 	virtual ~ScyllaNodeDB();
 
 public:
-	void setChannel(const UUID& id, SharedPtr<Channel> channel);
+	void setChannel(const UUID& id, shared_ptr<Channel> channel);
 	void unsetChannel(const UUID& id);
-	bool queryChannel(const UUID& id, SharedPtr<Channel>* channel);
+	bool queryChannel(const UUID& id, shared_ptr<Channel>* channel);
 
 public:
 	void setIdMapping(const group::CloseProcessGroup::MemberInfo& memberInfo, const UUID& id);
@@ -46,7 +46,7 @@ public:
 	bool queryIdMapping(const group::CloseProcessGroup::MemberInfo& memberInfo, UUID& id);
 
 private:
-	typedef tbb::concurrent_hash_map<UUID, SharedPtr<Channel>, UUIDHasher> ChannelMap;
+	typedef tbb::concurrent_hash_map<UUID, shared_ptr<Channel>, UUIDHasher> ChannelMap;
 	ChannelMap mChannels;
 
 private:

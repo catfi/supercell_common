@@ -45,15 +45,15 @@ using namespace zillians::net::rdma;
 //////////////////////////////////////////////////////////////////////////
 struct SingletonPool
 {
-	SharedPtr<IBDeviceResourceManager> device_resource_manager;
-	SharedPtr<IBBufferManager> buffer_manager;
+	shared_ptr<IBDeviceResourceManager> device_resource_manager;
+	shared_ptr<IBBufferManager> buffer_manager;
 } gSingletonPool;
 
 //////////////////////////////////////////////////////////////////////////
 void initSingleton()
 {
-	gSingletonPool.device_resource_manager = SharedPtr<IBDeviceResourceManager>(new IBDeviceResourceManager());
-	gSingletonPool.buffer_manager = SharedPtr<IBBufferManager>(new IBBufferManager(256*1024*1024 + IB_MINIMAL_MEMORY_USAGE));
+	gSingletonPool.device_resource_manager = shared_ptr<IBDeviceResourceManager>(new IBDeviceResourceManager());
+	gSingletonPool.buffer_manager = shared_ptr<IBBufferManager>(new IBBufferManager(256*1024*1024 + IB_MINIMAL_MEMORY_USAGE));
 }
 
 void finiSingleton()
@@ -67,7 +67,7 @@ void printUsage()
 	fprintf(stderr, "%s <server|client> <listen_address|connecting_address> <number_of_messages>\n", "InfinibandBasicSendReceiveTest");
 }
 
-void PollerThreadProc(SharedPtr<Poller> p)
+void PollerThreadProc(shared_ptr<Poller> p)
 {
 	p->run();
 }
@@ -76,21 +76,21 @@ void PollerThreadProc(SharedPtr<Poller> p)
 class ServerHandler : public IBDataHandler, public IBConnectionHandler
 {
 public:
-	ServerHandler(SharedPtr<Poller> poller)
+	ServerHandler(shared_ptr<Poller> poller)
 	{
 		mPoller = poller;
 		mConnectionCount = 0;
 	}
 
 public:
-	virtual void onConnected(SharedPtr<IBConnection> connection)
+	virtual void onConnected(shared_ptr<IBConnection> connection)
 	{
 		++mConnectionCount;
 		LOG4CXX_INFO(mLogger, "client connected, connection ptr = " << connection.get());
 		connection->setMaxSendInFlight(-1);
 	}
 
-	virtual void onDisconnected(SharedPtr<IBConnection> connection)
+	virtual void onDisconnected(shared_ptr<IBConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "client disconnected, connection ptr = " << connection.get());
 
@@ -102,13 +102,13 @@ public:
 		}
 	}
 
-	virtual void onError(SharedPtr<IBConnection> connection, int code)
+	virtual void onError(shared_ptr<IBConnection> connection, int code)
 	{
 		LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 	}
 
 public:
-	virtual void handle(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<IBConnection> connection)
+	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<IBConnection> connection)
 	{
 
 		static int s = 0;
@@ -163,7 +163,7 @@ public:
 	}
 
 private:
-	SharedPtr<Poller> mPoller;
+	shared_ptr<Poller> mPoller;
 	int mConnectionCount;
 
 private:
@@ -176,13 +176,13 @@ log4cxx::LoggerPtr ServerHandler::mLogger(log4cxx::Logger::getLogger("ServerHand
 class ClientHandler : public IBDataHandler, public IBConnectionHandler
 {
 public:
-	ClientHandler(SharedPtr<Poller> poller)
+	ClientHandler(shared_ptr<Poller> poller)
 	{
 		mPoller = poller;
 	}
 
 public:
-	virtual void onConnected(SharedPtr<IBConnection> connection)
+	virtual void onConnected(shared_ptr<IBConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "connected to server, connection ptr = " << connection.get());
 
@@ -191,7 +191,7 @@ public:
 		tbb::move(mSender, t);
 	}
 
-	virtual void onDisconnected(SharedPtr<IBConnection> connection)
+	virtual void onDisconnected(shared_ptr<IBConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "disconnected from server, connection ptr = " << connection.get());
 
@@ -199,7 +199,7 @@ public:
 		mPoller->terminate();
 	}
 
-	virtual void onError(SharedPtr<IBConnection> connection, int code)
+	virtual void onError(shared_ptr<IBConnection> connection, int code)
 	{
 		LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 	}
@@ -209,7 +209,7 @@ public:
 	 * We implemented some simple application level flow control here!
 	 * @param connection
 	 */
-	void run(SharedPtr<IBConnection> connection)
+	void run(shared_ptr<IBConnection> connection)
 	{
 		bool slow_down = false;
 		double slow_factor = 0.0005;
@@ -220,7 +220,7 @@ public:
 
 		for(int s=0;s<TEST_SEND_COUNT;++s)
 		{
-			SharedPtr<Buffer> buffer = connection->createBuffer(TEST_BUFFER_SIZE);
+			shared_ptr<Buffer> buffer = connection->createBuffer(TEST_BUFFER_SIZE);
 
 			BOOST_ASSERT(buffer.get() != NULL);
 			BOOST_ASSERT(buffer->allocatedSize() == TEST_BUFFER_SIZE);
@@ -298,7 +298,7 @@ public:
 	}
 
 public:
-	virtual void handle(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<IBConnection> connection)
+	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<IBConnection> connection)
 	{
 		static int s = 0;
 
@@ -339,7 +339,7 @@ public:
 		++s;
 	}
 private:
-	SharedPtr<Poller> mPoller;
+	shared_ptr<Poller> mPoller;
 
 private:
 	tbb::tbb_thread mSender;
@@ -350,12 +350,12 @@ private:
 };
 log4cxx::LoggerPtr ClientHandler::mLogger(log4cxx::Logger::getLogger("ClientHandler"));
 
-void ConnectorHandler(SharedPtr<IBConnection> connection, int err)
+void ConnectorHandler(shared_ptr<IBConnection> connection, int err)
 {
 	printf("ConnectorHandler: err = %d\n", err);
 }
 
-void AcceptorHandler(SharedPtr<IBConnection> connection, int err)
+void AcceptorHandler(shared_ptr<IBConnection> connection, int err)
 {
 	printf("AcceptorHandler: err = %d\n", err);
 }
@@ -401,16 +401,16 @@ int main(int argc, char** argv)
 	// start and run the network engine
 	if(1)
 	{
-		SharedPtr<Poller> poller(new Poller(ev_loop_new(0)));
+		shared_ptr<Poller> poller(new Poller(ev_loop_new(0)));
 
-		SharedPtr<IBDispatcher> dispatcher(new IBDispatcher());
-		SharedPtr<IBNetEngine> engine(new IBNetEngine());
+		shared_ptr<IBDispatcher> dispatcher(new IBDispatcher());
+		shared_ptr<IBNetEngine> engine(new IBNetEngine());
 		engine->setDispatcher(dispatcher);
 		engine->setBufferManager(gSingletonPool.buffer_manager);
 
 		if(strcmp(argv[1], "server") == 0)
 		{
-			SharedPtr<ServerHandler> server(new ServerHandler(poller));
+			shared_ptr<ServerHandler> server(new ServerHandler(poller));
 
 			dispatcher->registerDefaultDataHandler(server);
 			dispatcher->registerConnectionHandler(server);
@@ -420,7 +420,7 @@ int main(int argc, char** argv)
 		}
 		else if(strcmp(argv[1], "client") == 0)
 		{
-			SharedPtr<ClientHandler> client(new ClientHandler(poller));
+			shared_ptr<ClientHandler> client(new ClientHandler(poller));
 
 			dispatcher->registerDefaultDataHandler(client);
 			dispatcher->registerConnectionHandler(client);

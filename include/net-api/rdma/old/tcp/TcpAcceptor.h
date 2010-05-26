@@ -36,23 +36,23 @@ class TcpNetEngine;
 class TcpAcceptor
 {
 public:
-	typedef boost::function2<void, SharedPtr< TcpConnection >, int > AcceptorCallback;
+	typedef boost::function2<void, shared_ptr< TcpConnection >, int > AcceptorCallback;
 
 public:
 	TcpAcceptor(TcpNetEngine* engine);
 	~TcpAcceptor();
 
 public:
-	static SharedPtr<TcpAcceptor> create(void* e)
+	static shared_ptr<TcpAcceptor> create(void* e)
 	{
 		TcpNetEngine* engine = reinterpret_cast<TcpNetEngine*>(e);
-		SharedPtr<TcpAcceptor> p(new TcpAcceptor(engine));
+		shared_ptr<TcpAcceptor> p(new TcpAcceptor(engine));
 		p->mWeakThis = p;
 		return p;
 	}
 
 public:
-	bool accept(SharedPtr<Poller> poller, SharedPtr<InetSocketAddress> address, AcceptorCallback callback);
+	bool accept(shared_ptr<Poller> poller, shared_ptr<InetSocketAddress> address, AcceptorCallback callback);
 	void cancel();
 
 public:
@@ -89,7 +89,7 @@ private:
 	{
 		ev::io watcher;
 		ev::timer timeout;
-		SharedPtr<Poller> poller;
+		shared_ptr<Poller> poller;
 		handle_t handle;
 	} mAcceptInfo;
 

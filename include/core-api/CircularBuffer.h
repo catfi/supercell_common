@@ -30,19 +30,19 @@ namespace zillians {
 class CircularBuffer
 {
 public:
-	CircularBuffer(SharedPtr<Buffer> buffer)
+	CircularBuffer(shared_ptr<Buffer> buffer)
 	{
 		mBuffer = buffer;
 	}
 
 	CircularBuffer(std::size_t size)
 	{
-		mBuffer = SharedPtr<Buffer>(new Buffer(size));
+		mBuffer = shared_ptr<Buffer>(new Buffer(size));
 	}
 
 	CircularBuffer(byte* data, std::size_t size)
 	{
-		mBuffer = SharedPtr<Buffer>(new Buffer(data, size));
+		mBuffer = shared_ptr<Buffer>(new Buffer(data, size));
 	}
 
 	~CircularBuffer()
@@ -267,7 +267,7 @@ public:
 		}
 	}
 
-	inline std::size_t read(SharedPtr<Buffer> buffer, std::size_t size = 0)
+	inline std::size_t read(shared_ptr<Buffer> buffer, std::size_t size = 0)
 	{
 		std::size_t sizeToRead;
 		if(size == 0)
@@ -276,7 +276,7 @@ public:
 			sizeToRead = size;
 	}
 
-	inline std::size_t write(SharedPtr<Buffer> buffer, std::size_t size = 0)
+	inline std::size_t write(shared_ptr<Buffer> buffer, std::size_t size = 0)
 	{
 		std::size_t sizeToWrite;
 		if(size == 0)
@@ -287,7 +287,7 @@ public:
 	}
 
 public:
-	SharedPtr<Buffer> mBuffer;
+	shared_ptr<Buffer> mBuffer;
 	std::size_t mFillCount;
 };
 

@@ -36,23 +36,23 @@ class TcpNetEngine;
 class TcpConnector
 {
 public:
-	typedef boost::function2<void, SharedPtr< TcpConnection >, int > ConnectorCallback;
+	typedef boost::function2<void, shared_ptr< TcpConnection >, int > ConnectorCallback;
 
 public:
 	TcpConnector(TcpNetEngine* engine);
 	~TcpConnector();
 
 public:
-	static SharedPtr<TcpConnector> create(void* e)
+	static shared_ptr<TcpConnector> create(void* e)
 	{
 		TcpNetEngine* engine = reinterpret_cast<TcpNetEngine*>(e);
-		SharedPtr<TcpConnector> p(new TcpConnector(engine));
+		shared_ptr<TcpConnector> p(new TcpConnector(engine));
 		p->mWeakThis = p;
 		return p;
 	}
 
 public:
-	bool connect(SharedPtr<Poller> poller, SharedPtr<InetSocketAddress> address, ConnectorCallback callback);
+	bool connect(shared_ptr<Poller> poller, shared_ptr<InetSocketAddress> address, ConnectorCallback callback);
 	void cancel();
 
 public:
@@ -92,9 +92,9 @@ private:
 	{
 		ev::io watcher;
 		ev::timer timeout;
-		SharedPtr<Poller> poller;
+		shared_ptr<Poller> poller;
 		handle_t handle;
-		SharedPtr<TcpConnection> connection;
+		shared_ptr<TcpConnection> connection;
 	} mConnectInfo;
 
 	WeakPtr<TcpConnector> mWeakThis;

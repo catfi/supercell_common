@@ -29,12 +29,12 @@ public:
 
 
 public:
-	virtual void onDisconnected(SharedPtr<RdmaConnection> connection);
-	virtual void onConnected(SharedPtr<RdmaConnection> connection);
-	virtual void onError(SharedPtr<RdmaConnection> connection, int code);
+	virtual void onDisconnected(shared_ptr<RdmaConnection> connection);
+	virtual void onConnected(shared_ptr<RdmaConnection> connection);
+	virtual void onError(shared_ptr<RdmaConnection> connection, int code);
 
 public:
-	virtual void handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection);
+	virtual void handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection);
 
 
 public:
@@ -45,8 +45,8 @@ public:
 	tbb::tick_count mStartTime, mEndTime;
 private:
 	static log4cxx::LoggerPtr mLogger;
-	SharedPtr<RdmaConnection> mConnection;
-	SharedPtr<Buffer> mBuffer;
+	shared_ptr<RdmaConnection> mConnection;
+	shared_ptr<Buffer> mBuffer;
 
 };
 log4cxx::LoggerPtr RdmaPerformanceTestServer::mLogger(log4cxx::Logger::getLogger("RdmaPerformanceTestServer"));
@@ -61,12 +61,12 @@ class RdmaPerformanceTestClient : public RdmaConnectionHandler, public RdmaDataH
 
 
 	public:
-		virtual void onDisconnected(SharedPtr<RdmaConnection> connection);
-		virtual void onConnected(SharedPtr<RdmaConnection> connection);
-		virtual void onError(SharedPtr<RdmaConnection> connection, int code);
+		virtual void onDisconnected(shared_ptr<RdmaConnection> connection);
+		virtual void onConnected(shared_ptr<RdmaConnection> connection);
+		virtual void onError(shared_ptr<RdmaConnection> connection, int code);
 
 	public:
-		virtual void handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection);
+		virtual void handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection);
 
 	public:
 		void run();
@@ -83,8 +83,8 @@ class RdmaPerformanceTestClient : public RdmaConnectionHandler, public RdmaDataH
 
 	private:
 		static log4cxx::LoggerPtr mLogger;
-		SharedPtr<RdmaConnection> mConnection;
-		SharedPtr<Buffer> mBuffer;
+		shared_ptr<RdmaConnection> mConnection;
+		shared_ptr<Buffer> mBuffer;
 		bool mLock;
 
 
