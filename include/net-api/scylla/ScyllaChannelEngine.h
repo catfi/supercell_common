@@ -40,11 +40,11 @@ namespace zillians { namespace net {
 class ScyllaChannelEngine : public ChannelEngine
 {
 public:
-	ScyllaChannelEngine(const UUID& localIdentifier, SharedPtr<ScyllaNodeDB> db);
+	ScyllaChannelEngine(const UUID& localIdentifier, shared_ptr<ScyllaNodeDB> db);
 	virtual ~ScyllaChannelEngine();
 
 public:
-	virtual SharedPtr<Channel> findChannel(const UUID& destination);
+	virtual shared_ptr<Channel> findChannel(const UUID& destination);
 
 public:
 	virtual void registerAnyChannelListener(ChannelOnlineListener onOnline, ChannelOfflineListener onOffline, ChannelErrorListener onError);
@@ -73,10 +73,10 @@ private:
 //	void listenChannelOffline(const char* groupName, group::CloseProcessGroup::MemberInfo& memberInfo, group::MembershipChangeReason reason, ChannelOfflineListener onOffline);
 //	void listenChannelError(const char* groupName, group::CloseProcessGroup::MemberInfo& memberInfo, group::MembershipChangeReason reason, ChannelErrorListener onError);
 
-	void handleData(group::CloseProcessGroup::SourceInfo& source, uint32 type, SharedPtr<Buffer>& buffer, std::size_t size, DataHandler handler);
+	void handleData(group::CloseProcessGroup::SourceInfo& source, uint32 type, shared_ptr<Buffer>& buffer, std::size_t size, DataHandler handler);
 
 	void handleHelloMessage(group::CloseProcessGroup::SourceInfo& source, ScyllaHelloMessage& message);
-	void handleAckMessage(group::CloseProcessGroup::SourceInfo& source, uint32 type, SharedPtr<Buffer>& buffer, std::size_t size);
+	void handleAckMessage(group::CloseProcessGroup::SourceInfo& source, uint32 type, shared_ptr<Buffer>& buffer, std::size_t size);
 
 private:
 	ChannelOnlineListener defaultChannelOnlineListener;
@@ -92,10 +92,10 @@ private:
 	ChannelErrorListenerMap mChannelErrorListenerMap;
 
 private:
-	SharedPtr<ScyllaNodeDB> mNodeDB;
+	shared_ptr<ScyllaNodeDB> mNodeDB;
 	UUID mLocalIdentifier;
 	group::CloseProcessGroupManager* mCloseProcessGroupManager;
-	SharedPtr<Worker> mWorker;
+	shared_ptr<Worker> mWorker;
 
 private:
 	static log4cxx::LoggerPtr mLogger;

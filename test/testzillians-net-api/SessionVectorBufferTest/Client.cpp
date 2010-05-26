@@ -45,7 +45,7 @@ int thread_count;
 struct client_context
 {
 	int id_;
-	std::vector< SharedPtr<Buffer> > send_buffers;
+	std::vector< shared_ptr<Buffer> > send_buffers;
 	int count_to_send;
 	volatile int count_sent;
 	volatile bool connected;
@@ -55,7 +55,7 @@ struct client_context
 client_context* create_context(int id, int count);
 void handle_connected(int id, int count, double* latencies, const boost::system::error_code& ec, TcpSession* session);
 void handle_message_write(const boost::system::error_code& ec);
-void handle_buffer_read(TcpSession& session, uint32 type, SharedPtr<Buffer>& buffer, std::size_t size);
+void handle_buffer_read(TcpSession& session, uint32 type, shared_ptr<Buffer>& buffer, std::size_t size);
 void handle_session_close(TcpSessionEngine* engine, TcpSession& session);
 void handle_session_error(TcpSession& session, const boost::system::error_code& ec);
 
@@ -65,7 +65,7 @@ client_context* create_context(int id, int count)
 
 	for(int c=0;c<TEST_BUFFER_COUNT;++c)
 	{
-		SharedPtr<Buffer> buffer(new Buffer(TEST_SIZE*sizeof(uint)));
+		shared_ptr<Buffer> buffer(new Buffer(TEST_SIZE*sizeof(uint)));
 		for(int i=0;i<TEST_SIZE;++i)
 		{
 			*buffer << i;
@@ -128,7 +128,7 @@ void handle_message_write(const boost::system::error_code& ec)
 	}
 }
 
-void handle_buffer_read(TcpSession& session, uint32 type, SharedPtr<Buffer>& buffer, std::size_t size)
+void handle_buffer_read(TcpSession& session, uint32 type, shared_ptr<Buffer>& buffer, std::size_t size)
 {
 	client_context* ctx = session.getContext<client_context>();
 

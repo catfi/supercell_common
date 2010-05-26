@@ -39,13 +39,13 @@ using namespace zillians::net;
 //////////////////////////////////////////////////////////////////////////
 struct SingletonPool
 {
-	SharedPtr<TcpBufferManager> buffer_manager;
+	shared_ptr<TcpBufferManager> buffer_manager;
 } gSingletonPool;
 
 //////////////////////////////////////////////////////////////////////////
 void initSingleton()
 {
-	gSingletonPool.buffer_manager = SharedPtr<TcpBufferManager>(new TcpBufferManager(2048L*1024L*1024L));
+	gSingletonPool.buffer_manager = shared_ptr<TcpBufferManager>(new TcpBufferManager(2048L*1024L*1024L));
 }
 
 void finiSingleton()
@@ -62,14 +62,14 @@ void printUsage()
 class ServerHandler : public TcpDataHandler, public TcpConnectionHandler
 {
 public:
-	ServerHandler(SharedPtr<Poller> poller)
+	ServerHandler(shared_ptr<Poller> poller)
 	{
 		mPoller = poller;
 		mConnectionCount = 0;
 	}
 
 public:
-	virtual void onConnected(SharedPtr<TcpConnection> connection)
+	virtual void onConnected(shared_ptr<TcpConnection> connection)
 	{
 		int count = ++mConnectionCount;
 		LOG4CXX_INFO(mLogger, "\t" << "connection #" << count << " accepted");
@@ -77,7 +77,7 @@ public:
 		connection->setMaxSendInFlight(-1);
 	}
 
-	virtual void onDisconnected(SharedPtr<TcpConnection> connection)
+	virtual void onDisconnected(shared_ptr<TcpConnection> connection)
 	{
 		int count = --mConnectionCount;
 		LOG4CXX_INFO(mLogger, "\t" << "connection #" << count << " closed");
@@ -89,19 +89,19 @@ public:
 		}
 	}
 
-	virtual void onError(SharedPtr<TcpConnection> connection, int code)
+	virtual void onError(shared_ptr<TcpConnection> connection, int code)
 	{
 		LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 	}
 
 public:
-	virtual void handle(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<TcpConnection> connection)
+	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<TcpConnection> connection)
 	{
 		connection->send(type, buffer);
 	}
 
 public:
-	SharedPtr<Poller> mPoller;
+	shared_ptr<Poller> mPoller;
 	int mConnectionCount;
 
 private:
@@ -121,19 +121,19 @@ struct ClientConnectionCtx
 class ClientHandler : public TcpDataHandler, public TcpConnectionHandler
 {
 public:
-	ClientHandler(SharedPtr<Poller> poller)
+	ClientHandler(shared_ptr<Poller> poller)
 	{
 		mPoller = poller;
 		mConnectionCount = 0;
 	}
 
 public:
-	virtual void onConnected(SharedPtr<TcpConnection> connection)
+	virtual void onConnected(shared_ptr<TcpConnection> connection)
 	{
 		int count = ++mConnectionCount;
 	}
 
-	virtual void onDisconnected(SharedPtr<TcpConnection> connection)
+	virtual void onDisconnected(shared_ptr<TcpConnection> connection)
 	{
 		if(mConnectionCount == 0)
 		{
@@ -141,15 +141,15 @@ public:
 		}
 	}
 
-	virtual void onError(SharedPtr<TcpConnection> connection, int code)
+	virtual void onError(shared_ptr<TcpConnection> connection, int code)
 	{
 		LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 	}
 
 public:
-	virtual void handle(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<TcpConnection> connection)
+	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<TcpConnection> connection)
 	{
-		SharedPtr<ClientConnectionCtx> ctx = boost::static_pointer_cast<ClientConnectionCtx>(connection->getContext());
+		shared_ptr<ClientConnectionCtx> ctx = boost::static_pointer_cast<ClientConnectionCtx>(connection->getContext());
 
 		tbb::tick_count start; ctx->q.pop(start);
 		tbb::tick_count end = tbb::tick_count::now();
@@ -162,25 +162,25 @@ public:
 public:
 	static log4cxx::LoggerPtr mLogger;
 	tbb::atomic<int> mConnectionCount;
-	SharedPtr<Poller> mPoller;
+	shared_ptr<Poller> mPoller;
 };
 
 log4cxx::LoggerPtr ClientHandler::mLogger(log4cxx::Logger::getLogger("ClientHandler"));
 
 enum {max_length = 1024};
 
-void poller_thread(SharedPtr<Poller> p)
+void poller_thread(shared_ptr<Poller> p)
 {
 	p->run();
 }
 
 tbb::atomic<int> gActiveThreadCount;
 
-void runner_thread(SharedPtr<TcpConnection> connection, int tid, int count, double freq, double* latencies)
+void runner_thread(shared_ptr<TcpConnection> connection, int tid, int count, double freq, double* latencies)
 {
 	++gActiveThreadCount;
 
-	SharedPtr<ClientConnectionCtx> ctx(new ClientConnectionCtx);
+	shared_ptr<ClientConnectionCtx> ctx(new ClientConnectionCtx);
 	connection->setContext(ctx);
 
 	ctx->latency_sum = 0.0;
@@ -192,8 +192,8 @@ void runner_thread(SharedPtr<TcpConnection> connection, int tid, int count, doub
 	for(int i=0;i<max_length;++i)
 		request[i] = i%(std::numeric_limits<char>::max());
 
-	SharedPtr<Buffer> request_buffer(new Buffer(&request[0], max_length));
-	SharedPtr<Buffer> reply_buffer(new Buffer(&reply[0], max_length));
+	shared_ptr<Buffer> request_buffer(new Buffer(&request[0], max_length));
+	shared_ptr<Buffer> reply_buffer(new Buffer(&reply[0], max_length));
 
 	try
 	{
@@ -241,7 +241,7 @@ void runner_thread(SharedPtr<TcpConnection> connection, int tid, int count, doub
 double* gLatencies = NULL;
 tbb::tbb_thread* gClientThreads = NULL;
 
-void connector_completion_handler(SharedPtr<TcpConnection> connection, int err, int tid, int send_count)
+void connector_completion_handler(shared_ptr<TcpConnection> connection, int err, int tid, int send_count)
 {
 	//printf("ConnectorHandler: err = %d\n", err);
 
@@ -249,7 +249,7 @@ void connector_completion_handler(SharedPtr<TcpConnection> connection, int err, 
 	tbb::move(gClientThreads[tid], t);
 }
 
-void acceptor_completion_handler(SharedPtr<TcpConnection> connection, int err)
+void acceptor_completion_handler(shared_ptr<TcpConnection> connection, int err)
 {
 	//printf("AcceptorHandler: err = %d\n", err);
 }
@@ -283,16 +283,16 @@ int main(int argc, char** argv)
 	// start and run the network engine
 	if(1)
 	{
-		SharedPtr<Poller> poller(new Poller(ev_loop_new(0)));
+		shared_ptr<Poller> poller(new Poller(ev_loop_new(0)));
 
-		SharedPtr<TcpDispatcher> dispatcher(new TcpDispatcher());
-		SharedPtr<TcpNetEngine> engine(new TcpNetEngine());
+		shared_ptr<TcpDispatcher> dispatcher(new TcpDispatcher());
+		shared_ptr<TcpNetEngine> engine(new TcpNetEngine());
 		engine->setDispatcher(dispatcher);
 		engine->setBufferManager(gSingletonPool.buffer_manager);
 
 		if(strcmp(argv[1], "server") == 0)
 		{
-			SharedPtr<ServerHandler> server(new ServerHandler(poller));
+			shared_ptr<ServerHandler> server(new ServerHandler(poller));
 			dispatcher->registerDataHandler(0, server);
 			dispatcher->registerConnectionHandler(server);
 
@@ -315,7 +315,7 @@ int main(int argc, char** argv)
 			gClientThreads = new tbb::tbb_thread[thread_count];
 			gLatencies = new double[thread_count];
 
-			SharedPtr<ClientHandler> client(new ClientHandler(poller));
+			shared_ptr<ClientHandler> client(new ClientHandler(poller));
 			dispatcher->registerDataHandler(1000, client);
 			dispatcher->registerConnectionHandler(client);
 

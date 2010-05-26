@@ -46,7 +46,7 @@ public:
 public:
 	int resourceCount();
 	ibv_context* getContext(int id);
-	SharedPtr<IBDeviceResource> getResource(ibv_context* context);
+	shared_ptr<IBDeviceResource> getResource(ibv_context* context);
 
 public:
 	void regGlobalMemoryRegion(byte* address, size_t size);
@@ -61,7 +61,7 @@ private:
 		size_t size;
 	} mGlobalMemoryRegion;
 private:
-	typedef std::map<ibv_context*, SharedPtr<IBDeviceResource> > tResourceMap;
+	typedef std::map<ibv_context*, shared_ptr<IBDeviceResource> > tResourceMap;
 	tResourceMap mResourceMap;
 };
 

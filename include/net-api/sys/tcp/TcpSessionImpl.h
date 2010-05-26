@@ -41,7 +41,7 @@ namespace zillians { namespace net { namespace sys {
 
 // TODO delete this when error occurred or disconnected
 template<>
-class SessionT< boost::asio::ip::tcp >
+class SessionT< SessionTransport::tcp >
 {
 	typedef boost::asio::ip::tcp::socket Socket;
 	typedef boost::asio::io_service IoService;
@@ -71,13 +71,13 @@ public:
 		return mSocket;
 	}
 
-	void write(uint32 type, std::vector< SharedPtr<Buffer> >& buffers)
+	void write(uint32 type, std::vector< shared_ptr<Buffer> >& buffers)
 	{
 		std::size_t bytes_written = 0;
 
 		// calculate the total number of bytes to send
 		std::size_t bytes_to_write = 0;
-		for(std::vector< SharedPtr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it) bytes_to_write += (*it)->dataSize();
+		for(std::vector< shared_ptr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it) bytes_to_write += (*it)->dataSize();
 
 		// ASSERTION the given data size cannot exceed the underlying transport limit
 		BOOST_ASSERT(bytes_to_write <= boost::asio::detail::default_max_transfer_size - detail::MessageHeader::kHeaderSize);
@@ -104,7 +104,7 @@ public:
 			write_buffers.push_back( boost::asio::buffer(header_buffer->rptr(), detail::MessageHeader::kHeaderSize) );
 
 			// append all given buffers to write buffer
-			for(std::vector< SharedPtr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
+			for(std::vector< shared_ptr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
 				write_buffers.push_back( boost::asio::buffer((*it)->rptr(), (*it)->dataSize()) );
 
 			// perform asio synchronous write
@@ -124,7 +124,7 @@ public:
 			*write_buffer << header;
 
 			// append all given buffers to write buffer
-			for(std::vector< SharedPtr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
+			for(std::vector< shared_ptr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
 			{
 				// preserve the old read position so that it is not altered by append()
 				std::size_t old_rpos = (*it)->rpos();
@@ -145,12 +145,12 @@ public:
 		}
 		else
 		{
-			for(std::vector< SharedPtr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
+			for(std::vector< shared_ptr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
 				(*it)->rskip((*it)->dataSize());
 		}
 	}
 
-	void write(uint32 type, SharedPtr<Buffer>& buffer, std::size_t size = 0)
+	void write(uint32 type, shared_ptr<Buffer>& buffer, std::size_t size = 0)
 	{
 		std::size_t bytes_written = 0;
 		std::size_t bytes_to_write = (size == 0) ? buffer->dataSize() : size;
@@ -254,11 +254,11 @@ public:
 
 	/// Asynchronously write a collection of buffers to the session
 	template<typename Handler>
-	void writeAsync(uint32 type, std::vector< SharedPtr<Buffer> >& buffers, Handler handler)
+	void writeAsync(uint32 type, std::vector< shared_ptr<Buffer> >& buffers, Handler handler)
 	{
 		// calculate the total number of bytes to send
 		std::size_t bytes_to_write = 0;
-		for(std::vector< SharedPtr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it) bytes_to_write += (*it)->dataSize();
+		for(std::vector< shared_ptr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it) bytes_to_write += (*it)->dataSize();
 
 		// ASSERTION the given data size cannot exceed the underlying transport limit
 		BOOST_ASSERT(bytes_to_write <= boost::asio::detail::default_max_transfer_size - detail::MessageHeader::kHeaderSize);
@@ -270,7 +270,7 @@ public:
 			BOOST_ASSERT(buffers.size() < ksMaxIOV - 1);
 
 			// create a local buffer to store headers
-			SharedPtr<Buffer> header_buffer(new Buffer(detail::MessageHeader::kHeaderSize));
+			shared_ptr<Buffer> header_buffer(new Buffer(detail::MessageHeader::kHeaderSize));
 
 			// encode the header
 			detail::MessageHeader header;
@@ -283,7 +283,7 @@ public:
 			write_buffers.push_back( boost::asio::buffer(header_buffer->rptr(), header_buffer->dataSize()) );
 
 			// insert all given buffer one by one
-			for(std::vector< SharedPtr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
+			for(std::vector< shared_ptr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
 				write_buffers.push_back( boost::asio::buffer((*it)->rptr(), (*it)->dataSize()) );
 
 			// lock the structures for write queues
@@ -316,7 +316,7 @@ public:
 		else
 		{
 			// create a local buffer to store headers as well as given buffers
-			SharedPtr<Buffer> write_buffer(new Buffer(detail::MessageHeader::kHeaderSize + bytes_to_write));
+			shared_ptr<Buffer> write_buffer(new Buffer(detail::MessageHeader::kHeaderSize + bytes_to_write));
 
 			// encode the header
 			detail::MessageHeader header;
@@ -325,7 +325,7 @@ public:
 			*write_buffer << header;
 
 			// append all given buffers to the write buffer
-			for(std::vector< SharedPtr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
+			for(std::vector< shared_ptr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
 			{
 				// preserve the old read position so that it is not altered by append()
 				std::size_t old_rpos = (*it)->rpos();
@@ -334,7 +334,7 @@ public:
 			}
 
 			// consume all given buffers (since we have encoded them into a single write buffer
-			for(std::vector< SharedPtr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
+			for(std::vector< shared_ptr<Buffer> >::iterator it = buffers.begin(); it != buffers.end(); ++it)
 			{
 				(*it)->rskip((*it)->dataSize());
 			}
@@ -370,7 +370,7 @@ public:
 
 	/// Asynchronously write a buffer to the session
 	template<typename Handler>
-	void writeAsync(uint32 type, SharedPtr<Buffer>& buffer, Handler handler, std::size_t size = 0)
+	void writeAsync(uint32 type, shared_ptr<Buffer>& buffer, Handler handler, std::size_t size = 0)
 	{
 		// calculate the total number of bytes to send
 		std::size_t bytes_to_write = (size == 0) ? buffer->dataSize() : size;
@@ -386,7 +386,7 @@ public:
 		if(bytes_to_write > kScatterWriteThreshold)
 		{
 			// create a local buffer to store headers
-			SharedPtr<Buffer> header_buffer(new Buffer(detail::MessageHeader::kHeaderSize));
+			shared_ptr<Buffer> header_buffer(new Buffer(detail::MessageHeader::kHeaderSize));
 
 			// encode the header
 			detail::MessageHeader header;
@@ -429,7 +429,7 @@ public:
 		else
 		{
 			// create a local buffer (which will be held in the write completion handler)
-			SharedPtr<Buffer> write_buffer(new Buffer(detail::MessageHeader::kHeaderSize + bytes_to_write));
+			shared_ptr<Buffer> write_buffer(new Buffer(detail::MessageHeader::kHeaderSize + bytes_to_write));
 
 			detail::MessageHeader header;
 			header.type = type;
@@ -473,7 +473,7 @@ public:
 	void writeAsync(M& message, Handler handler)
 	{
 		// create a local buffer (which will be held in the write completion handler)
-		SharedPtr<Buffer> write_buffer(new Buffer(detail::MessageHeader::kHeaderSize + Buffer::probeSize(message)));
+		shared_ptr<Buffer> write_buffer(new Buffer(detail::MessageHeader::kHeaderSize + Buffer::probeSize(message)));
 
 		// ASSERTION the given data size cannot exceed the underlying transport limit
 		BOOST_ASSERT(write_buffer->dataSize() <= boost::asio::detail::default_max_transfer_size);
@@ -521,7 +521,7 @@ public:
 		}
 	}
 
-	void read(SharedPtr<Buffer>& buffer, std::size_t size = 0)
+	void read(shared_ptr<Buffer>& buffer, std::size_t size = 0)
 	{
 		std::size_t bytes_to_read = (size == 0) ? buffer->freeSize() : size;
 		std::size_t bytes_read = boost::asio::read(mSocket, boost::asio::buffer(buffer->wptr(), bytes_to_read));
@@ -533,7 +533,7 @@ public:
 		}
 	}
 
-//	void read(uint32& type, SharedPtr<BufferCollection> buffers)
+//	void read(uint32& type, shared_ptr<BufferCollection> buffers)
 //	{
 //		BOOST_ASSERT(buffers->count() < 64);
 //
@@ -569,7 +569,7 @@ public:
 //		buffers->rskip(bytes_transferred);
 //	}
 
-	void read(uint32& type, SharedPtr<Buffer> buffer)
+	void read(uint32& type, shared_ptr<Buffer> buffer)
 	{
 		// read the header synchronously
 		boost::asio::read(mSocket, boost::asio::buffer(buffer->wptr(), detail::MessageHeader::kHeaderSize));
@@ -638,9 +638,9 @@ public:
 	}
 
 	template<typename Handler>
-	void readAsync(SharedPtr<Buffer> buffer, Handler handler, std::size_t size = 0)
+	void readAsync(shared_ptr<Buffer> buffer, Handler handler, std::size_t size = 0)
 	{
-		void (SessionT::*f)(const boost::system::error_code&, const std::size_t&, SharedPtr<Buffer>, boost::tuple<Handler>) = &SessionT::readAsyncCompleted<Handler>;
+		void (SessionT::*f)(const boost::system::error_code&, const std::size_t&, shared_ptr<Buffer>, boost::tuple<Handler>) = &SessionT::readAsyncCompleted<Handler>;
 
 		std::size_t bytes_to_read = (size == 0) ? buffer->freeSize() : size;
 
@@ -657,10 +657,10 @@ public:
 	template<typename M, typename Handler>
 	void readAsync(M& message, Handler handler)
 	{
-		void (SessionT::*f)(const boost::system::error_code&, const std::size_t&, M&, boost::tuple<Handler>, SharedPtr<Buffer>) = &SessionT::readAsyncHeaderCompleted<M, Handler>;
+		void (SessionT::*f)(const boost::system::error_code&, const std::size_t&, M&, boost::tuple<Handler>, shared_ptr<Buffer>) = &SessionT::readAsyncHeaderCompleted<M, Handler>;
 
 		// create a local buffer (which will be held in the read completion handler)
-		SharedPtr<Buffer> buffer(new Buffer(detail::MessageHeader::kMaxDataSize));
+		shared_ptr<Buffer> buffer(new Buffer(detail::MessageHeader::kMaxDataSize));
 
 		// increment pending completion
 		++mPendingCompletions;
@@ -688,13 +688,13 @@ public:
 	template <typename T>
 	inline void setContext(T* ctx)
 	{
-		refContext<T>() = SharedPtr<T>(ctx);
+		refContext<T>() = shared_ptr<T>(ctx);
 	}
 
 	template <typename T>
 	inline T* getContext()
 	{
-		SharedPtr<T> ctx = boost::static_pointer_cast<T>(refContext<T>());
+		shared_ptr<T> ctx = boost::static_pointer_cast<T>(refContext<T>());
 		return ctx.get();
 	}
 
@@ -765,7 +765,7 @@ private:
 					boost::tuple< WriteCompletionHandler, WriteOperation >& op = mSendingQueue.front();
 
 					bool all_consumed = true;
-					for(std::vector< SharedPtr<Buffer> >::iterator it = boost::get<1>(op).buffers.begin(); it != boost::get<1>(op).buffers.end(); ++it)
+					for(std::vector< shared_ptr<Buffer> >::iterator it = boost::get<1>(op).buffers.begin(); it != boost::get<1>(op).buffers.end(); ++it)
 					{
 						if((*it).get())
 						{
@@ -813,7 +813,7 @@ private:
 			std::size_t total_size = 0;
 			for(std::list<boost::tuple< WriteCompletionHandler, WriteOperation > >::iterator it = mSendingQueue.begin(); it != mSendingQueue.end(); ++it)
 			{
-				for(std::vector< SharedPtr<Buffer> >::iterator it_buffers = boost::get<1>(*it).buffers.begin(); it_buffers != boost::get<1>(*it).buffers.end(); ++it_buffers)
+				for(std::vector< shared_ptr<Buffer> >::iterator it_buffers = boost::get<1>(*it).buffers.begin(); it_buffers != boost::get<1>(*it).buffers.end(); ++it_buffers)
 				{
 					if(LIKELY((*it_buffers).get()))
 					{
@@ -830,7 +830,7 @@ private:
 				boost::tuple< WriteCompletionHandler, WriteOperation >& op = mPendingQueue.front();
 
 				std::size_t size = 0;
-				for(std::vector< SharedPtr<Buffer> >::iterator it_buffers = boost::get<1>(op).buffers.begin(); it_buffers != boost::get<1>(op).buffers.end(); ++it_buffers)
+				for(std::vector< shared_ptr<Buffer> >::iterator it_buffers = boost::get<1>(op).buffers.begin(); it_buffers != boost::get<1>(op).buffers.end(); ++it_buffers)
 				{
 					if(LIKELY((*it_buffers).get()))
 					{
@@ -841,7 +841,7 @@ private:
 				if(total_size + size >= boost::asio::detail::default_max_transfer_size)
 					break;
 
-				for(std::vector< SharedPtr<Buffer> >::iterator it_buffers = boost::get<1>(op).buffers.begin(); it_buffers != boost::get<1>(op).buffers.end(); ++it_buffers)
+				for(std::vector< shared_ptr<Buffer> >::iterator it_buffers = boost::get<1>(op).buffers.begin(); it_buffers != boost::get<1>(op).buffers.end(); ++it_buffers)
 				{
 					if(LIKELY((*it_buffers).get()))
 					{
@@ -881,7 +881,7 @@ private:
 	}
 
 	template <typename Handler>
-	void readAsyncCompleted(const boost::system::error_code& ec, const std::size_t& bytes_transferred, SharedPtr<Buffer> buffer, boost::tuple<Handler> handler)
+	void readAsyncCompleted(const boost::system::error_code& ec, const std::size_t& bytes_transferred, shared_ptr<Buffer> buffer, boost::tuple<Handler> handler)
 	{
 		buffer->wskip(bytes_transferred);
 		boost::get<0>(handler)(ec, bytes_transferred);
@@ -898,7 +898,7 @@ private:
 
 	/// Handle a completed read of a message header. The handler is passed using a tuple since boost::bind seems to have trouble binding a function object created using boost::bind as a parameter
 	template<typename M, typename Handler>
-	void readAsyncHeaderCompleted(const boost::system::error_code& ec, const std::size_t& bytes_transferred, M& message, boost::tuple<Handler> handler, SharedPtr<Buffer> buffer)
+	void readAsyncHeaderCompleted(const boost::system::error_code& ec, const std::size_t& bytes_transferred, M& message, boost::tuple<Handler> handler, shared_ptr<Buffer> buffer)
 	{
 		if(!ec)
 		{
@@ -929,7 +929,7 @@ private:
 			else
 			{
 				// everything is ok, we should continue reading the data into input buffer
-				void (SessionT::*f)(const boost::system::error_code&, const std::size_t&, M&, boost::tuple<Handler>, SharedPtr<Buffer>) = &SessionT::readAsyncDataCompleted<M, Handler>;
+				void (SessionT::*f)(const boost::system::error_code&, const std::size_t&, M&, boost::tuple<Handler>, shared_ptr<Buffer>) = &SessionT::readAsyncDataCompleted<M, Handler>;
 
 				++mPendingCompletions;
 
@@ -955,7 +955,7 @@ private:
 
 	/// Handle a completed read of message data.
 	template<typename M, typename Handler>
-	void readAsyncDataCompleted(const boost::system::error_code& ec, const std::size_t& bytes_transferred, M& message, boost::tuple<Handler> handler, SharedPtr<Buffer> buffer)
+	void readAsyncDataCompleted(const boost::system::error_code& ec, const std::size_t& bytes_transferred, M& message, boost::tuple<Handler> handler, shared_ptr<Buffer> buffer)
 	{
 		if (ec)
 		{
@@ -1017,7 +1017,7 @@ private:
 	}
 
 	template <typename T>
-	inline SharedPtr<void>& refContext()
+	inline shared_ptr<void>& refContext()
 	{
 		static uint32 index = msContextIndexer++;
 		BOOST_ASSERT(index < ksMaximumSupportedContextTypes);
@@ -1037,7 +1037,7 @@ private:
 	const static std::size_t ksMaxIOV = boost::asio::detail::max_iov_len;
 
 	static tbb::atomic<uint32> msContextIndexer;
-	SharedPtr<void> mContext[ksMaximumSupportedContextTypes];
+	shared_ptr<void> mContext[ksMaximumSupportedContextTypes];
 
 	typedef boost::function< void (const boost::system::error_code&, const std::size_t&) > WriteCompletionHandler;
 
@@ -1048,30 +1048,30 @@ private:
 		WriteOperation()
 		{ }
 
-		WriteOperation(SharedPtr<Buffer> d)
+		WriteOperation(shared_ptr<Buffer> d)
 		{ buffers.push_back(d); }
 
-		WriteOperation(SharedPtr<Buffer> h, SharedPtr<Buffer> d)
+		WriteOperation(shared_ptr<Buffer> h, shared_ptr<Buffer> d)
 		{ buffers.push_back(h); buffers.push_back(d); }
 
-		WriteOperation(std::vector< SharedPtr<Buffer> >& b)
+		WriteOperation(std::vector< shared_ptr<Buffer> >& b)
 		{
-			for(std::vector< SharedPtr<Buffer> >::iterator it = b.begin(); it != b.end(); ++it)
+			for(std::vector< shared_ptr<Buffer> >::iterator it = b.begin(); it != b.end(); ++it)
 			{
 				buffers.push_back(*it);
 			}
 		}
 
-		WriteOperation(SharedPtr<Buffer> h, std::vector< SharedPtr<Buffer> >& b)
+		WriteOperation(shared_ptr<Buffer> h, std::vector< shared_ptr<Buffer> >& b)
 		{
 			buffers.push_back(h);
-			for(std::vector< SharedPtr<Buffer> >::iterator it = b.begin(); it != b.end(); ++it)
+			for(std::vector< shared_ptr<Buffer> >::iterator it = b.begin(); it != b.end(); ++it)
 			{
 				buffers.push_back(*it);
 			}
 		}
 
-		std::vector< SharedPtr<Buffer> > buffers;
+		std::vector< shared_ptr<Buffer> > buffers;
 	};
 
 	std::list< boost::tuple< WriteCompletionHandler, WriteOperation > > mPendingQueue;
@@ -1082,7 +1082,7 @@ private:
 };
 
 /// Pre-define TcpSession
-typedef SessionT< boost::asio::ip::tcp > TcpSession;
+typedef SessionT< SessionTransport::tcp > TcpSession;
 
 } } }
 

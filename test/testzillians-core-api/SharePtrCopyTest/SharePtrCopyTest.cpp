@@ -46,9 +46,9 @@ BOOST_AUTO_TEST_SUITE( SharePtrCopyTest )
 
 BOOST_AUTO_TEST_CASE ( SharePtrCopy )
 {
-	SharedPtr<Buffer> source(new Buffer(bufferSize));
-	SharedPtr<Buffer> dest;
-//	std::vector<SharedPtr<Buffer> > vec;
+	shared_ptr<Buffer> source(new Buffer(bufferSize));
+	shared_ptr<Buffer> dest;
+//	std::vector<shared_ptr<Buffer> > vec;
 
 	tbb::tick_count start, end;
 	start = tbb::tick_count::now();
@@ -84,9 +84,9 @@ BOOST_AUTO_TEST_CASE ( VoidPtrCopy )
 
 BOOST_AUTO_TEST_CASE ( SharePtrVectorInsert )
 {
-	SharedPtr<Buffer> source(new Buffer(bufferSize));
-	SharedPtr<Buffer> dest;
-	std::vector<SharedPtr<Buffer> > vec;
+	shared_ptr<Buffer> source(new Buffer(bufferSize));
+	shared_ptr<Buffer> dest;
+	std::vector<shared_ptr<Buffer> > vec;
 
 	tbb::tick_count start, end;
 	start = tbb::tick_count::now();

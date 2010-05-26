@@ -54,8 +54,8 @@ private:
 	string mSender;
 	string mReceiver;
 	string mText;
-	SharedPtr<RdmaConnection> mConnection;
-	SharedPtr<Buffer> mBuf;
+	shared_ptr<RdmaConnection> mConnection;
+	shared_ptr<Buffer> mBuf;
 
 public:
 	ChatRoomMsgType getType()
@@ -79,8 +79,8 @@ public:
 	}
 
 public:
-	void createBuffer(SharedPtr<RdmaConnection> connection){
-		SharedPtr<Buffer> buf(connection->createBuffer(BUFFER_SIZE));
+	void createBuffer(shared_ptr<RdmaConnection> connection){
+		shared_ptr<Buffer> buf(connection->createBuffer(BUFFER_SIZE));
 		mConnection = connection;
 		mBuf = buf;
 	}
@@ -121,7 +121,7 @@ public:
 	}
 
 //Unpack information for clients.
-	void unpackMsg(int32 type, SharedPtr<Buffer> buf)
+	void unpackMsg(int32 type, shared_ptr<Buffer> buf)
 	{
 		switch(type){
 			case LOGINFAIL:
@@ -149,7 +149,7 @@ public:
 	}
 
 //Unpack information for server to forward message.
-	void unpackSenderReceiver(int32 type, SharedPtr<Buffer> buf)
+	void unpackSenderReceiver(int32 type, shared_ptr<Buffer> buf)
 	{
 		switch(type){
 			case LOGIN:

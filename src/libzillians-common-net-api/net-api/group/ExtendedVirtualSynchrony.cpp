@@ -49,7 +49,7 @@ static void ExtendedVirtualSynchronyDeliveryCallback(
 	info.nodeId = nodeid;
 
 	// create buffer object from given data pointer
-	SharedPtr<Buffer> buffer(new Buffer((const byte*)msg, (std::size_t)msg_len));
+	shared_ptr<Buffer> buffer(new Buffer((const byte*)msg, (std::size_t)msg_len));
 
 	uint32 type; *buffer >> type;
 
@@ -132,7 +132,7 @@ ExtendedVirtualSynchrony::~ExtendedVirtualSynchrony()
 		throw std::runtime_error("failed to finalize extended virtual synchrony");
 }
 
-bool ExtendedVirtualSynchrony::send(uint32 type, SharedPtr<Buffer> buffer)
+bool ExtendedVirtualSynchrony::send(uint32 type, shared_ptr<Buffer> buffer)
 {
 	iovec iov[2];
 	iov[0].iov_base = &type;

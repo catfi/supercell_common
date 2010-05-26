@@ -53,7 +53,7 @@ public:
 	 * @param buffer The reference-counted buffer object.
 	 * @return True on success. False otherwise.
 	 */
-	virtual void send(uint32 type, SharedPtr<Buffer> buffer) = 0;
+	virtual void send(uint32 type, shared_ptr<Buffer> buffer) = 0;
 
 	/**
 	 * Asynchronous Send.
@@ -68,7 +68,7 @@ public:
 	 * @param handler The asynchronous completion handler.
 	 * @return True on success. False otherwise.
 	 */
-	//virtual void sendAsync(uint32 type, SharedPtr<Buffer> buffer, AsyncSendCompletionHandler handler) = 0;
+	//virtual void sendAsync(uint32 type, shared_ptr<Buffer> buffer, AsyncSendCompletionHandler handler) = 0;
 
 	/**
 	 * Synchronous Send with Acknowledgment.
@@ -82,7 +82,7 @@ public:
 	 * @param buffer The reference-counted buffer object.
 	 * @return True on success. False otherwise.
 	 */
-	virtual void acksend(uint32 type, SharedPtr<Buffer> buffer) = 0;
+	virtual void acksend(uint32 type, shared_ptr<Buffer> buffer) = 0;
 
 	/**
 	 * Asynchronous Send with Acknowledgment.
@@ -99,7 +99,7 @@ public:
 	 * @param handler The asynchronous completion handler.
 	 * @return True on success. False otherwise.
 	 */
-	virtual void acksendAsync(uint32 type, SharedPtr<Buffer> buffer, AsyncSendCompletionHandler handler) = 0;
+	virtual void acksendAsync(uint32 type, shared_ptr<Buffer> buffer, AsyncSendCompletionHandler handler) = 0;
 
 public:
 	/**
@@ -117,7 +117,7 @@ public:
 	template <typename T>
 	inline void setContext(T* ctx)
 	{
-		refContext<T>() = SharedPtr<T>(ctx);
+		refContext<T>() = shared_ptr<T>(ctx);
 	}
 
 	/**
@@ -131,7 +131,7 @@ public:
 	template <typename T>
 	inline T* getContext()
 	{
-		SharedPtr<T> ctx = boost::static_pointer_cast<T>(refContext<T>());
+		shared_ptr<T> ctx = boost::static_pointer_cast<T>(refContext<T>());
 		return ctx.get();
 	}
 
@@ -174,7 +174,7 @@ private:
 	 * @return The reference-counted object pointer.
 	 */
 	template <typename T>
-	inline SharedPtr<void>& refContext()
+	inline shared_ptr<void>& refContext()
 	{
 		static uint32 index = mContextIndexer++;
 		BOOST_ASSERT(index < kMaximumSupportedContextTypes);
@@ -185,7 +185,7 @@ private:
 	const static std::size_t kMaximumSupportedContextTypes = 8UL;
 
 	static tbb::atomic<uint32> mContextIndexer;
-	SharedPtr<void> mContext[kMaximumSupportedContextTypes];
+	shared_ptr<void> mContext[kMaximumSupportedContextTypes];
 
 	UUID mIdentifier;
 };

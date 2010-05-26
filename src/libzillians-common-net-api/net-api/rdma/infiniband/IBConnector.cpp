@@ -44,7 +44,7 @@ IBConnector::~IBConnector()
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool IBConnector::connect(SharedPtr<Poller> poller, SharedPtr<InetSocketAddress> address, ConnectorCallback callback)
+bool IBConnector::connect(shared_ptr<Poller> poller, shared_ptr<InetSocketAddress> address, ConnectorCallback callback)
 {
 	int err = 0;
 
@@ -119,7 +119,7 @@ void IBConnector::handleChannelEvent(ev::io& w, int revent)
 			if(err)
 			{
 				IB_DEBUG("failed to resolve route, err = " << err);
-				mConnectorCallback(SharedPtr<IBConnection>(), err);
+				mConnectorCallback(shared_ptr<IBConnection>(), err);
 			}
 
 			break;
@@ -130,10 +130,10 @@ void IBConnector::handleChannelEvent(ev::io& w, int revent)
 			err = rdma_ack_cm_event(event);
 
 			// create new rdma_event_channel
-			//SharedPtr<rdma_event_channel> rchannel = IBFactory::createEventChannel();
+			//shared_ptr<rdma_event_channel> rchannel = IBFactory::createEventChannel();
 
 			// create the IBConnection object
-			SharedPtr<IBConnection> connection = IBConnection::create(mEngine, mConnectInfo.id/*, rchannel*/);
+			shared_ptr<IBConnection> connection = IBConnection::create(mEngine, mConnectInfo.id/*, rchannel*/);
 
 			// start poller
 			connection->start(mConnectInfo.poller);
@@ -158,7 +158,7 @@ void IBConnector::handleChannelEvent(ev::io& w, int revent)
 			if(err)
 			{
 				IB_DEBUG("failed to make rdma connection, err = " << err);
-				mConnectorCallback(SharedPtr<IBConnection>(), err);
+				mConnectorCallback(shared_ptr<IBConnection>(), err);
 			}
 
 			break;
@@ -174,7 +174,7 @@ void IBConnector::handleChannelEvent(ev::io& w, int revent)
 			err = rdma_ack_cm_event(event);
 
 			// get connection object
-			SharedPtr<IBConnection> connection = mEngine->getConnection(id);
+			shared_ptr<IBConnection> connection = mEngine->getConnection(id);
 
 			// migrate the cm_id to new rdma_event_channel
 			rdma_migrate_id(connection->mVerbs.id.get(), connection->mVerbs.rchannel.get());
@@ -188,7 +188,7 @@ void IBConnector::handleChannelEvent(ev::io& w, int revent)
 			mStatus = CONNECTED;
 
 			// complete connecting process, remove itself
-			SharedPtr<IBConnector> holder(mWeakThis);
+			shared_ptr<IBConnector> holder(mWeakThis);
 			mEngine->connectorCompleted(holder);
 
 			mConnectorCallback(connection, 0);
@@ -209,7 +209,7 @@ void IBConnector::handleChannelEvent(ev::io& w, int revent)
 			err = rdma_ack_cm_event(event);
 
 			// get connection object
-			SharedPtr<IBConnection> connection = mEngine->getConnection(id);
+			shared_ptr<IBConnection> connection = mEngine->getConnection(id);
 
 			// the connection is disconnected before connection establish, don't notify upper user
 			mEngine->removeConnection(connection);
@@ -220,7 +220,7 @@ void IBConnector::handleChannelEvent(ev::io& w, int revent)
 			mStatus = ERROR;
 
 			// complete connecting process, remove itself
-			SharedPtr<IBConnector> holder(mWeakThis);
+			shared_ptr<IBConnector> holder(mWeakThis);
 			mEngine->connectorCompleted(holder);
 
 			break;
@@ -232,7 +232,7 @@ void IBConnector::handleChannelEvent(ev::io& w, int revent)
 			err = rdma_ack_cm_event(event);
 
 			// complete connecting process, remove itself
-			SharedPtr<IBConnector> holder(mWeakThis);
+			shared_ptr<IBConnector> holder(mWeakThis);
 			mEngine->connectorCompleted(holder);
 
 			mStatus = ERROR;

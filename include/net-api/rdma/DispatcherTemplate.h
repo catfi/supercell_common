@@ -52,7 +52,7 @@ public:
 	{ }
 
 public:
-	virtual void registerDefaultDataHandler(SharedPtr<DataHandler> dataHandler)
+	virtual void registerDefaultDataHandler(shared_ptr<DataHandler> dataHandler)
 	{
 		tbb::spin_rw_mutex::scoped_lock(mDataHandler.lock, true);
 		mDataHandler.def = dataHandler;
@@ -64,7 +64,7 @@ public:
 		mDataHandler.def.reset();
 	}
 
-	virtual void registerDataHandler(int32 type, SharedPtr<DataHandler> dataHandler)
+	virtual void registerDataHandler(int32 type, shared_ptr<DataHandler> dataHandler)
 	{
 		tbb::spin_rw_mutex::scoped_lock(mDataHandler.lock, true);
 		mDataHandler.map[type] = dataHandler;
@@ -85,13 +85,13 @@ public:
 	}
 
 public:
-	virtual void registerConnectionHandler(SharedPtr<ConnectionHandler> connectionHandler)
+	virtual void registerConnectionHandler(shared_ptr<ConnectionHandler> connectionHandler)
 	{
 		tbb::spin_rw_mutex::scoped_lock(mConnectionHandler.lock, true);
 		mConnectionHandler.map[connectionHandler.get()] = connectionHandler;
 	}
 
-	virtual void unregisterConnectionHandler(SharedPtr<ConnectionHandler> connectionHandler)
+	virtual void unregisterConnectionHandler(shared_ptr<ConnectionHandler> connectionHandler)
 	{
 		tbb::spin_rw_mutex::scoped_lock(mConnectionHandler.lock, true);
 		typename tConnectionHandlerMap::iterator it = mConnectionHandler.map.find(connectionHandler.get());
@@ -102,13 +102,13 @@ public:
 	}
 
 public:
-	virtual void registerCompletionHandler(SharedPtr<CompletionHandler> completionHandler)
+	virtual void registerCompletionHandler(shared_ptr<CompletionHandler> completionHandler)
 	{
 		tbb::spin_rw_mutex::scoped_lock(mCompletionHandler.lock, true);
 		mCompletionHandler.map[completionHandler.get()] = completionHandler;
 	}
 
-	virtual void unregisterCompletionHandler(SharedPtr<CompletionHandler> completionHandler)
+	virtual void unregisterCompletionHandler(shared_ptr<CompletionHandler> completionHandler)
 	{
 		tbb::spin_rw_mutex::scoped_lock(mCompletionHandler.lock, true);
 		typename tCompletionHandlerMap::iterator it = mCompletionHandler.map.find(completionHandler.get());
@@ -119,7 +119,7 @@ public:
 	}
 
 public:
-	void dispatchDataEvent(uint32 type, SharedPtr<Buffer> b, SharedPtr<Connection> connection)
+	void dispatchDataEvent(uint32 type, shared_ptr<Buffer> b, shared_ptr<Connection> connection)
 	{
 		tbb::spin_rw_mutex::scoped_lock(mDataHandler.lock, false);
 		typename tDataHandlerMap::iterator it = mDataHandler.map.find(type);
@@ -133,7 +133,7 @@ public:
 		}
 	}
 
-	void dispatchCompletion(SharedPtr<Buffer> b, SharedPtr<Connection> connection)
+	void dispatchCompletion(shared_ptr<Buffer> b, shared_ptr<Connection> connection)
 	{
 		tbb::spin_rw_mutex::scoped_lock(mCompletionHandler.lock, false);
 		for(typename tCompletionHandlerMap::iterator it = mCompletionHandler.map.begin(); it != mCompletionHandler.map.end(); ++it)
@@ -142,7 +142,7 @@ public:
 		}
 	}
 
-	void dispatchConnectionEvent(int type, SharedPtr<Connection> connection)
+	void dispatchConnectionEvent(int type, shared_ptr<Connection> connection)
 	{
 		tbb::spin_rw_mutex::scoped_lock(mConnectionHandler.lock, false);
 		switch(type)
@@ -166,13 +166,13 @@ private:
 	static log4cxx::LoggerPtr mLogger;
 
 private:
-	typedef std::map<int32, SharedPtr<DataHandler> > tDataHandlerMap;
-	typedef std::map<ConnectionHandler*, SharedPtr<ConnectionHandler> > tConnectionHandlerMap;
-	typedef std::map<CompletionHandler*, SharedPtr<CompletionHandler> > tCompletionHandlerMap;
+	typedef std::map<int32, shared_ptr<DataHandler> > tDataHandlerMap;
+	typedef std::map<ConnectionHandler*, shared_ptr<ConnectionHandler> > tConnectionHandlerMap;
+	typedef std::map<CompletionHandler*, shared_ptr<CompletionHandler> > tCompletionHandlerMap;
 
 	struct
 	{
-		SharedPtr<DataHandler> def;
+		shared_ptr<DataHandler> def;
 		tDataHandlerMap map;
 		tbb::spin_rw_mutex lock;
 	} mDataHandler;

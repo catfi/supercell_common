@@ -35,7 +35,7 @@ namespace zillians { namespace net { namespace group {
 template <typename Source>
 struct DataDispatchT
 {
-	virtual void dispatch(Source& source, uint32 type, SharedPtr<Buffer>& b, std::size_t size) = 0;
+	virtual void dispatch(Source& source, uint32 type, shared_ptr<Buffer>& b, std::size_t size) = 0;
 };
 
 /**
@@ -45,11 +45,11 @@ struct DataDispatchT
 template <typename Source>
 struct BufferDispatchT : public DataDispatchT<Source>
 {
-	typedef typename boost::function< void (Source&, uint32, SharedPtr<Buffer>&, std::size_t) > handler_type;
+	typedef typename boost::function< void (Source&, uint32, shared_ptr<Buffer>&, std::size_t) > handler_type;
 
 	BufferDispatchT(handler_type h) : handler(h) { }
 
-	virtual void dispatch(Source& source, uint32 type, SharedPtr<Buffer>& b, std::size_t size)
+	virtual void dispatch(Source& source, uint32 type, shared_ptr<Buffer>& b, std::size_t size)
 	{
 		handler(source, type, b, size);
 	}
@@ -67,7 +67,7 @@ struct MessageDispatchT : public DataDispatchT<Source>
 
 	MessageDispatchT(handler_type handler) : handler_(handler) { }
 
-	virtual void dispatch(Source& source, uint32 type, SharedPtr<Buffer>& b, std::size_t size)
+	virtual void dispatch(Source& source, uint32 type, shared_ptr<Buffer>& b, std::size_t size)
 	{
 		BOOST_ASSERT(type == M::TYPE);
 		M message;
@@ -124,7 +124,7 @@ public:
 	 *
 	 * @param h The handler functor with function prototype
 	 * @code
-	 * void handler(Source&, uint32, SharedPtr<Buffer>&, std::size_t);
+	 * void handler(Source&, uint32, shared_ptr<Buffer>&, std::size_t);
 	 * @endcode
 	 */
 	void bindAny(typename BufferDispatchT<Source>::handler_type h)
@@ -301,7 +301,7 @@ public:
 	 * @param b The completed buffer wrapped as a shared pointer.
 	 * @param size The size of the completion (the additional data that has been read into the completed buffer).
 	 */
-	void dispatch(Source& source, uint32 type, SharedPtr<Buffer>& b, std::size_t size)
+	void dispatch(Source& source, uint32 type, shared_ptr<Buffer>& b, std::size_t size)
 	{
 #if _HANDLE_MESSAGE_TYPE_OVERFLOW_AS_EXCEPTION
 		if(UNLIKELY(type >= mMaxDispatchType))

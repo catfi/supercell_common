@@ -51,16 +51,16 @@ private:
 	void regGlobalMemoryRegion(byte* address, size_t size);
 
 public:
-	inline SharedPtr<ibv_pd> getGlobalProtectionDomain() const { return mGPD; }
-	inline SharedPtr<ibv_mr> getGlobalMemoryRegion() const { return mGMR; }
+	inline shared_ptr<ibv_pd> getGlobalProtectionDomain() const { return mGPD; }
+	inline shared_ptr<ibv_mr> getGlobalMemoryRegion() const { return mGMR; }
 
 private:
 	static log4cxx::LoggerPtr mLogger;
 
 private:
 	ibv_context* mContext;
-	SharedPtr<ibv_pd> mGPD;
-	SharedPtr<ibv_mr> mGMR;
+	shared_ptr<ibv_pd> mGPD;
+	shared_ptr<ibv_mr> mGMR;
 };
 
 } } }

@@ -61,9 +61,9 @@ struct MyMessage
 bool gPassiveMode = false;
 tbb::atomic<int> gReceiveCount;
 
-void handle_my_message(SharedPtr<Channel> channel, uint32 type, SharedPtr<Buffer> buffer, SharedPtr<ScyllaChannelEngine> engine)
+void handle_my_message(shared_ptr<Channel> channel, uint32 type, shared_ptr<Buffer> buffer, shared_ptr<ScyllaChannelEngine> engine)
 {
-	SharedPtr<MyMessage> message = SharedPtr<MyMessage>(new MyMessage());
+	shared_ptr<MyMessage> message = shared_ptr<MyMessage>(new MyMessage());
 	buffer->readSerializable(*message);
 
 	LOG4CXX_INFO(mLogger, "from " << channel->getIdentifier() << ": " << message->data << " (#" << message->message_no << ")");
@@ -71,7 +71,7 @@ void handle_my_message(SharedPtr<Channel> channel, uint32 type, SharedPtr<Buffer
 	if(gPassiveMode)
 	{
 		message->data = "Hi!!";
-		SharedPtr<Buffer> buf(new Buffer(Buffer::probeSize(*message)));
+		shared_ptr<Buffer> buf(new Buffer(Buffer::probeSize(*message)));
 		buf->writeSerializable(*message);
 		channel->send(message->TYPE, buf);
 	}
@@ -85,54 +85,54 @@ void handle_async_complete(int i)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void test_send(SharedPtr<Channel> channel)
+void test_send(shared_ptr<Channel> channel)
 {
 	LOG4CXX_INFO(mLogger, "test send");
 	for(int i=0;i<test_message_count;++i)
 	{
 		LOG4CXX_INFO(mLogger, "send message #" << i);
 
-		SharedPtr<MyMessage> message(new MyMessage);
+		shared_ptr<MyMessage> message(new MyMessage);
 		message->data = "HELLO!!!";
 		message->message_no = i;
 
-		SharedPtr<Buffer> buf(new Buffer(Buffer::probeSize(*message)));
+		shared_ptr<Buffer> buf(new Buffer(Buffer::probeSize(*message)));
 		buf->writeSerializable(*message);
 
 		channel->send(message->TYPE, buf);
 	}
 }
 
-void test_acksend(SharedPtr<Channel> channel)
+void test_acksend(shared_ptr<Channel> channel)
 {
 	LOG4CXX_INFO(mLogger, "test acksend");
 	for(int i=0;i<test_message_count;++i)
 	{
 		LOG4CXX_INFO(mLogger, "send message #" << i);
 
-		SharedPtr<MyMessage> message(new MyMessage);
+		shared_ptr<MyMessage> message(new MyMessage);
 		message->data = "HELLO!!!";
 		message->message_no = i;
 
-		SharedPtr<Buffer> buf(new Buffer(Buffer::probeSize(*message)));
+		shared_ptr<Buffer> buf(new Buffer(Buffer::probeSize(*message)));
 		buf->writeSerializable(*message);
 
 		channel->acksend(message->TYPE, buf);
 	}
 }
 
-void test_acksendasync(SharedPtr<Channel> channel)
+void test_acksendasync(shared_ptr<Channel> channel)
 {
 	LOG4CXX_INFO(mLogger, "test acksendasync");
 	for(int i=0;i<test_message_count;++i)
 	{
 		LOG4CXX_INFO(mLogger, "send message #" << i);
 
-		SharedPtr<MyMessage> message(new MyMessage);
+		shared_ptr<MyMessage> message(new MyMessage);
 		message->data = "HELLO!!!";
 		message->message_no = i;
 
-		SharedPtr<Buffer> buf(new Buffer(Buffer::probeSize(*message)));
+		shared_ptr<Buffer> buf(new Buffer(Buffer::probeSize(*message)));
 		buf->writeSerializable(*message);
 
 		channel->acksendAsync(message->TYPE, buf, boost::bind(handle_async_complete, i));
@@ -140,12 +140,12 @@ void test_acksendasync(SharedPtr<Channel> channel)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void EngineRunThreadProc(SharedPtr<ChannelEngine> engine)
+void EngineRunThreadProc(shared_ptr<ChannelEngine> engine)
 {
 	engine->run();
 }
 
-void CheckThreadProc(SharedPtr<ChannelEngine> engine)
+void CheckThreadProc(shared_ptr<ChannelEngine> engine)
 {
 	while(gReceiveCount < test_message_count)
 	{
@@ -217,8 +217,8 @@ int main(int argc, char** argv)
 
 		gReceiveCount = 0;
 
-    	SharedPtr<ScyllaNodeDB> engineNodeDB(new ScyllaNodeDB());
-     	SharedPtr<ScyllaChannelEngine> engine(new ScyllaChannelEngine(vm["local"].as<std::string>(), engineNodeDB));
+		shared_ptr<ScyllaNodeDB> engineNodeDB(new ScyllaNodeDB());
+		shared_ptr<ScyllaChannelEngine> engine(new ScyllaChannelEngine(vm["local"].as<std::string>(), engineNodeDB));
     	engine->registerDefaultDataHandler(
 				boost::bind(handle_my_message,
 				placeholders::data::source_ref,
@@ -232,7 +232,7 @@ int main(int argc, char** argv)
     	if(vm.count("target") > 0)
     	{
     		UUID target = vm["target"].as<std::string>();
-    		SharedPtr<Channel> channel;
+    		shared_ptr<Channel> channel;
     		try
     		{
     			channel = engine->findChannel(target);

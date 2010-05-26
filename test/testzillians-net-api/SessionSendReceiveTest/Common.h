@@ -30,7 +30,7 @@ struct MySessionContext
 {
 	uint32 id;
 	uint32 type;
-	SharedPtr<Buffer> buffer;
+	shared_ptr<Buffer> buffer;
 };
 
 MySessionContext* createContext(uint32 id)
@@ -43,10 +43,10 @@ MySessionContext* createContext(uint32 id)
 
 void sendTestMessage(TcpSession& session)
 {
-	SharedPtr<Buffer> a0(new Buffer(1024));
-	SharedPtr<Buffer> a1(new Buffer(1024));
-	SharedPtr<Buffer> a2(new Buffer(1024));
-	SharedPtr<Buffer> a3(new Buffer(1024));
+	shared_ptr<Buffer> a0(new Buffer(1024));
+	shared_ptr<Buffer> a1(new Buffer(1024));
+	shared_ptr<Buffer> a2(new Buffer(1024));
+	shared_ptr<Buffer> a3(new Buffer(1024));
 
 	for(int32 i=0;i<1024/sizeof(int32);++i)
 	{
@@ -69,7 +69,7 @@ void sendTestMessage(TcpSession& session)
 		a3->write(x);
 	}
 
-	SharedPtr<BufferCollection> collection(new BufferCollection);
+	shared_ptr<BufferCollection> collection(new BufferCollection);
 	collection->add(a0);
 	collection->add(a1);
 	collection->add(a2);
@@ -78,7 +78,7 @@ void sendTestMessage(TcpSession& session)
 	session.write(0, collection);
 }
 
-bool verifyTestMessage(TcpSession& session, SharedPtr<Buffer> buffer)
+bool verifyTestMessage(TcpSession& session, shared_ptr<Buffer> buffer)
 {
 	for(int32 i=0;i<4096/sizeof(int32);++i)
 	{

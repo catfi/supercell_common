@@ -39,7 +39,7 @@ log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("zillians.common.core-api.M
 volatile bool gTerminated = false;
 tbb::atomic<int> gReadyThreads;
 
-void ThreadReader(volatile int* counter, SharedPtr<Map<int, UUID, WriteOverRead> > map)
+void ThreadReader(volatile int* counter, shared_ptr<Map<int, UUID, WriteOverRead> > map)
 {
 	LOG4CXX_INFO(logger, "Thread ID: " << tbb::this_tbb_thread::get_id());
 	try
@@ -77,7 +77,7 @@ void ThreadReader(volatile int* counter, SharedPtr<Map<int, UUID, WriteOverRead>
 	LOG4CXX_INFO(logger, "Thread " << tbb::this_tbb_thread::get_id() << ": found: " << NUM_LOOKUP - missed << " missed: " << missed);
 }
 
-void ThreadWriter(volatile int* counter, SharedPtr<Map<int, UUID, WriteOverRead> > map)
+void ThreadWriter(volatile int* counter, shared_ptr<Map<int, UUID, WriteOverRead> > map)
 {
 	while(gReadyThreads < NUM_THREAD) tbb::this_tbb_thread::yield();
 
@@ -100,7 +100,7 @@ int main()
 	srand(time(NULL));
 	log4cxx::BasicConfigurator::configure();
 	std::list<tbb::tbb_thread*> threads;
-	SharedPtr<Map<int, UUID, WriteOverRead> > map = SharedPtr<Map<int, UUID, WriteOverRead> >(new Map<int, UUID, WriteOverRead>());
+	shared_ptr<Map<int, UUID, WriteOverRead> > map = shared_ptr<Map<int, UUID, WriteOverRead> >(new Map<int, UUID, WriteOverRead>());
 	volatile int counter = 0;
 
 	LOG4CXX_INFO(logger, "NUM_THREAD: " << NUM_THREAD);

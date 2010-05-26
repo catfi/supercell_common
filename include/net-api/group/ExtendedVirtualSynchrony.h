@@ -52,7 +52,7 @@ public:
 	~ExtendedVirtualSynchrony();
 
 public:
-	bool send(uint32 type, SharedPtr<Buffer> buffer);
+	bool send(uint32 type, shared_ptr<Buffer> buffer);
 	bool join(const std::string& group);
 	bool leave(const std::string& group);
 	bool run(bool blocking = true);

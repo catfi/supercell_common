@@ -45,19 +45,19 @@ TcpBufferManager::~TcpBufferManager()
 }
 
 //////////////////////////////////////////////////////////////////////////
-SharedPtr<Buffer> TcpBufferManager::createBuffer(size_t size)
+shared_ptr<Buffer> TcpBufferManager::createBuffer(size_t size)
 {
 	Buffer* buffer = allocateBuffer(size);
 
 	if(!buffer)
-		return SharedPtr<Buffer>();
+		return shared_ptr<Buffer>();
 	else
-		return SharedPtr<Buffer>(buffer, boost::bind(&TcpBufferManager::returnBuffer, this, _1));
+		return shared_ptr<Buffer>(buffer, boost::bind(&TcpBufferManager::returnBuffer, this, _1));
 }
 
-SharedPtr<Buffer> TcpBufferManager::sliceBuffer(SharedPtr<Buffer> original, size_t size)
+shared_ptr<Buffer> TcpBufferManager::sliceBuffer(shared_ptr<Buffer> original, size_t size)
 {
-	SharedPtr<Buffer> new_buffer(new Buffer(original->rptr(), size));
+	shared_ptr<Buffer> new_buffer(new Buffer(original->rptr(), size));
 
 	if(size == 0)
 	{
@@ -75,9 +75,9 @@ SharedPtr<Buffer> TcpBufferManager::sliceBuffer(SharedPtr<Buffer> original, size
 	return new_buffer;
 }
 
-SharedPtr<Buffer> TcpBufferManager::cloneBuffer(SharedPtr<Buffer> original)
+shared_ptr<Buffer> TcpBufferManager::cloneBuffer(shared_ptr<Buffer> original)
 {
-	SharedPtr<Buffer> new_buffer(new Buffer(original->mData, original->mAllocatedSize));
+	shared_ptr<Buffer> new_buffer(new Buffer(original->mData, original->mAllocatedSize));
 
 	new_buffer->rpos(original->rpos());
 	new_buffer->wpos(original->wpos());

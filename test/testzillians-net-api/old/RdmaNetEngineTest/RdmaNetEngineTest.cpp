@@ -42,14 +42,14 @@ using namespace zillians::net;
 
 struct SingletonPool
 {
-	SharedPtr<RdmaDeviceResourceManager> device_resource_manager;
-	SharedPtr<RdmaBufferManager> buffer_manager;
+	shared_ptr<RdmaDeviceResourceManager> device_resource_manager;
+	shared_ptr<RdmaBufferManager> buffer_manager;
 } gSingletonPool;
 
 void initSingleton()
 {
-	gSingletonPool.device_resource_manager = SharedPtr<RdmaDeviceResourceManager>(new RdmaDeviceResourceManager());
-	gSingletonPool.buffer_manager = SharedPtr<RdmaBufferManager>(new RdmaBufferManager(256*MB));
+	gSingletonPool.device_resource_manager = shared_ptr<RdmaDeviceResourceManager>(new RdmaDeviceResourceManager());
+	gSingletonPool.buffer_manager = shared_ptr<RdmaBufferManager>(new RdmaBufferManager(256*MB));
 }
 
 void finiSingleton()
@@ -63,12 +63,12 @@ void printUsage()
 	fprintf(stderr, "%s <server|client> <listen_address|connecting_address>\n", "RdmaNetEngineTest");
 }
 
-void ConnectorHandler(SharedPtr<RdmaConnection> connection, int err)
+void ConnectorHandler(shared_ptr<RdmaConnection> connection, int err)
 {
 	printf("ConnectorHandler: err = %d\n", err);
 }
 
-void AcceptorHandler(SharedPtr<RdmaConnection> connection, int err)
+void AcceptorHandler(shared_ptr<RdmaConnection> connection, int err)
 {
 	printf("AcceptorHandler: err = %d\n", err);
 }
@@ -91,17 +91,17 @@ int main(int argc, char** argv)
 
 	// start and run the network engine
 	{
-		SharedPtr<RdmaDispatcher> d (new RdmaDispatcher());
-		SharedPtr<Poller> p(new Poller(ev_loop_new(0)));
+		shared_ptr<RdmaDispatcher> d (new RdmaDispatcher());
+		shared_ptr<Poller> p(new Poller(ev_loop_new(0)));
 
-		SharedPtr<RdmaNetEngine> engine(new RdmaNetEngine());
+		shared_ptr<RdmaNetEngine> engine(new RdmaNetEngine());
 
 		engine->setDispatcher(d);
 		engine->setBufferManager(gSingletonPool.buffer_manager);
 
 		if(strcmp(argv[1], "server") == 0)
 		{
-			SharedPtr<RdmaNetEngineTestServer> server(new RdmaNetEngineTestServer());
+			shared_ptr<RdmaNetEngineTestServer> server(new RdmaNetEngineTestServer());
 
 			d->registerDefaultDataHandler(server);
 			d->registerConnectionHandler(server);
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 		}
 		else if(strcmp(argv[1], "client") == 0)
 		{
-			SharedPtr<RdmaNetEngineTestClient> client(new RdmaNetEngineTestClient());
+			shared_ptr<RdmaNetEngineTestClient> client(new RdmaNetEngineTestClient());
 
 			d->registerDefaultDataHandler(client);
 			d->registerConnectionHandler(client);

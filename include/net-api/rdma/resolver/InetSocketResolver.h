@@ -33,7 +33,7 @@ public:
 	virtual ~InetSocketResolver();
 
 public:
-	virtual SharedPtr<InetSocketAddress> resolve(std::string host);
+	virtual shared_ptr<InetSocketAddress> resolve(std::string host);
 };
 
 } } }

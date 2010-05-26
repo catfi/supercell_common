@@ -37,12 +37,12 @@ RdmaChatRoomTestServer::~RdmaChatRoomTestServer()
 {
 }
 
-void RdmaChatRoomTestServer::onConnected(SharedPtr<RdmaConnection> connection)
+void RdmaChatRoomTestServer::onConnected(shared_ptr<RdmaConnection> connection)
 {
 	std::cout<<"Client connected."<<std::endl;
 }
 
-void RdmaChatRoomTestServer::onDisconnected(SharedPtr<RdmaConnection> connection)
+void RdmaChatRoomTestServer::onDisconnected(shared_ptr<RdmaConnection> connection)
 {
 	std::cout<<"Client disconnected."<<std::endl;
 
@@ -56,7 +56,7 @@ void RdmaChatRoomTestServer::onDisconnected(SharedPtr<RdmaConnection> connection
 	}
 }
 
-void RdmaChatRoomTestServer::onError(SharedPtr<RdmaConnection> connection, int code)
+void RdmaChatRoomTestServer::onError(shared_ptr<RdmaConnection> connection, int code)
 {
 	std::cout << "ERROR" << std::endl;
 }
@@ -95,16 +95,16 @@ void RdmaChatRoomTestServer::handleStdin(ev::io &w, int revents)
 
 }
 
-void RdmaChatRoomTestServer::handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection)
+void RdmaChatRoomTestServer::handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection)
 {
-	SharedPtr<RdmaChatRoomTestMsg> msg(new RdmaChatRoomTestMsg());
+	shared_ptr<RdmaChatRoomTestMsg> msg(new RdmaChatRoomTestMsg());
 	msg->unpackSenderReceiver(type, b);
 
 	switch(type)
 	{
 	case RdmaChatRoomTestMsg::LOGIN:
 		{
-			SharedPtr<RdmaChatRoomTestMsg> sendMsg(new RdmaChatRoomTestMsg());
+			shared_ptr<RdmaChatRoomTestMsg> sendMsg(new RdmaChatRoomTestMsg());
 			sendMsg->createBuffer(connection);
 
 //			Avoid userName conflict
@@ -114,7 +114,7 @@ void RdmaChatRoomTestServer::handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<
 			}
 			else
 			{
-				mConnectionContainer.insert(pair<string, SharedPtr<RdmaConnection> > (msg->getSender(), connection));
+				mConnectionContainer.insert(pair<string, shared_ptr<RdmaConnection> > (msg->getSender(), connection));
 				updateClientList();
 				sendMsg->sendMsg(RdmaChatRoomTestMsg::LOGINOK, "server", "", mClientList);
 			}
@@ -139,7 +139,7 @@ void RdmaChatRoomTestServer::handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<
 
 	case RdmaChatRoomTestMsg::WHO:
 		{
-			SharedPtr<RdmaChatRoomTestMsg> sendMsg(new RdmaChatRoomTestMsg());
+			shared_ptr<RdmaChatRoomTestMsg> sendMsg(new RdmaChatRoomTestMsg());
 			sendMsg->createBuffer(connection);
 			sendMsg->sendMsg(RdmaChatRoomTestMsg::UNICAST,"server", msg->getSender() , mClientList);
 		}

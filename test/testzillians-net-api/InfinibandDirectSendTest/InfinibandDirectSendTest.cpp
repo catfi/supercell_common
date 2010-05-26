@@ -42,15 +42,15 @@ using namespace zillians::net::rdma;
 //////////////////////////////////////////////////////////////////////////
 struct SingletonPool
 {
-	SharedPtr<IBDeviceResourceManager> device_resource_manager;
-	SharedPtr<IBBufferManager> buffer_manager;
+	shared_ptr<IBDeviceResourceManager> device_resource_manager;
+	shared_ptr<IBBufferManager> buffer_manager;
 } gSingletonPool;
 
 //////////////////////////////////////////////////////////////////////////
 void initSingleton()
 {
-	gSingletonPool.device_resource_manager = SharedPtr<IBDeviceResourceManager>(new IBDeviceResourceManager());
-	gSingletonPool.buffer_manager = SharedPtr<IBBufferManager>(new IBBufferManager(TEST_DIRECT_BUFFER_SIZE*2 + IB_MINIMAL_MEMORY_USAGE + 10*MB));
+	gSingletonPool.device_resource_manager = shared_ptr<IBDeviceResourceManager>(new IBDeviceResourceManager());
+	gSingletonPool.buffer_manager = shared_ptr<IBBufferManager>(new IBBufferManager(TEST_DIRECT_BUFFER_SIZE*2 + IB_MINIMAL_MEMORY_USAGE + 10*MB));
 }
 
 void finiSingleton()
@@ -64,12 +64,12 @@ void printUsage()
 	fprintf(stderr, "%s <server|client> <listen_address|connecting_address>\n", "InfinibandDirectSendTest");
 }
 
-void PollerThreadProc(SharedPtr<Poller> p)
+void PollerThreadProc(shared_ptr<Poller> p)
 {
 	p->run();
 }
 
-void checkBuffer(log4cxx::LoggerPtr &mLogger, uint32 type, SharedPtr<Buffer> b)
+void checkBuffer(log4cxx::LoggerPtr &mLogger, uint32 type, shared_ptr<Buffer> b)
 {
 	LOG4CXX_INFO(mLogger, "receive large buffer");
 
@@ -102,18 +102,18 @@ void checkBuffer(log4cxx::LoggerPtr &mLogger, uint32 type, SharedPtr<Buffer> b)
 class ServerHandler : public IBDataHandler, public IBConnectionHandler
 {
 public:
-	ServerHandler(SharedPtr<Poller> poller)
+	ServerHandler(shared_ptr<Poller> poller)
 	{
 		mPoller = poller;
 		mReady = false;
 	}
 
 public:
-	virtual void onConnected(SharedPtr<IBConnection> connection)
+	virtual void onConnected(shared_ptr<IBConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "client connected, connection ptr = " << connection.get());
 		std::string st[]={"aaa","bbb","ccc","ddd","eee","fffff"};
-		SharedPtr<Buffer> b = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE);
+		shared_ptr<Buffer> b = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE);
 		uint64 key = connection->registrerDirect(b);
 		LOG4CXX_INFO(mLogger, "buffer registered, key = " << key);
 
@@ -125,14 +125,14 @@ public:
 		}
 
 		LOG4CXX_INFO(mLogger, "sending out the local key (the sink_id)...");
-		SharedPtr<Buffer> key_info = connection->createBuffer(sizeof(uint64));
+		shared_ptr<Buffer> key_info = connection->createBuffer(sizeof(uint64));
 		key_info->write(key);
 		connection->send(0, key_info);
 
 		mReady = true;
 	}
 
-	virtual void onDisconnected(SharedPtr<IBConnection> connection)
+	virtual void onDisconnected(shared_ptr<IBConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "client disconnected, connection ptr = " << connection.get());
 
@@ -140,13 +140,13 @@ public:
 		mPoller->terminate();
 	}
 
-	virtual void onError(SharedPtr<IBConnection> connection, int code)
+	virtual void onError(shared_ptr<IBConnection> connection, int code)
 	{
 		LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 	}
 
 public:
-	virtual void handle(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<IBConnection> connection)
+	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<IBConnection> connection)
 	{
 		if(type == 0)
 		{
@@ -169,17 +169,17 @@ public:
 			checkBuffer(mLogger, type, buffer);
 
 			// send a dummy ack buffer back
-			SharedPtr<Buffer> ack = connection->createBuffer(4);
+			shared_ptr<Buffer> ack = connection->createBuffer(4);
 			ack->write(0);
 			connection->send(2, ack);
 		}
 	}
 private:
-	SharedPtr<Poller> mPoller;
+	shared_ptr<Poller> mPoller;
 
 private:
 	bool mReady;
-	SharedPtr<Buffer> sourceBuffer;
+	shared_ptr<Buffer> sourceBuffer;
 
 private:
 	static log4cxx::LoggerPtr mLogger;
@@ -193,18 +193,18 @@ log4cxx::LoggerPtr ServerHandler::mLogger(log4cxx::Logger::getLogger("ServerHand
 class ClientHandler : public IBDataHandler, public IBConnectionHandler
 {
 public:
-	ClientHandler(SharedPtr<Poller> poller)
+	ClientHandler(shared_ptr<Poller> poller)
 	{
 		mPoller = poller;
 		mReady = false;
 	}
 
 public:
-	virtual void onConnected(SharedPtr<IBConnection> connection)
+	virtual void onConnected(shared_ptr<IBConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "connected to server, connection ptr = " << connection.get());
 
-		SharedPtr<Buffer> b = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE);
+		shared_ptr<Buffer> b = connection->createBuffer(TEST_DIRECT_BUFFER_SIZE);
 		uint64 key = connection->registrerDirect(b);
 		LOG4CXX_INFO(mLogger, "buffer registered, key = " << key);
 
@@ -216,14 +216,14 @@ public:
 		}
 
 		LOG4CXX_INFO(mLogger, "sending out the local key (the sink_id)...");
-		SharedPtr<Buffer> key_info = connection->createBuffer(sizeof(uint64));
+		shared_ptr<Buffer> key_info = connection->createBuffer(sizeof(uint64));
 		key_info->write(key);
 		connection->send(0, key_info);
 
 		mReady = true;
 	}
 
-	virtual void onDisconnected(SharedPtr<IBConnection> connection)
+	virtual void onDisconnected(shared_ptr<IBConnection> connection)
 	{
 		LOG4CXX_INFO(mLogger, "disconnected from server, connection ptr = " << connection.get());
 
@@ -231,13 +231,13 @@ public:
 		mPoller->terminate();
 	}
 
-	virtual void onError(SharedPtr<IBConnection> connection, int code)
+	virtual void onError(shared_ptr<IBConnection> connection, int code)
 	{
 		LOG4CXX_ERROR(mLogger, "client error, connection ptr = " << connection.get() << ", error code = " << code);
 	}
 
 public:
-	virtual void handle(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<IBConnection> connection)
+	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<IBConnection> connection)
 	{
 		if(type == 0)
 		{
@@ -260,17 +260,17 @@ public:
 			checkBuffer(mLogger, type, buffer);
 
 			// send a dummy ack buffer back
-			SharedPtr<Buffer> ack = connection->createBuffer(4);
+			shared_ptr<Buffer> ack = connection->createBuffer(4);
 			ack->write(0);
 			connection->send(2, ack);
 		}
 	}
 private:
-	SharedPtr<Poller> mPoller;
+	shared_ptr<Poller> mPoller;
 
 private:
 	bool mReady;
-	SharedPtr<Buffer> sourceBuffer;
+	shared_ptr<Buffer> sourceBuffer;
 
 private:
 	static log4cxx::LoggerPtr mLogger;
@@ -278,12 +278,12 @@ private:
 };
 log4cxx::LoggerPtr ClientHandler::mLogger(log4cxx::Logger::getLogger("ClientHandler"));
 
-void ConnectorHandler(SharedPtr<IBConnection> connection, int err)
+void ConnectorHandler(shared_ptr<IBConnection> connection, int err)
 {
 	printf("ConnectorHandler: err = %d\n", err);
 }
 
-void AcceptorHandler(SharedPtr<IBConnection> connection, int err)
+void AcceptorHandler(shared_ptr<IBConnection> connection, int err)
 {
 	printf("AcceptorHandler: err = %d\n", err);
 }
@@ -307,16 +307,16 @@ int main(int argc, char** argv)
 
 	// start and run the network engine
 	{
-		SharedPtr<Poller> poller(new Poller(ev_loop_new(0)));
+		shared_ptr<Poller> poller(new Poller(ev_loop_new(0)));
 
-		SharedPtr<IBDispatcher> dispatcher(new IBDispatcher());
-		SharedPtr<IBNetEngine> engine(new IBNetEngine());
+		shared_ptr<IBDispatcher> dispatcher(new IBDispatcher());
+		shared_ptr<IBNetEngine> engine(new IBNetEngine());
 		engine->setDispatcher(dispatcher);
 		engine->setBufferManager(gSingletonPool.buffer_manager);
 
 		if(strcmp(argv[1], "server") == 0)
 		{
-			SharedPtr<ServerHandler> server(new ServerHandler(poller));
+			shared_ptr<ServerHandler> server(new ServerHandler(poller));
 
 			dispatcher->registerDefaultDataHandler(server);
 			dispatcher->registerConnectionHandler(server);
@@ -325,7 +325,7 @@ int main(int argc, char** argv)
 		}
 		else if(strcmp(argv[1], "client") == 0)
 		{
-			SharedPtr<ClientHandler> client(new ClientHandler(poller));
+			shared_ptr<ClientHandler> client(new ClientHandler(poller));
 
 			dispatcher->registerDefaultDataHandler(client);
 			dispatcher->registerConnectionHandler(client);

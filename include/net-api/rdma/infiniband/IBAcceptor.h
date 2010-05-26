@@ -37,23 +37,23 @@ class IBNetEngine;
 class IBAcceptor
 {
 public:
-	typedef boost::function2<void, SharedPtr< IBConnection >, int > AcceptorCallback;
+	typedef boost::function2<void, shared_ptr< IBConnection >, int > AcceptorCallback;
 
 public:
 	IBAcceptor(IBNetEngine* engine);
 	~IBAcceptor();
 
 public:
-	static SharedPtr<IBAcceptor> create(void* e)
+	static shared_ptr<IBAcceptor> create(void* e)
 	{
 		IBNetEngine* engine = reinterpret_cast<IBNetEngine*>(e);
-		SharedPtr<IBAcceptor> p(new IBAcceptor(engine));
+		shared_ptr<IBAcceptor> p(new IBAcceptor(engine));
 		p->mWeakThis = p;
 		return p;
 	}
 
 public:
-	bool accept(SharedPtr<Poller> poller, SharedPtr<InetSocketAddress> address, AcceptorCallback callback);
+	bool accept(shared_ptr<Poller> poller, shared_ptr<InetSocketAddress> address, AcceptorCallback callback);
 	void cancel();
 
 public:
@@ -91,9 +91,9 @@ private:
 	{
 		ev::io watcher;
 		ev::timer timeout;
-		SharedPtr<Poller> poller;
-		SharedPtr<rdma_event_channel> rchannel;
-		SharedPtr<rdma_cm_id> listen_id;
+		shared_ptr<Poller> poller;
+		shared_ptr<rdma_event_channel> rchannel;
+		shared_ptr<rdma_cm_id> listen_id;
 	} mAcceptInfo;
 
     WeakPtr<IBAcceptor> mWeakThis;

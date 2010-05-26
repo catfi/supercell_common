@@ -50,11 +50,11 @@ TcpConnection::~TcpConnection()
 }
 
 //////////////////////////////////////////////////////////////////////////
-SharedPtr<Buffer> TcpConnection::createBuffer(size_t size)
+shared_ptr<Buffer> TcpConnection::createBuffer(size_t size)
 {
 	ASSERT(mEngine->getBufferManager());
 
-	SharedPtr<Buffer> buffer = mEngine->getBufferManager()->createBuffer(size);
+	shared_ptr<Buffer> buffer = mEngine->getBufferManager()->createBuffer(size);
 
 	if(!buffer)
 	{
@@ -64,7 +64,7 @@ SharedPtr<Buffer> TcpConnection::createBuffer(size_t size)
 	return buffer;
 }
 
-bool TcpConnection::send(uint32 type, SharedPtr<Buffer> buffer)
+bool TcpConnection::send(uint32 type, shared_ptr<Buffer> buffer)
 {
 	ASSERT(buffer->dataSize() > 0);
 
@@ -104,7 +104,7 @@ void TcpConnection::close()
 	}
 
 	// remove itself from TcpNetEngine
-	SharedPtr<TcpConnection> shared_from_this(mWeakThis);
+	shared_ptr<TcpConnection> shared_from_this(mWeakThis);
 	mEngine->removeConnection(shared_from_this);
 
 	// dispatch to upper application
@@ -153,7 +153,7 @@ void TcpConnection::setMaxSendInFlight(int32 maxSendInFlight)
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool TcpConnection::directSend(uint32 type, SharedPtr<Buffer> buffer)
+bool TcpConnection::directSend(uint32 type, shared_ptr<Buffer> buffer)
 {
 	TCP_DEBUG("[DirectSend] send direct, type = " << type << ", buffer size = " << buffer->dataSize());
 
@@ -215,7 +215,7 @@ bool TcpConnection::directSend(uint32 type, SharedPtr<Buffer> buffer)
 	return true;
 }
 
-bool TcpConnection::queueSend(uint32 type, SharedPtr<Buffer> buffer)
+bool TcpConnection::queueSend(uint32 type, shared_ptr<Buffer> buffer)
 {
 	TCP_DEBUG("[QueueSend] send queued, type = " << type << ", buffer size = " << buffer->dataSize());
 
@@ -299,16 +299,16 @@ void TcpConnection::handleDeviceRead(ev::io &w, int revent)
 			}
 
 			// slice (copy) the buffer
-			SharedPtr<Buffer> buffer = createBuffer(buffer_length);
+			shared_ptr<Buffer> buffer = createBuffer(buffer_length);
 			buffer->writeArray(mReadBuffer->rptr() + BUFFER_HEADER_SIZE, buffer_length);
-			//SharedPtr<Buffer> buffer(new Buffer(mReadBuffer->rptr() + BUFFER_HEADER_SIZE, buffer_length));
+			//shared_ptr<Buffer> buffer(new Buffer(mReadBuffer->rptr() + BUFFER_HEADER_SIZE, buffer_length));
 			//buffer->wpos(buffer_length);
 
 			// advance the read pointer
 			mReadBuffer->rpos(mReadBuffer->rpos() + BUFFER_HEADER_SIZE + buffer_length);
 
 			// dispatch the buffer to application
-			SharedPtr<TcpConnection> shared_from_this(mWeakThis);
+			shared_ptr<TcpConnection> shared_from_this(mWeakThis);
 			mEngine->getDispatcher()->dispatchDataEvent(buffer_type, buffer, shared_from_this);
 		}
 
@@ -472,7 +472,7 @@ bool TcpConnection::requestSend()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void TcpConnection::start(SharedPtr<Poller> poller)
+void TcpConnection::start(shared_ptr<Poller> poller)
 {
 	mPoller = poller;
 

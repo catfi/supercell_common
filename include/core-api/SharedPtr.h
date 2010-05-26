@@ -24,18 +24,17 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
-#define SharedPtr boost::shared_ptr
-#define WeakPtr boost::weak_ptr
-
 using boost::static_pointer_cast;
 using boost::const_pointer_cast;
 using boost::dynamic_pointer_cast;
+using boost::shared_ptr;
+using boost::weak_ptr;
 
 /**
  * @brief Allow direct comparison of shared_ptr and its wrapping type (for "equal to" operator)
  */
 template<class T>
-inline bool operator == (const SharedPtr<T> &a, const T* b)
+inline bool operator == (const shared_ptr<T> &a, const T* b)
 {
     return (a.get() == b);
 }
@@ -44,7 +43,7 @@ inline bool operator == (const SharedPtr<T> &a, const T* b)
  * @brief Allow direct comparison of shared_ptr and its wrapping type (for "not equal to" operator)
  */
 template<class T>
-inline bool operator != (const SharedPtr<T> &a, const T* b)
+inline bool operator != (const shared_ptr<T> &a, const T* b)
 {
     return (a.get() != b);
 }

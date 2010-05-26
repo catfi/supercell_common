@@ -33,13 +33,13 @@ InetSocketResolver::~InetSocketResolver()
 }
 
 //////////////////////////////////////////////////////////////////////////
-SharedPtr<InetSocketAddress> InetSocketResolver::resolve(std::string host)
+shared_ptr<InetSocketAddress> InetSocketResolver::resolve(std::string host)
 {
 	std::string token(":");
 
 	size_t pos = host.find_last_of(token);
 	if(pos == std::string::npos)
-		return SharedPtr<InetSocketAddress>();
+		return shared_ptr<InetSocketAddress>();
 
 	InetAddress inetAddr;
 	std::string name = host.substr(0, pos);
@@ -50,15 +50,15 @@ SharedPtr<InetSocketAddress> InetSocketResolver::resolve(std::string host)
 		inetAddr.setByHostName(name);
 
 	if(!inetAddr.isValid())
-		return SharedPtr<InetSocketAddress>();
+		return shared_ptr<InetSocketAddress>();
 
 	std::string port = host.substr(pos+1);
 
 	int nport = atoi(port.c_str());
 	if(nport <= 0 || nport >= 65536)
-		return SharedPtr<InetSocketAddress>();
+		return shared_ptr<InetSocketAddress>();
 
-	return SharedPtr<InetSocketAddress>(new InetSocketAddress(inetAddr, nport));
+	return shared_ptr<InetSocketAddress>(new InetSocketAddress(inetAddr, nport));
 }
 
 } } }

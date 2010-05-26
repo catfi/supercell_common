@@ -37,30 +37,30 @@ void RdmaNetEngineTestClient::run(std::string &address)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void RdmaNetEngineTestClient::onConnected(SharedPtr<RdmaConnection> connection)
+void RdmaNetEngineTestClient::onConnected(shared_ptr<RdmaConnection> connection)
 {
 	printf("CONNECTED\n");
 }
 
-void RdmaNetEngineTestClient::onDisconnected(SharedPtr<RdmaConnection> connection)
+void RdmaNetEngineTestClient::onDisconnected(shared_ptr<RdmaConnection> connection)
 {
 	printf("DISCONNECTED\n");
 }
 
-void RdmaNetEngineTestClient::onError(SharedPtr<RdmaConnection> connection, int code)
+void RdmaNetEngineTestClient::onError(shared_ptr<RdmaConnection> connection, int code)
 {
 	printf("ERROR\n");
 }
 
 //////////////////////////////////////////////////////////////////////////
-void RdmaNetEngineTestClient::handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<RdmaConnection> connection)
+void RdmaNetEngineTestClient::handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<RdmaConnection> connection)
 {
 	if(type == 5)
 	{
 		BufferInfo info;
 		b->readAny(info);
 
-		SharedPtr<Buffer> rb = connection->createBuffer(info.length);
+		shared_ptr<Buffer> rb = connection->createBuffer(info.length);
 
 		for(int i=0;i<info.length/sizeof(int);++i)
 		{

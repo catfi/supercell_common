@@ -45,7 +45,7 @@ TcpConnector::~TcpConnector()
 }
 
 /////////////////////////////////////////////////////////////////////////
-bool TcpConnector::connect(SharedPtr<Poller> poller, SharedPtr<InetSocketAddress> address, ConnectorCallback callback)
+bool TcpConnector::connect(shared_ptr<Poller> poller, shared_ptr<InetSocketAddress> address, ConnectorCallback callback)
 {
 	mConnectorCallback = callback;
 
@@ -163,7 +163,7 @@ void TcpConnector::handleConnected()
 	mStatus = CONNECTED;
 
 	// notify TcpNetEngine about the completion
-	SharedPtr<TcpConnector> shared_from_this(mWeakThis);
+	shared_ptr<TcpConnector> shared_from_this(mWeakThis);
 	mEngine->connectorCompleted(shared_from_this);
 
 	mConnectorCallback(mConnectInfo.connection, 0);
@@ -180,10 +180,10 @@ void TcpConnector::handleTimeoutEvent(ev::timer &w, int revent)
 	mStatus = ERROR;
 
 	// notify TcpNetEngine about the completion
-	SharedPtr<TcpConnector> shared_from_this(mWeakThis);
+	shared_ptr<TcpConnector> shared_from_this(mWeakThis);
 	mEngine->connectorCompleted(shared_from_this);
 
-	mConnectorCallback(SharedPtr<TcpConnection>(), -1);
+	mConnectorCallback(shared_ptr<TcpConnection>(), -1);
 
 	cleanup();
 }

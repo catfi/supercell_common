@@ -40,12 +40,12 @@ public:
 
 public:
 	/**
-	 * @brief This method allocates a buffer with specified size. The buffer is de-allocated automatically by SharedPtr
+	 * @brief This method allocates a buffer with specified size. The buffer is de-allocated automatically by shared_ptr
 	 *
 	 * @param size The size required
 	 * @return The buffer object allocated, or NULL if allocation fails.
 	 */
-	virtual SharedPtr<Buffer> createBuffer(size_t size) = 0;
+	virtual shared_ptr<Buffer> createBuffer(size_t size) = 0;
 
 	/**
 	 * Slice a portion of the original buffer as a new buffer (starting from the read pos of the original buffer.)
@@ -55,7 +55,7 @@ public:
 	 * @param size the size of the new buffer (if the size equal to 0, it represents all remaining data)
 	 * @return the new buffer (the child buffer)
 	 */
-	virtual SharedPtr<Buffer> sliceBuffer(SharedPtr<Buffer> original, size_t size = 0) = 0;
+	virtual shared_ptr<Buffer> sliceBuffer(shared_ptr<Buffer> original, size_t size = 0) = 0;
 
 	/**
 	 * Make a copy of the original buffer object.
@@ -64,7 +64,7 @@ public:
 	 * @param original original buffer (parent buffer)
 	 * @return the cloned buffer
 	 */
-	virtual SharedPtr<Buffer> cloneBuffer(SharedPtr<Buffer> original) = 0;
+	virtual shared_ptr<Buffer> cloneBuffer(shared_ptr<Buffer> original) = 0;
 };
 
 }

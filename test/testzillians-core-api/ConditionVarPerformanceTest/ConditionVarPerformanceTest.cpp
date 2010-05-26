@@ -191,7 +191,7 @@ struct CondVarPingPongTestLocal
 	boost::condition_variable producer_cond;
 	volatile bool consumer_ready;
 	volatile bool producer_ready;
-	const static uint32 iterations = 20000;
+	const static uint32 iterations = 200000;
 };
 
 BOOST_AUTO_TEST_CASE( CondVarPingPongTestCase )
@@ -205,6 +205,100 @@ BOOST_AUTO_TEST_CASE( CondVarPingPongTestCase )
 //	t1.join();
 }
 
+#include <condition_variable>
+struct StdConditionVariableTestCaseLocal
+{
+	void consumer()
+	{
+		consumer_ready = false;
+		counter = 0;
+
+		tbb::tick_count s = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+			{
+				std::unique_lock<std::mutex> lock(m);
+				bool waited = false;
+				while(!consumer_ready)
+				{
+					if(waited)
+					{
+						printf("spurious! i = %d\n", i);
+					}
+					consumer_cond.wait(lock);
+					waited = true;
+				}
+				consumer_ready = false;
+			}
+
+//			if(counter % 1000 == 1)
+//				printf("consumer counter = %d\n", counter);
+//			BOOST_CHECK(counter % 2 == 1);
+			++counter;
+
+			producer_ready = true;
+			producer_cond.notify_one();
+		}
+		tbb::tick_count e = tbb::tick_count::now();
+		printf("[STD ConditionVar] wait for %d times takes %f ms\n", iterations, (e-s).seconds()*1000.0);
+	}
+
+	void producer()
+	{
+		producer_ready = false;
+		tbb::tick_count s = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+//			if(counter % 1000 == 0)
+//				printf("producer counter = %d\n", counter);
+//			BOOST_CHECK(counter % 2 == 0);
+			++counter;
+
+			consumer_ready = true;
+			consumer_cond.notify_one();
+
+			{
+				std::unique_lock<std::mutex> lock(m);
+				bool waited = false;
+				while(!producer_ready)
+				{
+					if(waited)
+					{
+						printf("spurious! i = %d\n", i);
+					}
+					producer_cond.wait(lock);
+					waited = true;
+				}
+				producer_ready = false;
+			}
+		}
+		tbb::tick_count e = tbb::tick_count::now();
+		printf("[STD ConditionVar] notify for %d times takes %f ms\n", iterations, (e-s).seconds()*1000.0);
+	}
+
+	volatile uint32 counter;
+	std::mutex m;
+	std::condition_variable consumer_cond;
+	std::condition_variable producer_cond;
+	volatile bool consumer_ready;
+	volatile bool producer_ready;
+	//std::atomic<bool> consumer_ready;
+	//std::atomic<bool> producer_ready;
+	const static uint32 iterations = 200000;
+};
+
+BOOST_AUTO_TEST_CASE( StdConditionVariableTestCaseCase )
+{
+//	StdConditionVariableTestCaseLocal obj;
+//
+//	tbb::tbb_thread t0(boost::bind(&StdConditionVariableTestCaseLocal::consumer, &obj));
+//	tbb::tbb_thread t1(boost::bind(&StdConditionVariableTestCaseLocal::producer, &obj));
+//
+//	t0.join();
+//	t1.join();
+}
+
+
 struct ConcurrentQueuePingPongTestLocal
 {
 	void consumer()
@@ -216,9 +310,9 @@ struct ConcurrentQueuePingPongTestLocal
 			uint32 dummy = 0;
 			consumer_q.pop(dummy);
 
-			if(counter % 10000 == 0)
-				printf("consumer counter = %d, dummy = %d\n", counter, dummy);
-			BOOST_CHECK(counter % 2 == 0);
+//			if(counter % 10000 == 0)
+//				printf("consumer counter = %d, dummy = %d\n", counter, dummy);
+//			BOOST_CHECK(counter % 2 == 0);
 			dummy = ++counter;
 
 			producer_q.push(dummy);
@@ -237,9 +331,9 @@ struct ConcurrentQueuePingPongTestLocal
 			consumer_q.push(dummy);
 			producer_q.pop(dummy);
 
-			if(counter % 10000 == 1)
-				printf("producer counter = %d, dummy = %d\n", counter, dummy);
-			BOOST_CHECK(counter % 2 == 1);
+//			if(counter % 10000 == 1)
+//				printf("producer counter = %d, dummy = %d\n", counter, dummy);
+//			BOOST_CHECK(counter % 2 == 1);
 			++counter;
 		}
 		tbb::tick_count e = tbb::tick_count::now();
@@ -306,7 +400,7 @@ public:
 		AckMap::iterator it = mAckMap.map.find(key);
 		//BOOST_ASSERT( it != mAckMap.map.end() );// NOTE: Commented out because of Win32 compilation error
 		/* Error
-			error C2668: '_wassert' : ¼Ò¸W¨â¥iªº©I¥s¦h¸ü¨ç¦¡	
+			error C2668: '_wassert' : ï¿½Ò¸Wï¿½ï¿½iï¿½ï¿½ï¿½Iï¿½sï¿½hï¿½ï¿½ç¦¡	
 			\zillians\projects\common\test\testzillians-core-api\ConditionVarPerformanceTest\ConditionVarPerformanceTest.cpp	307
 		*/
 
@@ -324,7 +418,7 @@ public:
 			printf("failed to upgrade to writer\n");
 		}
 
-		SharedPtr<AckSlot> cond = it->second;
+		shared_ptr<AckSlot> cond = it->second;
 		cond->reset();
 
 		mAckMap.map.erase(it);
@@ -347,10 +441,10 @@ public:
 
 		Key key = ++mCounter;
 
-		SharedPtr<AckSlot> cond;
+		shared_ptr<AckSlot> cond;
 		if(!mAckSlotQueue.try_pop(cond))
 		{
-			cond = SharedPtr<AckSlot>(new AckSlot);
+			cond = shared_ptr<AckSlot>(new AckSlot);
 		}
 
 		mAckMap.map[key] = cond;
@@ -361,14 +455,14 @@ public:
 private:
 	tbb::atomic<Key> mCounter;
 
-	typedef std::map<Key, SharedPtr<AckSlot> > AckMap;
+	typedef std::map<Key, shared_ptr<AckSlot> > AckMap;
 	struct
 	{
 		AckMap map;
 		tbb::spin_rw_mutex lock;
 	} mAckMap;
 
-	typedef tbb::concurrent_queue< SharedPtr<AckSlot> > AckSlotQueue;
+	typedef tbb::concurrent_queue< shared_ptr<AckSlot> > AckSlotQueue;
 	AckSlotQueue mAckSlotQueue;
 };
 
@@ -484,7 +578,7 @@ BOOST_AUTO_TEST_CASE( IoServicePingPongTestCase )
 //	t1.join();
 }
 
-struct TbbQueueCondVarPingPongTestCaseLocal
+struct StdCondVarPingPongTestCaseLocal
 {
 	void consumer()
 	{
@@ -495,7 +589,66 @@ struct TbbQueueCondVarPingPongTestCaseLocal
 			uint32 dummy = 0;
 			consumer_cond.wait(dummy);
 
-			if(counter % 10000 == 0)
+//			if(counter % 10000 == 0)
+//				printf("consumer counter = %d, dummy = %d\n", counter, dummy);
+			BOOST_CHECK(counter % 2 == 0);
+			dummy = ++counter;
+
+			producer_cond.signal(dummy);
+		}
+		tbb::tick_count e = tbb::tick_count::now();
+		printf("[StdConditionVariable] wait for %d times takes %f ms\n", iterations, (e-s).seconds()*1000.0);
+	}
+
+	void producer()
+	{
+		tbb::tick_count s = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+			uint32 dummy = counter;
+
+			consumer_cond.signal(dummy);
+			producer_cond.wait(dummy);
+
+//			if(counter % 10000 == 1)
+//				printf("producer counter = %d, dummy = %d\n", counter, dummy);
+			BOOST_CHECK(counter % 2 == 1);
+			++counter;
+		}
+		tbb::tick_count e = tbb::tick_count::now();
+		printf("[StdConditionVariable] notify for %d times takes %f ms\n", iterations, (e-s).seconds()*1000.0);
+	}
+
+	volatile uint32 counter;
+	zillians::ConditionVariable<uint32> consumer_cond;
+	zillians::ConditionVariable<uint32> producer_cond;
+	const static uint32 iterations = 200000;
+};
+
+BOOST_AUTO_TEST_CASE( StdCondVarPingPongTestCase )
+{
+	StdCondVarPingPongTestCaseLocal obj;
+
+	obj.counter = 0;
+
+	tbb::tbb_thread t0(boost::bind(&StdCondVarPingPongTestCaseLocal::consumer, &obj));
+	tbb::tbb_thread t1(boost::bind(&StdCondVarPingPongTestCaseLocal::producer, &obj));
+
+	t0.join();
+	t1.join();
+}
+
+struct TbbQueueCondVarPingPongTestCaseLocal
+{
+	void consumer()
+	{
+		tbb::tick_count s = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+			uint32 dummy = 0;
+			consumer_cond.wait(dummy);
+
+//			if(counter % 10000 == 0)
 				printf("consumer counter = %d, dummy = %d\n", counter, dummy);
 			BOOST_CHECK(counter % 2 == 0);
 			dummy = ++counter;
@@ -516,7 +669,7 @@ struct TbbQueueCondVarPingPongTestCaseLocal
 			consumer_cond.signal(dummy);
 			producer_cond.wait(dummy);
 
-			if(counter % 10000 == 1)
+//			if(counter % 10000 == 1)
 				printf("producer counter = %d, dummy = %d\n", counter, dummy);
 			BOOST_CHECK(counter % 2 == 1);
 			++counter;
@@ -528,18 +681,20 @@ struct TbbQueueCondVarPingPongTestCaseLocal
 	volatile uint32 counter;
 	zillians::ConditionVariable<uint32> consumer_cond;
 	zillians::ConditionVariable<uint32> producer_cond;
-	const static uint32 iterations = 200000;
+	const static uint32 iterations = 20;
 };
 
 BOOST_AUTO_TEST_CASE( TbbQueueCondVarPingPongTestCase )
 {
-	TbbQueueCondVarPingPongTestCaseLocal obj;
-
-	tbb::tbb_thread t0(boost::bind(&TbbQueueCondVarPingPongTestCaseLocal::consumer, &obj));
-	tbb::tbb_thread t1(boost::bind(&TbbQueueCondVarPingPongTestCaseLocal::producer, &obj));
-
-	t0.join();
-	t1.join();
+//	TbbQueueCondVarPingPongTestCaseLocal obj;
+//
+//	obj.counter = 0;
+//
+//	tbb::tbb_thread t0(boost::bind(&TbbQueueCondVarPingPongTestCaseLocal::consumer, &obj));
+//	tbb::tbb_thread t1(boost::bind(&TbbQueueCondVarPingPongTestCaseLocal::producer, &obj));
+//
+//	t0.join();
+//	t1.join();
 }
 
 // KNOWN BUG: ConditionVariable cannot take bool as its template argument, due to a bug in tbb::concurrent_bounded_queue
@@ -557,6 +712,118 @@ BOOST_AUTO_TEST_CASE( TbbQueueCondVarPingPongTestCase )
 //	bool dummy = false;
 //	BOOST_CHECK_NO_THROW(xd.wait(dummy));
 //}
+
+template<typename Data>
+class std_concurrent_queue
+{
+private:
+    std::queue<Data> the_queue;
+    mutable boost::mutex the_mutex;
+    boost::condition_variable the_condition_variable;
+public:
+    void push(Data const& data)
+    {
+        boost::mutex::scoped_lock lock(the_mutex);
+        the_queue.push(data);
+        lock.unlock();
+        the_condition_variable.notify_one();
+    }
+
+    bool empty() const
+    {
+        boost::mutex::scoped_lock lock(the_mutex);
+        return the_queue.empty();
+    }
+
+    bool try_pop(Data& popped_value)
+    {
+        boost::mutex::scoped_lock lock(the_mutex);
+        if(the_queue.empty())
+        {
+            return false;
+        }
+
+        popped_value=the_queue.front();
+        the_queue.pop();
+        return true;
+    }
+
+    void wait_and_pop(Data& popped_value)
+    {
+        boost::mutex::scoped_lock lock(the_mutex);
+        while(the_queue.empty())
+        {
+            the_condition_variable.wait(lock);
+        }
+
+        popped_value=the_queue.front();
+        the_queue.pop();
+    }
+
+};
+
+#include "core-api/ConcurrentQueue.h"
+
+struct StdQueueCondVarPingPongTestCaseLocal
+{
+	void consumer()
+	{
+		counter = 0;
+		tbb::tick_count s = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+			uint32 dummy = 0;
+			consumer_cond.wait_and_pop(dummy);
+
+//			if(counter % 10000 == 0)
+//				printf("consumer counter = %d, dummy = %d\n", counter, dummy);
+			BOOST_CHECK(counter % 2 == 0);
+			dummy = ++counter;
+
+			producer_cond.push(dummy);
+		}
+		tbb::tick_count e = tbb::tick_count::now();
+		printf("[StdQueueConditionVariable] wait for %d times takes %f ms\n", iterations, (e-s).seconds()*1000.0);
+	}
+
+	void producer()
+	{
+		tbb::tick_count s = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+			uint32 dummy = counter;
+
+			consumer_cond.push(dummy);
+			producer_cond.wait_and_pop(dummy);
+
+//			if(counter % 10000 == 1)
+//				printf("producer counter = %d, dummy = %d\n", counter, dummy);
+			BOOST_CHECK(counter % 2 == 1);
+			++counter;
+		}
+		tbb::tick_count e = tbb::tick_count::now();
+		printf("[StdQueueConditionVariable] notify for %d times takes %f ms\n", iterations, (e-s).seconds()*1000.0);
+	}
+
+	volatile uint32 counter;
+	//std_concurrent_queue<uint32> consumer_cond;
+	//std_concurrent_queue<uint32> producer_cond;
+
+	zillians::ConcurrentQueue<uint32> consumer_cond;
+	zillians::ConcurrentQueue<uint32> producer_cond;
+	const static uint32 iterations = 200000;
+};
+
+BOOST_AUTO_TEST_CASE( StdQueueCondVarPingPongTestCase )
+{
+	StdQueueCondVarPingPongTestCaseLocal obj;
+
+	tbb::tbb_thread t0(boost::bind(&StdQueueCondVarPingPongTestCaseLocal::consumer, &obj));
+	tbb::tbb_thread t1(boost::bind(&StdQueueCondVarPingPongTestCaseLocal::producer, &obj));
+
+	t0.join();
+	t1.join();
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

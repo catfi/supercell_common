@@ -39,23 +39,23 @@ class ScyllaChannel : public Channel
 	friend class ScyllaChannelEngine;
 
 public:
-	ScyllaChannel(group::CloseProcessGroup* cpg, SharedPtr<Worker> worker);
+	ScyllaChannel(group::CloseProcessGroup* cpg, shared_ptr<Worker> worker);
 	virtual ~ScyllaChannel();
 
 public:
-	virtual void send(uint32 type, SharedPtr<Buffer> buffer);
-	virtual void acksend(uint32 type, SharedPtr<Buffer> buffer);
-	virtual void acksendAsync(uint32 type, SharedPtr<Buffer> buffer, AsyncSendCompletionHandler handler);
+	virtual void send(uint32 type, shared_ptr<Buffer> buffer);
+	virtual void acksend(uint32 type, shared_ptr<Buffer> buffer);
+	virtual void acksendAsync(uint32 type, shared_ptr<Buffer> buffer, AsyncSendCompletionHandler handler);
 
 protected:
 	virtual void handleAckMessage(uint32 cvId, const boost::system::error_code& ec);
 
 private:
-	void doAcksendAsync(uint32 type, SharedPtr<Buffer> buffer, AsyncSendCompletionHandler handler);
+	void doAcksendAsync(uint32 type, shared_ptr<Buffer> buffer, AsyncSendCompletionHandler handler);
 
 protected:
 	group::CloseProcessGroup* mCloseProcessGroup;
-	SharedPtr<Worker> mAcksendWorker;
+	shared_ptr<Worker> mAcksendWorker;
 
 private:
 	ConditionVariable<boost::system::error_code>** mConditionVarArray;

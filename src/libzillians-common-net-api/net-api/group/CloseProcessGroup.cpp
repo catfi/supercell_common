@@ -52,7 +52,7 @@ static void CloseProcessGroupDeliveryCallback(
 	info.processId = pid;
 
 	// create buffer object from given data pointer
-	SharedPtr<Buffer> buffer(new Buffer((byte*)msg, (std::size_t)msg_len));
+	shared_ptr<Buffer> buffer(new Buffer((byte*)msg, (std::size_t)msg_len));
 
 	uint32 type; *buffer >> type;
 	dispatcher->dispatch(info, type, buffer, msg_len - sizeof(uint32));
@@ -152,7 +152,7 @@ CloseProcessGroup::~CloseProcessGroup()
 		throw std::runtime_error("failed to finalize close process group");
 }
 
-bool CloseProcessGroup::send(uint32 type, SharedPtr<Buffer> buffer)
+bool CloseProcessGroup::send(uint32 type, shared_ptr<Buffer> buffer)
 {
 	iovec iov[2];
 	iov[0].iov_base = &type;

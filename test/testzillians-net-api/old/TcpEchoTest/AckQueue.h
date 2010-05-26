@@ -74,14 +74,14 @@ public:
 			printf("failed to upgrade to writer\n");
 		}
 
-		SharedPtr<AckSlot> cond = it->second.first;
+		shared_ptr<AckSlot> cond = it->second.first;
 		cond->reset();
 
 		mAckMap.map.erase(it);
 		mAckSlotQueue.push(cond);
 	}
 
-	void signal(ack_key_type key, SharedPtr<Buffer>* value)
+	void signal(ack_key_type key, shared_ptr<Buffer>* value)
 	{
 		tbb::spin_rw_mutex::scoped_lock lock(mAckMap.lock, false);
 
@@ -93,16 +93,16 @@ public:
 		it->second.first->signal();
 	}
 
-	ack_key_type next(SharedPtr<Buffer>* value)
+	ack_key_type next(shared_ptr<Buffer>* value)
 	{
 		tbb::spin_rw_mutex::scoped_lock lock(mAckMap.lock, true);
 
 		ack_key_type key = ++mCounter;
 
-		SharedPtr<AckSlot> cond;
+		shared_ptr<AckSlot> cond;
 		if(!mAckSlotQueue.try_pop(cond))
 		{
-			cond = SharedPtr<AckSlot>(new AckSlot);
+			cond = shared_ptr<AckSlot>(new AckSlot);
 		}
 
 		mAckMap.map[key] = std::make_pair(cond, value);
@@ -113,14 +113,14 @@ public:
 private:
 	tbb::atomic<ack_key_type> mCounter;
 
-	typedef std::map<ack_key_type, std::pair< SharedPtr<AckSlot>, SharedPtr<Buffer>* > > AckMap;
+	typedef std::map<ack_key_type, std::pair< shared_ptr<AckSlot>, shared_ptr<Buffer>* > > AckMap;
 	struct
 	{
 		AckMap map;
 		tbb::spin_rw_mutex lock;
 	} mAckMap;
 
-	typedef tbb::concurrent_queue< SharedPtr<AckSlot> > AckSlotQueue;
+	typedef tbb::concurrent_queue< shared_ptr<AckSlot> > AckSlotQueue;
 	AckSlotQueue mAckSlotQueue;
 };
 

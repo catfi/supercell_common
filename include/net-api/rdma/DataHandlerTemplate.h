@@ -32,7 +32,7 @@ namespace zillians { namespace net { namespace rdma {
 template <typename Connection>
 struct DataHandlerTemplate
 {
-	virtual void handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<Connection> connection) = 0;
+	virtual void handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<Connection> connection) = 0;
 };
 
 template <typename Connection>
@@ -56,11 +56,11 @@ struct DataHandlerBinder : public DataHandlerTemplate<Connection>
 		}
 	};
 
-	typedef typename boost::function< void (SharedPtr<Connection> connection, uint32, SharedPtr<Buffer>) > handler_type;
+	typedef typename boost::function< void (shared_ptr<Connection> connection, uint32, shared_ptr<Buffer>) > handler_type;
 
 	DataHandlerBinder(handler_type h) : handler(h) { }
 
-	virtual void handle(uint32 type, SharedPtr<Buffer> b, SharedPtr<Connection> connection)
+	virtual void handle(uint32 type, shared_ptr<Buffer> b, shared_ptr<Connection> connection)
 	{
 		handler(connection, type, b);
 	}

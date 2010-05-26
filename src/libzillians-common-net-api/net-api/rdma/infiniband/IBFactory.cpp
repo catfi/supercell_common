@@ -36,14 +36,14 @@ IBFactory::~IBFactory()
 { }
 
 //////////////////////////////////////////////////////////////////////////
-SharedPtr<ibv_context> IBFactory::createDeviceContext(ibv_device* device)
+shared_ptr<ibv_context> IBFactory::createDeviceContext(ibv_device* device)
 {
 	ibv_context* context = ibv_open_device(device);
 	IB_DEBUG("create device context = " << context);
-	return SharedPtr<ibv_context>(context, IBFactory::destroyDeviceContext);
+	return shared_ptr<ibv_context>(context, IBFactory::destroyDeviceContext);
 }
 
-SharedPtr<rdma_event_channel> IBFactory::createEventChannel()
+shared_ptr<rdma_event_channel> IBFactory::createEventChannel()
 {
     rdma_event_channel* ec = rdma_create_event_channel();
 
@@ -55,10 +55,10 @@ SharedPtr<rdma_event_channel> IBFactory::createEventChannel()
 
     //::fcntl(ec->fd, F_SETFL, O_NONBLOCK);
     IB_DEBUG("create rdma event channel = " << ec);
-    return SharedPtr<rdma_event_channel>(ec, IBFactory::destroyEventChannel);
+    return shared_ptr<rdma_event_channel>(ec, IBFactory::destroyEventChannel);
 }
 
-SharedPtr<rdma_cm_id> IBFactory::createManagementId(rdma_event_channel* ec, void* context, rdma_port_space ps)
+shared_ptr<rdma_cm_id> IBFactory::createManagementId(rdma_event_channel* ec, void* context, rdma_port_space ps)
 {
     rdma_cm_id* id = NULL;
     rdma_create_id(ec, &id, context, ps);
@@ -70,10 +70,10 @@ SharedPtr<rdma_cm_id> IBFactory::createManagementId(rdma_event_channel* ec, void
     }
 
     IB_DEBUG("create rdma cm id = " << id);
-    return SharedPtr<rdma_cm_id>(id, IBFactory::destroyManagementId);
+    return shared_ptr<rdma_cm_id>(id, IBFactory::destroyManagementId);
 }
 
-SharedPtr<ibv_pd> IBFactory::createProtectionDomain(ibv_context* c)
+shared_ptr<ibv_pd> IBFactory::createProtectionDomain(ibv_context* c)
 {
     ibv_pd* pd = ibv_alloc_pd(c);
     if(!pd)
@@ -83,11 +83,11 @@ SharedPtr<ibv_pd> IBFactory::createProtectionDomain(ibv_context* c)
     }
 
     IB_DEBUG("create ib protection domain = " << pd);
-    return SharedPtr<ibv_pd>(pd, IBFactory::destroyProtectionDomain);
+    return shared_ptr<ibv_pd>(pd, IBFactory::destroyProtectionDomain);
 
 }
 
-SharedPtr<ibv_comp_channel> IBFactory::createCompletionChannel(ibv_context* c)
+shared_ptr<ibv_comp_channel> IBFactory::createCompletionChannel(ibv_context* c)
 {
     ibv_comp_channel* cc = ibv_create_comp_channel(c);
     if(!cc)
@@ -98,11 +98,11 @@ SharedPtr<ibv_comp_channel> IBFactory::createCompletionChannel(ibv_context* c)
 
     //::fcntl(cc->fd, F_SETFL, O_NONBLOCK);
     IB_DEBUG("create ib completion channel = " << cc);
-    return SharedPtr<ibv_comp_channel>(cc, IBFactory::destroyCompletionChannel);
+    return shared_ptr<ibv_comp_channel>(cc, IBFactory::destroyCompletionChannel);
 
 }
 
-SharedPtr<ibv_cq> IBFactory::createCompletionQueue(ibv_context* c, int cqe, void* context, ibv_comp_channel* cc)
+shared_ptr<ibv_cq> IBFactory::createCompletionQueue(ibv_context* c, int cqe, void* context, ibv_comp_channel* cc)
 {
     ibv_cq* cq = ibv_create_cq(c, cqe, context, cc, 0);
     if(!cq)
@@ -112,7 +112,7 @@ SharedPtr<ibv_cq> IBFactory::createCompletionQueue(ibv_context* c, int cqe, void
     }
 
     IB_DEBUG("create ib completion queue = " << cq);
-    return SharedPtr<ibv_cq>(cq, IBFactory::destroyCompletionQueue);
+    return shared_ptr<ibv_cq>(cq, IBFactory::destroyCompletionQueue);
 }
 
 void IBFactory::createQueuePair(rdma_cm_id* id, ibv_pd* pd, ibv_qp_init_attr* attr)
@@ -127,7 +127,7 @@ void IBFactory::createQueuePair(rdma_cm_id* id, ibv_pd* pd, ibv_qp_init_attr* at
 	IB_DEBUG("create rdma queue pair = " << id->qp);
 }
 
-SharedPtr<ibv_mr> IBFactory::createMemoryRegion(ibv_pd* pd, void* addr, size_t size)
+shared_ptr<ibv_mr> IBFactory::createMemoryRegion(ibv_pd* pd, void* addr, size_t size)
 {
 	ibv_mr* mr = zillians_ibv_reg_mr(pd, addr, size);
 	if(!mr)
@@ -138,7 +138,7 @@ SharedPtr<ibv_mr> IBFactory::createMemoryRegion(ibv_pd* pd, void* addr, size_t s
 
 	IB_DEBUG("create memory region = " << mr);
 
-	return SharedPtr<ibv_mr>(mr, IBFactory::destroyMemoryRegion);
+	return shared_ptr<ibv_mr>(mr, IBFactory::destroyMemoryRegion);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -37,8 +37,8 @@ public:
 	virtual ~IBTransportSR();
 
 public:
-	bool sendAsync(uint32 type, SharedPtr<Buffer>, CompletionHandler handler);
-	bool receiveAsync(SharedPtr<Buffer>, CompletionHandler handler);
+	bool sendAsync(uint32 type, shared_ptr<Buffer>, CompletionHandler handler);
+	bool receiveAsync(shared_ptr<Buffer>, CompletionHandler handler);
 
 public:
 	virtual void workCompleted(const ibv_wc& wc);

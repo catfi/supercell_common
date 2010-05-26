@@ -39,7 +39,7 @@
  * context. The blocking (synchronous) dispatch uses a condition variable
  * to wait for completion acknowledgment sent by the internal thread.
  */
-#define MAXIMUM_CONCURRENT_CALLS 1024
+#define ZILLIANS_WORKER_DEFAULT_MAXIMUM_CONCURRENT_CALLS 1024
 
 namespace zillians {
 
@@ -51,17 +51,31 @@ namespace zillians {
  */
 class Worker
 {
+	friend class WorkerGroup;
+	Worker(zillians::ConditionVariable<uint32>** conditions, tbb::concurrent_bounded_queue<uint32>* slots) :
+		mTerminated(false),
+		mConditionTableOwner(false),
+		mThread(boost::bind(&Worker::run, this))
+	{
+		mConditionSlots = slots;
+		mConditions = conditions;
+	}
+
 public:
 	/**
 	 * @brief Construct a worker object.
 	 */
-	Worker() :
+	Worker(std::size_t maxConcurrentCalls = ZILLIANS_WORKER_DEFAULT_MAXIMUM_CONCURRENT_CALLS) :
 		mTerminated(false),
+		mConditionTableOwner(true),
+		mConditionTableSize(maxConcurrentCalls),
 		mThread(boost::bind(&Worker::run, this))
 	{
-		for(uint32 i=0;i<MAXIMUM_CONCURRENT_CALLS;++i)
+		mConditionSlots = new tbb::concurrent_bounded_queue<uint32>();
+		mConditions = new zillians::ConditionVariable<uint32>*[mConditionTableSize];
+		for(uint32 i=0;i<mConditionTableSize;++i)
 		{
-			mAvailableConditionSlots.push(i);
+			mConditionSlots->push(i);
 			mConditions[i] = new zillians::ConditionVariable<uint32>();
 		}
 	}
@@ -72,9 +86,15 @@ public:
 	virtual ~Worker()
 	{
 		stop();
-		for(uint32 i=0;i<MAXIMUM_CONCURRENT_CALLS;++i)
+
+		if(mConditionTableOwner)
 		{
-			SAFE_DELETE(mConditions[i]);
+			for(uint32 i=0;i<mConditionTableSize;++i)
+			{
+				SAFE_DELETE(mConditions[i]);
+			}
+			SAFE_DELETE_ARRAY(mConditions);
+			SAFE_DELETE(mConditionSlots);
 		}
 	}
 
@@ -102,7 +122,7 @@ public:
 		{
 			void (Worker::*f)(uint32 /*key*/, boost::tuple<CompletionHandler> /*handler*/) = &Worker::wrap<CompletionHandler>;
 
-			uint32 key = 0; mAvailableConditionSlots.pop(key);
+			uint32 key = 0; mConditionSlots->pop(key);
 			mIoService.dispatch(boost::bind(f, this, key, boost::make_tuple(handler)));
 			uint32 dummy = 0; mConditions[key]->wait(dummy);
 		}
@@ -117,7 +137,7 @@ public:
 	{
 		void (Worker::*f)(uint32 /*key*/, boost::tuple<CompletionHandler> /*handler*/) = &Worker::wrap<CompletionHandler>;
 
-		uint32 key = 0; mAvailableConditionSlots.pop(key);
+		uint32 key = 0; mConditionSlots->pop(key);
 
 		mConditions[key]->reset();
 		mIoService.post(boost::bind(f, this, key, boost::make_tuple(handler)));
@@ -148,7 +168,7 @@ public:
 		{
 			void (Worker::*f)(uint32 /*key*/, boost::tuple<CompletionHandler> /*handler*/) = &Worker::wrap<CompletionHandler>;
 
-			uint32 key = 0; mAvailableConditionSlots.pop(key);
+			uint32 key = 0; mConditionSlots->pop(key);
 			mIoService.post(boost::bind(f, this, key, boost::make_tuple(handler)));
 			uint32 dummy = 0; mConditions[key]->wait(dummy);
 		}
@@ -206,15 +226,178 @@ protected:
 	{
 		boost::get<0>(handler)();
 		mConditions[key]->signal(0);
-		mAvailableConditionSlots.push(key);
+		mConditionSlots->push(key);
 	}
 
 protected:
+	bool mConditionTableOwner;
 	bool mTerminated;
 	boost::asio::io_service mIoService;
 	boost::thread mThread;
-	tbb::concurrent_bounded_queue<uint32> mAvailableConditionSlots;
-	boost::array<zillians::ConditionVariable<uint32>*, MAXIMUM_CONCURRENT_CALLS> mConditions;
+	int mConditionTableSize;
+	tbb::concurrent_bounded_queue<uint32>* mConditionSlots;
+	zillians::ConditionVariable<uint32>** mConditions;
+};
+
+class WorkerGroup
+{
+public:
+	struct load_balancing_t
+	{
+		enum type { round_robin, least_load_first };
+	};
+
+	explicit WorkerGroup(std::size_t workers = 1, std::size_t threads_per_worker = 16, load_balancing_t::type policy = load_balancing_t::round_robin, std::size_t maxConcurrentCalls = ZILLIANS_WORKER_DEFAULT_MAXIMUM_CONCURRENT_CALLS)
+	{
+		// initialize load balancing context
+		mLoadBalancingPolicy = policy;
+		if(mLoadBalancingPolicy == load_balancing_t::round_robin)
+		{
+			mLoadBalancingContext.round_robin.current = 0;
+		}
+		else if(mLoadBalancingPolicy == load_balancing_t::least_load_first)
+		{
+			BOOST_ASSERT("least-load-first policy is not yet implemented" && 0);
+		}
+		else
+		{
+			BOOST_ASSERT("unknown load balancing policy is provided" && 0);
+		}
+
+		// create shared condition variables and slots
+		mConditionTableSize = workers * maxConcurrentCalls;
+		mConditionSlots = new tbb::concurrent_bounded_queue<uint32>();
+		mConditions = new zillians::ConditionVariable<uint32>*[mConditionTableSize];
+		for(uint32 i=0;i<mConditionTableSize;++i)
+		{
+			mConditionSlots->push(i);
+			mConditions[i] = new zillians::ConditionVariable<uint32>();
+		}
+
+		// create all workers with shared condition variables and slots
+		mWorkerSize = workers;
+		mWorkers = new Worker*[workers];
+		for(int i=0;i<workers;++i)
+		{
+			mWorkers[i] = new Worker(mConditions, mConditionSlots);
+
+			// spawn default threads on each worker
+			// (note that there's one thread associated with the worker by default, that's why we minus one here)
+			for(int j=0;j<threads_per_worker - 1;++j)
+			{
+				boost::thread *t = new boost::thread(boost::bind(&Worker::run, mWorkers[i]));
+				mWorkerThreads.push_back(t);
+			}
+		}
+	}
+
+	virtual ~WorkerGroup()
+	{
+		// stop all workers
+		for(int i=0;i<mWorkerSize;++i)
+		{
+			mWorkers[i]->stop();
+		}
+
+		// join on all worker threads
+		for(std::vector<boost::thread*>::iterator i = mWorkerThreads.begin(); i != mWorkerThreads.end(); ++i)
+		{
+			if((*i)->joinable())
+			{
+				(*i)->join();
+			}
+			delete (*i);
+		}
+		mWorkerThreads.clear();
+
+		// destroy all workers
+		for(int i=0;i<mWorkerSize;++i)
+		{
+			SAFE_DELETE(mWorkers[i]);
+		}
+		SAFE_DELETE_ARRAY(mWorkers);
+
+		// destroy shared condition variables and slots
+		for(uint32 i=0;i<mConditionTableSize;++i)
+		{
+			SAFE_DELETE(mConditions[i]);
+		}
+		SAFE_DELETE_ARRAY(mConditions);
+		SAFE_DELETE(mConditionSlots);
+	}
+
+public:
+	template<typename CompletionHandler>
+	inline void dispatch(CompletionHandler handler, bool blocking = false)
+	{
+		if(mLoadBalancingPolicy == load_balancing_t::round_robin)
+		{
+			mWorkers[mLoadBalancingContext.round_robin.current]->dispatch(handler, blocking);
+			++mLoadBalancingContext.round_robin.current;
+			if(mLoadBalancingContext.round_robin.current >= mWorkerSize) mLoadBalancingContext.round_robin.current -= mWorkerSize;
+		}
+		else if(mLoadBalancingPolicy == load_balancing_t::least_load_first)
+		{
+			BOOST_ASSERT("least-load-first policy is not yet implemented" && 0);
+		}
+	}
+
+	template<typename CompletionHandler>
+	inline void post(CompletionHandler handler, bool blocking = false)
+	{
+		if(mLoadBalancingPolicy == load_balancing_t::round_robin)
+		{
+			mWorkers[mLoadBalancingContext.round_robin.current]->post(handler, blocking);
+			++mLoadBalancingContext.round_robin.current;
+			if(mLoadBalancingContext.round_robin.current >= mWorkerSize) mLoadBalancingContext.round_robin.current -= mWorkerSize;
+		}
+		else if(mLoadBalancingPolicy == load_balancing_t::least_load_first)
+		{
+			BOOST_ASSERT("least-load-first policy is not yet implemented" && 0);
+		}
+	}
+
+	template<typename CompletionHandler>
+	inline int async(CompletionHandler handler)
+	{
+		if(mLoadBalancingPolicy == load_balancing_t::round_robin)
+		{
+			mWorkers[mLoadBalancingContext.round_robin.current]->async(handler);
+			++mLoadBalancingContext.round_robin.current;
+			if(mLoadBalancingContext.round_robin.current >= mWorkerSize) mLoadBalancingContext.round_robin.current -= mWorkerSize;
+		}
+		else if(mLoadBalancingPolicy == load_balancing_t::least_load_first)
+		{
+			BOOST_ASSERT("least-load-first policy is not yet implemented" && 0);
+		}
+	}
+
+	inline void wait(int key)
+	{
+		uint32 dummy = 0;
+		mConditions[key]->wait(dummy);
+	}
+
+protected:
+	int mWorkerSize;
+	Worker** mWorkers;
+	load_balancing_t::type mLoadBalancingPolicy;
+	struct
+	{
+		struct
+		{
+			int current;
+		} round_robin;
+
+		struct
+		{
+			// NOT IMPLEMENT YET
+		} least_load_first;
+	} mLoadBalancingContext;
+	std::vector<boost::thread*> mWorkerThreads;
+	int mConditionTableSize;
+	tbb::concurrent_bounded_queue<uint32>* mConditionSlots;
+	zillians::ConditionVariable<uint32>** mConditions;
 };
 
 /**

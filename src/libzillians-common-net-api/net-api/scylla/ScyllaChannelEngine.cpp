@@ -42,7 +42,7 @@ struct null_deleter
 };
 
 //////////////////////////////////////////////////////////////////////////
-ScyllaChannelEngine::ScyllaChannelEngine(const UUID& localIdentifier, SharedPtr<ScyllaNodeDB> db):
+ScyllaChannelEngine::ScyllaChannelEngine(const UUID& localIdentifier, shared_ptr<ScyllaNodeDB> db):
 	defaultChannelOfflineListener(NULL),
 	defaultChannelErrorListener(NULL)
 {
@@ -77,9 +77,9 @@ ScyllaChannelEngine::ScyllaChannelEngine(const UUID& localIdentifier, SharedPtr<
 
 		ScyllaChannel* scyllaChannel = new ScyllaChannel(cpg, mWorker);
 		scyllaChannel->setIdentifier(GLOBAL_GROUP_UUID);
-		SharedPtr<Channel> channel;
+		shared_ptr<Channel> channel;
 		channel.reset();
-		channel = boost::static_pointer_cast<Channel>(SharedPtr<ScyllaChannel>(scyllaChannel, null_deleter()));
+		channel = boost::static_pointer_cast<Channel>(shared_ptr<ScyllaChannel>(scyllaChannel, null_deleter()));
 
 		mNodeDB->setChannel(GLOBAL_GROUP_UUID, channel);
 	}
@@ -103,9 +103,9 @@ ScyllaChannelEngine::ScyllaChannelEngine(const UUID& localIdentifier, SharedPtr<
 
 		ScyllaChannel* scyllaChannel = new ScyllaChannel(cpg, mWorker);
 		scyllaChannel->setIdentifier(mLocalIdentifier);
-		SharedPtr<Channel> channel;
+		shared_ptr<Channel> channel;
 		channel.reset();
-		channel = boost::static_pointer_cast<Channel>(SharedPtr<ScyllaChannel>(scyllaChannel, null_deleter()));
+		channel = boost::static_pointer_cast<Channel>(shared_ptr<ScyllaChannel>(scyllaChannel, null_deleter()));
 
 		mNodeDB->setChannel(mLocalIdentifier, channel);
 	}
@@ -117,16 +117,16 @@ ScyllaChannelEngine::~ScyllaChannelEngine()
 }
 
 //////////////////////////////////////////////////////////////////////////
-SharedPtr<Channel> ScyllaChannelEngine::findChannel(const UUID& destination)
+shared_ptr<Channel> ScyllaChannelEngine::findChannel(const UUID& destination)
 {
-	SharedPtr<Channel> channel;	channel.reset();
+	shared_ptr<Channel> channel;	channel.reset();
 	if(!mNodeDB->queryChannel(destination, &channel))
 	{
 		CloseProcessGroup* cpg = new CloseProcessGroup();
 		BOOST_ASSERT(cpg->join(destination));
 		ScyllaChannel* scyllaChannel = new ScyllaChannel(cpg, mWorker);
 		scyllaChannel->setIdentifier(destination);
-		channel = boost::static_pointer_cast<Channel>(SharedPtr<ScyllaChannel>(scyllaChannel, null_deleter()));
+		channel = boost::static_pointer_cast<Channel>(shared_ptr<ScyllaChannel>(scyllaChannel, null_deleter()));
 
 		mNodeDB->setChannel(destination, channel);
 	}
@@ -139,7 +139,7 @@ void ScyllaChannelEngine::listenChannelOnline(const char* groupName, CloseProces
 {
 	LOG4CXX_INFO(mLogger, "(" << memberInfo.nodeId << ", " << memberInfo.processId << ") is online");
 
-	SharedPtr<Channel> channel; channel.reset();
+	shared_ptr<Channel> channel; channel.reset();
 	if (!mNodeDB->queryChannel(GLOBAL_GROUP_UUID, &channel))
 	{
 		LOG4CXX_ERROR(mLogger, "can't find global channel");
@@ -148,7 +148,7 @@ void ScyllaChannelEngine::listenChannelOnline(const char* groupName, CloseProces
 	{
 		ScyllaHelloMessage hello;
 		hello.mIdentity = mLocalIdentifier;
-		SharedPtr<Buffer> buf(new Buffer(Buffer::probeSize(hello)));
+		shared_ptr<Buffer> buf(new Buffer(Buffer::probeSize(hello)));
 		buf->writeSerializable(hello);
 		channel->send(ScyllaHelloMessage::TYPE, buf);
 	}
@@ -176,10 +176,10 @@ void ScyllaChannelEngine::listenChannelOffline(const char* groupName, CloseProce
 
 	LOG4CXX_INFO(mLogger, "channel " << identifier << " is offline");
 
-	SharedPtr<Channel> channel; channel.reset();
+	shared_ptr<Channel> channel; channel.reset();
 	if (mNodeDB->queryChannel(identifier, &channel))
 	{
-		SharedPtr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
+		shared_ptr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
 		scyllaChannel->mCloseProcessGroup->leave(identifier);
 	}
 
@@ -316,7 +316,7 @@ void ScyllaChannelEngine::unregisterChannelListener(const UUID& destination)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void ScyllaChannelEngine::handleData(CloseProcessGroup::SourceInfo& source, uint32 type, SharedPtr<Buffer>& buffer, std::size_t size, DataHandler handler)
+void ScyllaChannelEngine::handleData(CloseProcessGroup::SourceInfo& source, uint32 type, shared_ptr<Buffer>& buffer, std::size_t size, DataHandler handler)
 {
 	UUID identifier;
 	CloseProcessGroup::MemberInfo memberInfo;
@@ -325,7 +325,7 @@ void ScyllaChannelEngine::handleData(CloseProcessGroup::SourceInfo& source, uint
 
 	if (mNodeDB->queryIdMapping(memberInfo, identifier))
 	{
-		SharedPtr<Channel> channel; channel.reset();
+		shared_ptr<Channel> channel; channel.reset();
 		channel = findChannel(identifier);
 		handler(channel, type, buffer);
 	}
@@ -333,10 +333,10 @@ void ScyllaChannelEngine::handleData(CloseProcessGroup::SourceInfo& source, uint
 
 void ScyllaChannelEngine::registerDefaultDataHandler(DataHandler handler)
 {
-	SharedPtr<Channel> channel; channel.reset();
+	shared_ptr<Channel> channel; channel.reset();
 	if (mNodeDB->queryChannel(mLocalIdentifier, &channel))
 	{
-		SharedPtr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
+		shared_ptr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
 		CloseProcessGroup::DataDispatcher* dataDispatcher = scyllaChannel->mCloseProcessGroup->getDataDispatcher();
 		if (dataDispatcher == NULL)
 		{
@@ -356,10 +356,10 @@ void ScyllaChannelEngine::registerDefaultDataHandler(DataHandler handler)
 }
 void ScyllaChannelEngine::unregisterDefaultDataHandler()
 {
-	SharedPtr<Channel> channel; channel.reset();
+	shared_ptr<Channel> channel; channel.reset();
 	if (mNodeDB->queryChannel(mLocalIdentifier, &channel))
 	{
-		SharedPtr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
+		shared_ptr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
 		CloseProcessGroup::DataDispatcher* dataDispatcher = scyllaChannel->mCloseProcessGroup->getDataDispatcher();
 		if (dataDispatcher != NULL)
 		{
@@ -371,10 +371,10 @@ void ScyllaChannelEngine::unregisterDefaultDataHandler()
 //////////////////////////////////////////////////////////////////////////
 void ScyllaChannelEngine::registerDataHandler(uint32 type, DataHandler handler)
 {
-	SharedPtr<Channel> channel; channel.reset();
+	shared_ptr<Channel> channel; channel.reset();
 	if (mNodeDB->queryChannel(mLocalIdentifier, &channel))
 	{
-		SharedPtr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
+		shared_ptr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
 		CloseProcessGroup::DataDispatcher* dataDispatcher = scyllaChannel->mCloseProcessGroup->getDataDispatcher();
 		if (dataDispatcher == NULL)
 		{
@@ -396,10 +396,10 @@ void ScyllaChannelEngine::registerDataHandler(uint32 type, DataHandler handler)
 
 void ScyllaChannelEngine::unregisterDataHandler(uint32 type)
 {
-	SharedPtr<Channel> channel; channel.reset();
+	shared_ptr<Channel> channel; channel.reset();
 	if (mNodeDB->queryChannel(mLocalIdentifier, &channel))
 	{
-		SharedPtr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
+		shared_ptr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
 		CloseProcessGroup::DataDispatcher* dataDispatcher = scyllaChannel->mCloseProcessGroup->getDataDispatcher();
 		if (dataDispatcher != NULL)
 		{
@@ -430,11 +430,11 @@ void ScyllaChannelEngine::handleHelloMessage(CloseProcessGroup::SourceInfo& sour
 	mNodeDB->setIdMapping(memberInfo, message.mIdentity);
 }
 
-void ScyllaChannelEngine::handleAckMessage(CloseProcessGroup::SourceInfo& source, uint32 type, SharedPtr<Buffer>& buffer, std::size_t size)
+void ScyllaChannelEngine::handleAckMessage(CloseProcessGroup::SourceInfo& source, uint32 type, shared_ptr<Buffer>& buffer, std::size_t size)
 {
 	//uint32 cvId, messageType;
 	//*buffer >> cvId >> messageType;
-	SharedPtr<ScyllaAckMessage> message = SharedPtr<ScyllaAckMessage>(new ScyllaAckMessage());
+	shared_ptr<ScyllaAckMessage> message = shared_ptr<ScyllaAckMessage>(new ScyllaAckMessage());
 	buffer->readSerializable(*message);
 
 	UUID identifier;
@@ -454,13 +454,13 @@ void ScyllaChannelEngine::handleAckMessage(CloseProcessGroup::SourceInfo& source
 		boost::system::error_code ec;
 		*buffer >> ec;
 
-		SharedPtr<Channel> channel; channel.reset();
+		shared_ptr<Channel> channel; channel.reset();
 		if (!mNodeDB->queryChannel(identifier, &channel))
 		{
 			LOG4CXX_ERROR(mLogger, "can't find channel (" << identifier << ")");
 			return;
 		}
-		SharedPtr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
+		shared_ptr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
 
 		scyllaChannel->handleAckMessage(message->mCvId, ec);
 	}
@@ -471,13 +471,13 @@ void ScyllaChannelEngine::handleAckMessage(CloseProcessGroup::SourceInfo& source
 		boost::system::error_code ec;
 		try
 		{
-			SharedPtr<Channel> channel; channel.reset();
+			shared_ptr<Channel> channel; channel.reset();
 			if (!mNodeDB->queryChannel(mLocalIdentifier, &channel))
 			{
 				LOG4CXX_ERROR(mLogger, "can't find channel (" << mLocalIdentifier << ")");
 				return;
 			}
-			SharedPtr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
+			shared_ptr<ScyllaChannel> scyllaChannel = boost::dynamic_pointer_cast<ScyllaChannel>(channel);
 
 			CloseProcessGroup::DataDispatcher* dataDispatcher = scyllaChannel->mCloseProcessGroup->getDataDispatcher();
 			BOOST_ASSERT(dataDispatcher != NULL);
@@ -495,11 +495,11 @@ void ScyllaChannelEngine::handleAckMessage(CloseProcessGroup::SourceInfo& source
 		ackMessage.mCvId = message->mCvId;
 		ackMessage.mOriginalMessageType = 0;
 		ackMessage.mOriginalMessageSize = 0;
-		SharedPtr<Buffer> buf(new Buffer(Buffer::probeSize(ackMessage) + Buffer::probeSize(ec)));
+		shared_ptr<Buffer> buf(new Buffer(Buffer::probeSize(ackMessage) + Buffer::probeSize(ec)));
 		buf->writeSerializable(ackMessage);
 		*buf << ec;
 
-		SharedPtr<Channel> remoteChannel = findChannel(identifier);
+		shared_ptr<Channel> remoteChannel = findChannel(identifier);
 		remoteChannel->send(ScyllaAckMessage::TYPE, buf);
 	}
 }

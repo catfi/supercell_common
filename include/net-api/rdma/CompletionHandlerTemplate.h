@@ -31,7 +31,7 @@ namespace zillians { namespace net { namespace rdma {
 template <typename Connection>
 struct CompletionHandlerTemplate
 {
-	virtual void onCompleted(SharedPtr<Buffer> b, SharedPtr<Connection> connection) = 0;
+	virtual void onCompleted(shared_ptr<Buffer> b, shared_ptr<Connection> connection) = 0;
 };
 
 template <typename Connection>
@@ -50,12 +50,12 @@ struct CompletionHandlerBinder : public CompletionHandlerTemplate<Connection>
 		}
 	};
 
-	typedef typename boost::function< void (SharedPtr<Connection> connection, SharedPtr<Buffer>) > handler_type;
+	typedef typename boost::function< void (shared_ptr<Connection> connection, shared_ptr<Buffer>) > handler_type;
 
 	CompletionHandlerBinder(handler_type h) : handler(h)
 	{ }
 
-	virtual void onCompleted(SharedPtr<Buffer> b, SharedPtr<Connection> connection)
+	virtual void onCompleted(shared_ptr<Buffer> b, shared_ptr<Connection> connection)
 	{
 		handler(connection, b);
 	}

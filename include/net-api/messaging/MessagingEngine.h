@@ -46,18 +46,18 @@ public:
 	private:
 		Remote();
 	public:
-		bool write(SharedPtr<Buffer> buffer);
-		bool sendControl(int32 type, SharedPtr<Buffer> buffer);
+		bool write(shared_ptr<Buffer> buffer);
+		bool sendControl(int32 type, shared_ptr<Buffer> buffer);
 
 	private:
 		std::string name;
 		uint64 rposKey;
 		uint64 wposKey;
 		uint64 bufferKey;
-		SharedPtr<Buffer> rposCache;
-		SharedPtr<Buffer> wposCache;
+		shared_ptr<Buffer> rposCache;
+		shared_ptr<Buffer> wposCache;
 		std::size_t bufferSize;
-		SharedPtr<IBConnection> connection;
+		shared_ptr<IBConnection> connection;
 	};
 
 	struct Local
@@ -66,8 +66,8 @@ public:
 	private:
 		Local();
 	public:
-		std::size_t read(SharedPtr<Buffer> buffer);
-		std::size_t peek(SharedPtr<Buffer> buffer);
+		std::size_t read(shared_ptr<Buffer> buffer);
+		std::size_t peek(shared_ptr<Buffer> buffer);
 		bool skip(std::size_t size);
 
 	public:
@@ -76,11 +76,11 @@ public:
 
 	private:
 		std::string name;
-		SharedPtr<Buffer> rpos;
-		SharedPtr<Buffer> wpos;
-		SharedPtr<Buffer> buffer;
+		shared_ptr<Buffer> rpos;
+		shared_ptr<Buffer> wpos;
+		shared_ptr<Buffer> buffer;
 		uint64 bufferKey;
-		SharedPtr<IBConnection> connection;
+		shared_ptr<IBConnection> connection;
 	};
 
 public:
@@ -88,37 +88,37 @@ public:
 	~MessagingEngine();
 
 public:
-	bool findRemote(const std::string& name, /*OUT*/ SharedPtr<Remote>& remote);
-	bool findLocal(const std::string& name, /*OUT*/ SharedPtr<Local>& local);
+	bool findRemote(const std::string& name, /*OUT*/ shared_ptr<Remote>& remote);
+	bool findLocal(const std::string& name, /*OUT*/ shared_ptr<Local>& local);
 
-	bool createRemote(const std::string& name, /*OUT*/ SharedPtr<Remote>& remote);
-	bool createLocal(const std::string& name, SharedPtr<Buffer> buffer, /*OUT*/ SharedPtr<Local>& local);
+	bool createRemote(const std::string& name, /*OUT*/ shared_ptr<Remote>& remote);
+	bool createLocal(const std::string& name, shared_ptr<Buffer> buffer, /*OUT*/ shared_ptr<Local>& local);
 
 public:
-	void registerDefaultControlHandler(SharedPtr<ControlHandler> Handler);
+	void registerDefaultControlHandler(shared_ptr<ControlHandler> Handler);
 	void unregisterDefaultControlHandler();
-	void registerControlHandler(int32 type, SharedPtr<ControlHandler> Handler);
+	void registerControlHandler(int32 type, shared_ptr<ControlHandler> Handler);
 	void unregisterControlHandler(int32 type);
 
 private:
-	void handleAcceptorCompleted(SharedPtr<IBConnection> connection, int err);
-	void handleConnectorCompleted(SharedPtr<IBConnection> connection, int err, ConnectionContext* context);
-	void handleConnected(SharedPtr<IBConnection> connection);
-	void handleDisconnected(SharedPtr<IBConnection> connection);
+	void handleAcceptorCompleted(shared_ptr<IBConnection> connection, int err);
+	void handleConnectorCompleted(shared_ptr<IBConnection> connection, int err, ConnectionContext* context);
+	void handleConnected(shared_ptr<IBConnection> connection);
+	void handleDisconnected(shared_ptr<IBConnection> connection);
 
 private:
-	void handleQueueInfoExchangeRequest(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<IBConnection> connection);
-	void handleQueueInfoExchangeResponse(uint32 type, SharedPtr<Buffer> buffer, SharedPtr<IBConnection> connection);
+	void handleQueueInfoExchangeRequest(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<IBConnection> connection);
+	void handleQueueInfoExchangeResponse(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<IBConnection> connection);
 
 private:
-	hash_map<std::string, SharedPtr<Local> > mLocalInfos;
-	hash_map<std::string, SharedPtr<Remote> > mRemoteInfos;
+	hash_map<std::string, shared_ptr<Local> > mLocalInfos;
+	hash_map<std::string, shared_ptr<Remote> > mRemoteInfos;
 
-	typedef std::map<int32, SharedPtr<DataHandler> > tControlHandlerMap;
+	typedef std::map<int32, shared_ptr<DataHandler> > tControlHandlerMap;
 
 	struct
 	{
-		SharedPtr<ControlHandler> def;
+		shared_ptr<ControlHandler> def;
 		tControlHandlerMap map;
 	} mControlHandler;
 
@@ -163,9 +163,9 @@ private:
 	};
 
 private:
-	SharedPtr<Poller> mPoller;
-	SharedPtr<IBDispatcher> mDispatcher;
-	SharedPtr<IBNetEngine> mEngine;
+	shared_ptr<Poller> mPoller;
+	shared_ptr<IBDispatcher> mDispatcher;
+	shared_ptr<IBNetEngine> mEngine;
 	tbb::tbb_thread mPollerThread;
 
 };

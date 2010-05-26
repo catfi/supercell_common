@@ -38,7 +38,7 @@ ScyllaNodeDB::~ScyllaNodeDB()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void ScyllaNodeDB::setChannel(const UUID& id, SharedPtr<Channel> channel)
+void ScyllaNodeDB::setChannel(const UUID& id, shared_ptr<Channel> channel)
 {
 	LOG4CXX_INFO(mLogger, "setChannel: " << id);
 	ChannelMap::accessor iter;
@@ -61,7 +61,7 @@ void ScyllaNodeDB::unsetChannel(const UUID& id)
 	}
 }
 
-bool ScyllaNodeDB::queryChannel(const UUID& id, SharedPtr<Channel>* channel)
+bool ScyllaNodeDB::queryChannel(const UUID& id, shared_ptr<Channel>* channel)
 {
 	ChannelMap::const_accessor iter;
 	if(!mChannels.find(iter, id))
