@@ -102,7 +102,7 @@ public:
 	 *
 	 * @param maxType
 	 */
-	DispatcherT(uint32 maxType) : mMaxDispatchType(maxType)
+	DispatcherT(uint32 maxType = 256) : mMaxDispatchType(maxType)
 	{
 		mDispatchByType = new DispatchT<Source>*[mMaxDispatchType];
 		for(uint32 i = 0UL; i < mMaxDispatchType;++i)
