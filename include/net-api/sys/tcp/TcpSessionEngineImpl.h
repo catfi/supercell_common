@@ -56,6 +56,7 @@ private:
 		bool dispatchEnabled;
 		CloseCallback onClose;
 		ErrorCallback onError;
+		Dispatcher* dispatcher;
 	};
 
 public:
@@ -235,16 +236,18 @@ public:
 		mIoService->dispatch(boost::bind(f, this, session, type, host_name, service_name, boost::make_tuple(handler)));
 	}
 
-	void startDispatch(Session* session, CloseCallback onClose, ErrorCallback onError)
+	void startDispatch(Session* session, CloseCallback onClose, ErrorCallback onError, Dispatcher* dispatcher = NULL)
 	{
 		BOOST_ASSERT(session != NULL);
-		mIoService->dispatch(boost::bind(&SessionEngineT::doStartDispatch, this, session, onClose, onError));
+		if(!dispatcher) dispatcher = mDispatcher;
+		mIoService->dispatch(boost::bind(&SessionEngineT::doStartDispatch, this, session, onClose, onError, dispatcher));
 	}
 
-	void updateDispatch(Session* session, CloseCallback onClose, ErrorCallback onError)
+	void updateDispatch(Session* session, CloseCallback onClose, ErrorCallback onError, Dispatcher* dispatcher = NULL)
 	{
 		BOOST_ASSERT(session != NULL);
-		mIoService->dispatch(boost::bind(&SessionEngineT::doUpdateDispatch, this, session, onClose, onError));
+		if(!dispatcher) dispatcher = mDispatcher;
+		mIoService->dispatch(boost::bind(&SessionEngineT::doUpdateDispatch, this, session, onClose, onError, dispatcher));
 	}
 
 	void stopDispatch(Session* session)
@@ -376,7 +379,7 @@ private:
 		boost::get<0>(handler)(ec);
 	}
 
-	void doStartDispatch(Session* session, CloseCallback onClose, ErrorCallback onError)
+	void doStartDispatch(Session* session, CloseCallback onClose, ErrorCallback onError, Dispatcher* dispatcher)
 	{
 		DispatcherContext* ctx = session->getContext<DispatcherContext>();
 		if(!ctx)
@@ -389,6 +392,7 @@ private:
 		ctx->dispatchEnabled = true;
 		ctx->onClose = onClose;
 		ctx->onError = onError;
+		ctx->dispatcher = dispatcher;
 
 		session->readAsync(
 				ctx->buffer,
@@ -396,7 +400,7 @@ private:
 				detail::MessageHeader::kHeaderSize);
 	}
 
-	void doUpdateDispatch(Session* session, CloseCallback onClose, ErrorCallback onError)
+	void doUpdateDispatch(Session* session, CloseCallback onClose, ErrorCallback onError, Dispatcher* dispatcher)
 	{
 		DispatcherContext* ctx = session->getContext<DispatcherContext>();
 		if(!ctx)
@@ -408,6 +412,7 @@ private:
 
 		ctx->onClose = onClose;
 		ctx->onError = onError;
+		ctx->dispatcher = dispatcher;
 	}
 
 	void doStopDispatch(Session* session)
@@ -417,6 +422,7 @@ private:
 		ctx->dispatchEnabled = false;
 		ctx->onClose.clear();
 		ctx->onError.clear();
+		ctx->dispatcher = NULL;
 	}
 
 	void handleHeaderRead(Session* session, const boost::system::error_code& ec)
@@ -501,7 +507,8 @@ private:
 		{
 			try
 			{
-				mDispatcher->dispatch(type, *session, ctx->buffer, bytes_requested);
+				//mDispatcher->dispatch(type, *session, ctx->buffer, bytes_requested);
+				ctx->dispatcher->dispatch(type, *session, ctx->buffer, bytes_requested);
 				ctx->buffer->clear();
 
 				if(ctx->dispatchEnabled)
