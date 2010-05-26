@@ -45,7 +45,7 @@ public:
 	typedef Protocol::endpoint Endpoint;
 	typedef Protocol::acceptor Acceptor;
 	typedef Protocol::resolver Resolver;
-	typedef SessionT<Protocol> Session;
+	typedef SessionT< SessionTransport::tcp > Session;
 	typedef DispatcherT<Session> Dispatcher;
 
 	typedef boost::function< void (Session&) > CloseCallback;

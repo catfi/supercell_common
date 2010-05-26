@@ -34,8 +34,6 @@
 using namespace zillians;
 using namespace std;
 
-
-
 BOOST_AUTO_TEST_SUITE( BufferTest )
 
 BOOST_AUTO_TEST_CASE( StringEncodingAndDecodingTest )
@@ -531,7 +529,7 @@ BOOST_AUTO_TEST_CASE( SerializableEncodingAndDecodingTest3 )
 
 BOOST_AUTO_TEST_CASE( MapReadWriteTest1 )
 {
-	shared_ptr<Buffer> b(new Buffer(4096));
+	boost::shared_ptr<Buffer> b(new Buffer(4096));
 
 	std::map<std::string, std::string> input;
 	input["A_KEY"] = "A_VALUE";
@@ -563,7 +561,7 @@ BOOST_AUTO_TEST_CASE( MapReadWriteTest1 )
 
 BOOST_AUTO_TEST_CASE( MapReadWriteTest2 )
 {
-	shared_ptr<Buffer> b(new Buffer(4096));
+	boost::shared_ptr<Buffer> b(new Buffer(4096));
 
 	std::map<long, std::string> input;
 	input[100]   = "A_VALUE";
@@ -595,7 +593,7 @@ BOOST_AUTO_TEST_CASE( MapReadWriteTest2 )
 
 BOOST_AUTO_TEST_CASE( MapReadWriteTest3 )
 {
-	shared_ptr<Buffer> b(new Buffer(4096));
+	boost::shared_ptr<Buffer> b(new Buffer(4096));
 
 	std::map<long, long> input;
 	input[100]   = 456;
@@ -627,7 +625,7 @@ BOOST_AUTO_TEST_CASE( MapReadWriteTest3 )
 
 BOOST_AUTO_TEST_CASE( ErrorCodeSerializationTest1 )
 {
-	shared_ptr<Buffer> b(new Buffer(4096));
+	boost::shared_ptr<Buffer> b(new Buffer(4096));
 
 	{
 		boost::system::error_code input; // the default error code is success without error
@@ -683,7 +681,7 @@ BOOST_AUTO_TEST_CASE( ErrorCodeSerializationTest1 )
 
 BOOST_AUTO_TEST_CASE( StringStreamReadWriteTest1 )
 {
-	shared_ptr<Buffer> br(new Buffer(4096));
+	boost::shared_ptr<Buffer> br(new Buffer(4096));
 
 	SerializableObject1 obj1;
 	obj1.x = 1024;
@@ -700,7 +698,7 @@ BOOST_AUTO_TEST_CASE( StringStreamReadWriteTest1 )
 
 	BOOST_CHECK(ss.str().length() > 0);
 
-	shared_ptr<Buffer> bw(new Buffer(4096));
+	boost::shared_ptr<Buffer> bw(new Buffer(4096));
 
 	ss >> (*bw);
 

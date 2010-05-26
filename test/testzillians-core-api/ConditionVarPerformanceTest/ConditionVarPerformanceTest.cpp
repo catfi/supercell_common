@@ -22,6 +22,8 @@
 
 
 #include "core-api/Prerequisite.h"
+#include "core-api/JustThread.h"
+
 #include "eventcount.h"
 #include <log4cxx/logger.h>
 #include <log4cxx/basicconfigurator.h>
@@ -418,7 +420,7 @@ public:
 			printf("failed to upgrade to writer\n");
 		}
 
-		shared_ptr<AckSlot> cond = it->second;
+		boost::shared_ptr<AckSlot> cond = it->second;
 		cond->reset();
 
 		mAckMap.map.erase(it);
@@ -441,10 +443,10 @@ public:
 
 		Key key = ++mCounter;
 
-		shared_ptr<AckSlot> cond;
+		boost::shared_ptr<AckSlot> cond;
 		if(!mAckSlotQueue.try_pop(cond))
 		{
-			cond = shared_ptr<AckSlot>(new AckSlot);
+			cond = boost::shared_ptr<AckSlot>(new AckSlot);
 		}
 
 		mAckMap.map[key] = cond;
@@ -455,14 +457,14 @@ public:
 private:
 	tbb::atomic<Key> mCounter;
 
-	typedef std::map<Key, shared_ptr<AckSlot> > AckMap;
+	typedef std::map<Key, boost::shared_ptr<AckSlot> > AckMap;
 	struct
 	{
 		AckMap map;
 		tbb::spin_rw_mutex lock;
 	} mAckMap;
 
-	typedef tbb::concurrent_queue< shared_ptr<AckSlot> > AckSlotQueue;
+	typedef tbb::concurrent_queue< boost::shared_ptr<AckSlot> > AckSlotQueue;
 	AckSlotQueue mAckSlotQueue;
 };
 

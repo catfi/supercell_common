@@ -24,6 +24,6 @@
 
 namespace zillians { namespace net { namespace sys {
 
-tbb::atomic<uint32> SessionT< boost::asio::ip::tcp >::msContextIndexer;
+tbb::atomic<uint32> SessionT< SessionTransport::tcp >::msContextIndexer;
 
 } } }

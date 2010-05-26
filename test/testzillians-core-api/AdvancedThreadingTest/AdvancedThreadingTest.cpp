@@ -21,6 +21,7 @@
  */
 
 #include "core-api/Prerequisite.h"
+#include "core-api/JustThread.h"
 #include <iostream>
 #include <string>
 #include <limits>

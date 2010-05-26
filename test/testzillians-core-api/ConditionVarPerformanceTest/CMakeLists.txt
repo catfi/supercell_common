@@ -25,6 +25,7 @@ ADD_EXECUTABLE(ConditionVarPerformanceTest ConditionVarPerformanceTest.cpp)
 
 TARGET_LINK_LIBRARIES(ConditionVarPerformanceTest 
     zillians-common-core-api
+    ${JUSTTHREAD_LIBRARIES_STATIC}
     )
 
 ADD_TEST(ConditionVarPerformanceTest ${EXECUTABLE_OUTPUT_PATH}/ConditionVarPerformanceTest)
