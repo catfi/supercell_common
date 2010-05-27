@@ -89,7 +89,7 @@ int main()
 	srand(time(NULL));
 	log4cxx::BasicConfigurator::configure();
 	std::list<tbb::tbb_thread*> threads;
-	shared_ptr<BiMap<int, UUID> > map = boost::shared_ptr<BiMap<int, UUID> >(new BiMap<int, UUID>());
+	shared_ptr<BiMap<int, UUID> > map = shared_ptr<BiMap<int, UUID> >(new BiMap<int, UUID>());
 	volatile int counter = 0;
 
 	LOG4CXX_INFO(logger, "NUM_THREAD: " << NUM_THREAD);
