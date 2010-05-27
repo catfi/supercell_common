@@ -24,6 +24,7 @@
 // Include common headers
 #include "core-api/Platform.h"
 #include "core-api/Types.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

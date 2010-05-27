@@ -22,6 +22,11 @@
 ADD_SUBDIRECTORY(libzillians-common-core-api)
 ADD_SUBDIRECTORY(libzillians-common-net-api)
 ADD_SUBDIRECTORY(libzillians-common-networking)
+ADD_SUBDIRECTORY(libzillians-common-networking-tcp)
+
+IF(RDMA_FOUND)
+    ADD_SUBDIRECTORY(libzillians-common-networking-infiniband)
+ENDIF(RDMA_FOUND)
 
 IF(COROSYNC_FOUND)
     ADD_SUBDIRECTORY(libzillians-common-networking-cpg)
