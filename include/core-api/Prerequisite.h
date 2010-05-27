@@ -32,12 +32,8 @@
 #if BUILD_WITH_BOOST
 #include <boost/assert.hpp>
 #include <boost/algorithm/minmax.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/array.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>

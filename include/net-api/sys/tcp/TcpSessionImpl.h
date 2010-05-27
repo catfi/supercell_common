@@ -694,7 +694,7 @@ public:
 	template <typename T>
 	inline T* getContext()
 	{
-		shared_ptr<T> ctx = boost::static_pointer_cast<T>(refContext<T>());
+		shared_ptr<T> ctx = static_pointer_cast<T>(refContext<T>());
 		return ctx.get();
 	}
 

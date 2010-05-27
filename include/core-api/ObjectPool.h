@@ -22,7 +22,6 @@
 
 #include "core-api/Common.h"
 #include <tbb/concurrent_queue.h>
-#include <queue>
 
 #define ZILLIANS_OBJPOOL_PREFERABLE_POOL_SIZE     0
 #define ZILLIANS_OBJPOOL_ENABLE_OBJ_POOL_COUNTER  0

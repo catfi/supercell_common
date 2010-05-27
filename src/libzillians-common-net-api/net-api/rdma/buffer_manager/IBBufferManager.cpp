@@ -76,7 +76,7 @@ shared_ptr<Buffer> IBBufferManager::sliceBuffer(shared_ptr<Buffer> original, siz
 		original->rpos(original->rpos() + size);
 	}
 
-	new_buffer->setContext(boost::static_pointer_cast<void>(original));
+	new_buffer->setContext(static_pointer_cast<void>(original));
 
 	return new_buffer;
 }
@@ -88,7 +88,7 @@ shared_ptr<Buffer> IBBufferManager::cloneBuffer(shared_ptr<Buffer> original)
 	new_buffer->rpos(original->rpos());
 	new_buffer->wpos(original->wpos());
 
-	new_buffer->setContext(boost::static_pointer_cast<void>(original));
+	new_buffer->setContext(static_pointer_cast<void>(original));
 
 	return new_buffer;
 }

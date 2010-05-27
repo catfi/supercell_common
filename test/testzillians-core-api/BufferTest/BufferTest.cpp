@@ -529,7 +529,7 @@ BOOST_AUTO_TEST_CASE( SerializableEncodingAndDecodingTest3 )
 
 BOOST_AUTO_TEST_CASE( MapReadWriteTest1 )
 {
-	boost::shared_ptr<Buffer> b(new Buffer(4096));
+	shared_ptr<Buffer> b(new Buffer(4096));
 
 	std::map<std::string, std::string> input;
 	input["A_KEY"] = "A_VALUE";
@@ -561,7 +561,7 @@ BOOST_AUTO_TEST_CASE( MapReadWriteTest1 )
 
 BOOST_AUTO_TEST_CASE( MapReadWriteTest2 )
 {
-	boost::shared_ptr<Buffer> b(new Buffer(4096));
+	shared_ptr<Buffer> b(new Buffer(4096));
 
 	std::map<long, std::string> input;
 	input[100]   = "A_VALUE";
@@ -593,7 +593,7 @@ BOOST_AUTO_TEST_CASE( MapReadWriteTest2 )
 
 BOOST_AUTO_TEST_CASE( MapReadWriteTest3 )
 {
-	boost::shared_ptr<Buffer> b(new Buffer(4096));
+	shared_ptr<Buffer> b(new Buffer(4096));
 
 	std::map<long, long> input;
 	input[100]   = 456;
@@ -625,7 +625,7 @@ BOOST_AUTO_TEST_CASE( MapReadWriteTest3 )
 
 BOOST_AUTO_TEST_CASE( ErrorCodeSerializationTest1 )
 {
-	boost::shared_ptr<Buffer> b(new Buffer(4096));
+	shared_ptr<Buffer> b(new Buffer(4096));
 
 	{
 		boost::system::error_code input; // the default error code is success without error
@@ -681,7 +681,7 @@ BOOST_AUTO_TEST_CASE( ErrorCodeSerializationTest1 )
 
 BOOST_AUTO_TEST_CASE( StringStreamReadWriteTest1 )
 {
-	boost::shared_ptr<Buffer> br(new Buffer(4096));
+	shared_ptr<Buffer> br(new Buffer(4096));
 
 	SerializableObject1 obj1;
 	obj1.x = 1024;
@@ -698,7 +698,7 @@ BOOST_AUTO_TEST_CASE( StringStreamReadWriteTest1 )
 
 	BOOST_CHECK(ss.str().length() > 0);
 
-	boost::shared_ptr<Buffer> bw(new Buffer(4096));
+	shared_ptr<Buffer> bw(new Buffer(4096));
 
 	ss >> (*bw);
 

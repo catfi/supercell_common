@@ -24,6 +24,7 @@
 // Include common headers
 #include "core-api/Platform.h"
 #include "core-api/Types.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,6 +39,12 @@
 #include <queue>
 #include <list>
 #include <algorithm>
+
+#ifdef _WIN32
+#define MSVC_VERSION	_MSC_VER
+#else
+#define GCC_VERSION		(__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif
 
 #ifdef _WIN32
 #include <xutility>

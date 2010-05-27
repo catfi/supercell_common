@@ -149,7 +149,7 @@ public:
 public:
 	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<TcpConnection> connection)
 	{
-		shared_ptr<ClientConnectionCtx> ctx = boost::static_pointer_cast<ClientConnectionCtx>(connection->getContext());
+		shared_ptr<ClientConnectionCtx> ctx = static_pointer_cast<ClientConnectionCtx>(connection->getContext());
 
 		tbb::tick_count start; ctx->q.pop(start);
 		tbb::tick_count end = tbb::tick_count::now();

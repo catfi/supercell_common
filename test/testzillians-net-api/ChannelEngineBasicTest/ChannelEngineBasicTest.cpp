@@ -95,7 +95,7 @@ class MyMessageHandler : public MessageHandler
 public:
 	virtual void onMessage(uint32 type, shared_ptr<Channel> channel, shared_ptr<Message> message)
 	{
-		shared_ptr<MyMessage> mymsg = boost::static_pointer_cast<MyMessage>(message);
+		shared_ptr<MyMessage> mymsg = static_pointer_cast<MyMessage>(message);
 		LOG4CXX_INFO(mLogger, "from " << channel->getIdentifier() << ": " << mymsg->data);
 		if(gPassiveMode)
 		{

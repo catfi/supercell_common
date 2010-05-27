@@ -140,7 +140,7 @@ public:
 public:
 	virtual void handle(uint32 type, shared_ptr<Buffer> buffer, shared_ptr<RdmaConnection> connection)
 	{
-		shared_ptr<AckSlot> ack = boost::static_pointer_cast<AckSlot>(connection->getContext());
+		shared_ptr<AckSlot> ack = static_pointer_cast<AckSlot>(connection->getContext());
 		ack->signal();
 	}
 
