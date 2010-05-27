@@ -420,7 +420,7 @@ public:
 			printf("failed to upgrade to writer\n");
 		}
 
-		boost::shared_ptr<AckSlot> cond = it->second;
+		shared_ptr<AckSlot> cond = it->second;
 		cond->reset();
 
 		mAckMap.map.erase(it);
@@ -443,10 +443,10 @@ public:
 
 		Key key = ++mCounter;
 
-		boost::shared_ptr<AckSlot> cond;
+		shared_ptr<AckSlot> cond;
 		if(!mAckSlotQueue.try_pop(cond))
 		{
-			cond = boost::shared_ptr<AckSlot>(new AckSlot);
+			cond = shared_ptr<AckSlot>(new AckSlot);
 		}
 
 		mAckMap.map[key] = cond;
@@ -457,14 +457,14 @@ public:
 private:
 	tbb::atomic<Key> mCounter;
 
-	typedef std::map<Key, boost::shared_ptr<AckSlot> > AckMap;
+	typedef std::map<Key, shared_ptr<AckSlot> > AckMap;
 	struct
 	{
 		AckMap map;
 		tbb::spin_rw_mutex lock;
 	} mAckMap;
 
-	typedef tbb::concurrent_queue< boost::shared_ptr<AckSlot> > AckSlotQueue;
+	typedef tbb::concurrent_queue< shared_ptr<AckSlot> > AckSlotQueue;
 	AckSlotQueue mAckSlotQueue;
 };
 
