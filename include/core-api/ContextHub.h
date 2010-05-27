@@ -80,11 +80,11 @@ public:
 	{
 		if(TransferOwnership)
 		{
-			refSharedContext<T>() = boost::shared_ptr<T>(ctx);
+			refSharedContext<T>() = shared_ptr<T>(ctx);
 		}
 		else
 		{
-			refSharedContext<T>() = boost::shared_ptr<T>(ctx, NullDeleter());
+			refSharedContext<T>() = shared_ptr<T>(ctx, NullDeleter());
 		}
 	}
 
@@ -96,7 +96,7 @@ public:
 	template <typename T>
 	inline T* get()
 	{
-		return boost::static_pointer_cast<T>(refSharedContext<T>()).get();
+		return static_pointer_cast<T>(refSharedContext<T>()).get();
 	}
 
 	/**
@@ -118,14 +118,14 @@ private:
 	 * @return The reference to the shared pointer
 	 */
 	template <typename T>
-	inline std::vector< boost::shared_ptr<void> >::reference refSharedContext()
+	inline std::vector< shared_ptr<void> >::reference refSharedContext()
 	{
 		static uint32 index = msContextIndexer++;
 		if(UNLIKELY(index >= mSharedContextObjects.size()))
 		{
 			while(index >= mSharedContextObjects.size())
 			{
-				mSharedContextObjects.push_back(boost::shared_ptr<void>());
+				mSharedContextObjects.push_back(shared_ptr<void>());
 			}
 		}
 
@@ -133,7 +133,7 @@ private:
 		return mSharedContextObjects[index];
 	}
 
-	std::vector< boost::shared_ptr<void> > mSharedContextObjects;
+	std::vector< shared_ptr<void> > mSharedContextObjects;
 #if ZILLIANS_SERVICEHUB_ALLOW_ARBITRARY_CONTEXT_PLACEMENT_FOR_DIFFERENT_INSTANCE
 	tbb::atomic<uint32> msContextIndexer;
 #else
@@ -182,11 +182,11 @@ public:
 	{
 		if(TransferOwnership)
 		{
-			refSharedContext<T>(name) = boost::shared_ptr<T>(ctx);
+			refSharedContext<T>(name) = shared_ptr<T>(ctx);
 		}
 		else
 		{
-			refSharedContext<T>(name) = boost::shared_ptr<T>(ctx, NullDeleter());
+			refSharedContext<T>(name) = shared_ptr<T>(ctx, NullDeleter());
 		}
 	}
 
@@ -198,7 +198,7 @@ public:
 	template <typename T>
 	inline T* get(const std::string& name = typeid(T).name())
 	{
-		return boost::static_pointer_cast<T>(refSharedContext<T>(name)).get();
+		return static_pointer_cast<T>(refSharedContext<T>(name)).get();
 	}
 
 	/**
@@ -220,12 +220,12 @@ private:
 	 * @return The reference to the shared pointer
 	 */
 	template <typename T>
-	inline boost::shared_ptr<void>& refSharedContext(const std::string& name)
+	inline shared_ptr<void>& refSharedContext(const std::string& name)
 	{
-		std::map< std::string, boost::shared_ptr<void> >::iterator it = mSharedContextObjects.find(name);
+		std::map< std::string, shared_ptr<void> >::iterator it = mSharedContextObjects.find(name);
 		if(UNLIKELY(it == mSharedContextObjects.end()))
 		{
-			mSharedContextObjects[name] = boost::shared_ptr<void>();
+			mSharedContextObjects[name] = shared_ptr<void>();
 			return mSharedContextObjects[name];
 		}
 		else
@@ -234,7 +234,7 @@ private:
 		}
 	}
 
-	std::map< std::string, boost::shared_ptr<void> > mSharedContextObjects;
+	std::map< std::string, shared_ptr<void> > mSharedContextObjects;
 };
 
 }

@@ -40,6 +40,12 @@
 #include <algorithm>
 
 #ifdef _WIN32
+#define MSVC_VERSION	_MSC_VER
+#else
+#define GCC_VERSION		(__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif
+
+#ifdef _WIN32
 #include <xutility>
 #endif
 
