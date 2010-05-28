@@ -197,6 +197,15 @@ public:
 		if(error) { throw boost::system::system_error(error); }
 	}
 
+	/**
+		@param session      The session used to establish this connection
+
+		@param type         Protocol used, e.g. boost::asio::ip::tcp::v4()
+
+		@param endpoint_name Equals to host_name:service_name, @see connectAsync
+
+		@param handler      Callback
+	*/
 	template <typename Handler>
 	void connectAsync(Session* session, const Protocol& type, const std::string& endpoint_name, Handler handler)
 	{
@@ -207,6 +216,19 @@ public:
 		connectAsync<Handler>(session, type, tokens[0], tokens[1], handler);
 	}
 
+
+	/**
+		@param session      The session used to establish this connection
+
+		@param type         Protocol used, e.g. boost::asio::ip::tcp::v4()
+
+		@param host_name    Hostname of remote point. IP or domain name
+
+		@param service_name Service name which will be translated into a port number. 
+		                    (Assigning a port number as string might also work, not tested)
+
+		@param handler      Callback
+	*/
 	template <typename Handler>
 	void connectAsync(Session* session, const Protocol& type, const std::string& host_name, const std::string& service_name, Handler handler)
 	{
