@@ -47,7 +47,7 @@ class IBNetEngine;
  *
  * @see NetEngine, IBConnector, IBAcceptor
  */
-class IBConnection : public ContextHub<true>
+class IBConnection : public ContextHub<ContextOwnership::transfer>
 {
 	friend class IBConnector;
 	friend class IBAcceptor;
