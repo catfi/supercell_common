@@ -42,8 +42,8 @@ struct ContextOwnership
 {
 	enum type
 	{
-		transfer,
-		keep,
+		keep		= 0,
+		transfer	= 1,
 	};
 };
 /**
