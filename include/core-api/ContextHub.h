@@ -38,6 +38,14 @@
 
 namespace zillians {
 
+struct ContextOwnership
+{
+	enum type
+	{
+		transfer,
+		keep,
+	};
+};
 /**
  * ContextHub is a universal storage for arbitrary class with constant access time.
  *
@@ -50,7 +58,7 @@ namespace zillians {
  * three different types named A, B, and C. You can only save one instance of A into
  * one instance of ContextHub. Same for B and C.
  */
-template<bool TransferOwnershipDefault>
+template<ContextOwnership::type TransferOwnershipDefault = ContextOwnership::transfer>
 class ContextHub
 {
 private:
@@ -75,10 +83,10 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, bool TransferOwnership = TransferOwnershipDefault>
+	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>
 	inline void set(T* ctx)
 	{
-		if(TransferOwnership)
+		if(TransferOwnership == ContextOwnership::transfer)
 		{
 			refSharedContext<T>() = shared_ptr<T>(ctx);
 		}
@@ -141,7 +149,7 @@ private:
 #endif
 };
 
-template<bool TransferOwnershipDefault> tbb::atomic<uint32> ContextHub<TransferOwnershipDefault>::msContextIndexer;
+template<ContextOwnership::type TransferOwnershipDefault> tbb::atomic<uint32> ContextHub<TransferOwnershipDefault>::msContextIndexer;
 
 
 /**
@@ -152,7 +160,7 @@ template<bool TransferOwnershipDefault> tbb::atomic<uint32> ContextHub<TransferO
  * context pointer. By default, the key is the name (typeid) of the
  * given type object.
  */
-template<bool TransferOwnershipDefault>
+template<ContextOwnership::type TransferOwnershipDefault>
 class NamedContextHub
 {
 private:
@@ -177,10 +185,10 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, bool TransferOwnership = TransferOwnershipDefault>
+	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>
 	inline void set(T* ctx, const std::string& name = typeid(T).name())
 	{
-		if(TransferOwnership)
+		if(TransferOwnership == ContextOwnership::transfer)
 		{
 			refSharedContext<T>(name) = shared_ptr<T>(ctx);
 		}
