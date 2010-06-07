@@ -166,7 +166,7 @@ inline uint64 bitmap_xchg(uint64 bitmap, uint64 bitmap_new)
 	bitmap_old = bitmap_new;
 	__asm__ volatile (
 			"lock; xchg %0, %1"
-			: "=r" (valudOld)
+			: "=r" (bitmap_old)
 			: "m" (bitmap), "0" (bitmap_old)
 			: "memory"
 			);

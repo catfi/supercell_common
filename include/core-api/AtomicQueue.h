@@ -24,8 +24,70 @@
 #define ZILLIANS_ATOMIC_ATOMICQUEUE_H_
 
 #include "core-api/Atomic.h"
+#include "core-api/AtomicStack.h"
 
 namespace zillians { namespace atomic {
+
+struct node;
+
+struct node_ptr_t
+{
+	explicit node_ptr_t(node* const p) : _ptr(p), _tag(0)
+	{ }
+
+	node_ptr_t(node* const p, const int32 t) : _ptr(p), _tag(t)
+	{ }
+
+	node_ptr_t() : _ptr(0), _tag(0)
+	{ }
+
+	inline void set(node* const p, const int32 t)
+	{
+		_ptr = p;
+		_tag = t;
+	}
+
+	inline bool operator == (const node_ptr_t & p)
+	{
+		return (_ptr == p._ptr) && (_tag == p._tag);
+	}
+
+	inline bool operator != (const node_ptr_t & p)
+	{
+		return !(*this == (p));
+	}
+
+	union
+	{
+		struct
+		{
+			node * volatile _ptr;
+			volatile unsigned int _tag;
+		};
+		volatile int64 _data;
+	};
+};
+
+struct node
+{
+	node() : _next(0), _prev(0), _dummy(false)
+	{ }
+
+	node(const bool d) : _next(0), _prev(0), _dummy(d)
+	{ }
+
+	node_ptr_t _next;
+	node_ptr_t _prev;
+	bool _dummy;
+};
+
+struct dummy_node: public node, public stack_node
+{
+	dummy_node() : node(true)
+	{ }
+};
+
+typedef node node_t;
 
 /**
  * Atomic Double Linked List FIFO Queue
@@ -41,69 +103,6 @@ namespace zillians { namespace atomic {
 template<class T>
 class queue
 {
-public:
-	struct node;
-
-	struct node_ptr_t
-	{
-		explicit node_ptr_t(node* const p) : _ptr(p), _tag(0)
-		{ }
-
-		node_ptr_t(node* const p, const int32 t) : _ptr(p), _tag(t)
-		{ }
-
-		node_ptr_t() : _ptr(0), _tag(0)
-		{ }
-
-		inline void set(node* const p, const int32 t)
-		{
-			_ptr = p;
-			_tag = t;
-		}
-
-		inline bool operator == (const node_ptr_t & p)
-		{
-			return (_ptr == p._ptr) && (_tag == p._tag);
-		}
-
-		inline bool operator != (const node_ptr_t & p)
-		{
-			return !(*this == (p));
-		}
-
-		union
-		{
-			struct
-			{
-				node * volatile _ptr;
-				volatile unsigned int _tag;
-			};
-			volatile int64 _data;
-		};
-	};
-
-public:
-	struct node
-	{
-		node() : _next(0), _prev(0), _dummy(false)
-		{ }
-
-		node(const bool d) : _next(0), _prev(0), _dummy(d)
-		{ }
-
-		node_ptr_t _next;
-		node_ptr_t _prev;
-		bool _dummy;
-	};
-
-	struct dummy_node: public node, public stack_node
-	{
-		dummy_node() : node(true)
-		{ }
-	};
-
-	typedef node node_t;
-
 public:
 	node_ptr_t _tail;
 	node_ptr_t _head;
@@ -125,7 +124,7 @@ protected:
 			if(cur_node_next._tag != cur_node._tag)
 				return;
 
-			next_node_prev = cur_nodeNext._ptr->_prev;
+			next_node_prev = cur_node_next._ptr->_prev;
 			if(next_node_prev != node_ptr_t(cur_node._ptr, cur_node._tag - 1))
 				cur_node_next._ptr->_prev.set(cur_node._ptr, cur_node._tag - 1);
 
