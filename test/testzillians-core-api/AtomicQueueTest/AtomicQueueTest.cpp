@@ -22,13 +22,15 @@
 
 #include "core-api/Prerequisite.h"
 #include "core-api/AtomicQueue.h"
-#include "tbb/tick_count.h"
-#include <boost/thread/thread.hpp>
+#include <tbb/tick_count.h>
+#include <tbb/tbb_thread.h>
+//#include <boost/thread/thread.hpp>
 
 using std::cout;
 using std::endl;
 using namespace zillians;
 
+#if 0
 const int numData = 10000;
 
 struct msgTest : atomic::node_t
@@ -81,3 +83,69 @@ int main()
 
 	return 0;
 }
+#else
+
+#define numElements 256
+
+const int numData = 102400000;
+
+struct TestMsg
+{
+	int size;
+};
+
+void ThreadReader(atomic::AtomicPipe<int, numElements>* pipe)
+{
+	cout << "reader" << endl;
+
+	int ret;
+	for(int i = 0; i < numData; ++i)
+	{
+		pipe->read(&ret);
+		BOOST_ASSERT(ret == i);
+	}
+}
+
+void ThreadWriter(atomic::AtomicPipe<int, numElements>* pipe)
+{
+	cout << "writer" << endl;
+
+	//TestMsg* message = new TestMsg;
+
+	for(int i = 0; i < numData; ++i)
+	{
+		pipe->write(i, true);
+	}
+
+
+}
+
+int main()
+{
+	atomic::AtomicPipe<int, numElements> atomicPipe;
+//	atomic::AtomicQueue<int, numElements> atomicQueue;
+
+	tbb::tbb_thread threadWriter(boost::bind(&ThreadWriter, &atomicPipe));
+	tbb::tbb_thread threadReader(boost::bind(&ThreadReader, &atomicPipe));
+
+//	tbb::tbb_thread threadWriter(boost::bind(&ThreadWriter));
+//	tbb::tbb_thread threadReader(boost::bind(&ThreadReader));
+
+	tbb::tick_count start, end;
+	start = tbb::tick_count::now();
+
+//	if(threadWriter.joinable())
+		threadWriter.join();
+
+//	if(threadReader.joinable())
+		threadReader.join();
+
+	end = tbb::tick_count::now();
+	float total = (end - start).seconds()*1000.0;
+
+	//	cout << "througput: " << total / numData << endl;
+	//	cout << "time: " << total << endl;
+	cout << "enqueue/dequeue: " << numData << " elements in " << total << " ms" << endl;
+}
+
+#endif

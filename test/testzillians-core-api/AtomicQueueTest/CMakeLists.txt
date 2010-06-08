@@ -22,8 +22,15 @@
 INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
 
 ADD_EXECUTABLE(AtomicQueueTest AtomicQueueTest.cpp)
+ADD_EXECUTABLE(SpscQueueTest SpscQueueTest.cpp)
 
 TARGET_LINK_LIBRARIES(AtomicQueueTest 
     zillians-common-core-api
     zillians-common-util-api
     )
+
+TARGET_LINK_LIBRARIES(SpscQueueTest 
+    zillians-common-core-api
+    zillians-common-util-api
+    )
+    
