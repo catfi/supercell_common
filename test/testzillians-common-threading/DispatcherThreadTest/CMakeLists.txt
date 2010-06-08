@@ -1,6 +1,6 @@
 # 
 # Zillians MMO
-# Copyright (C) 2007-2010 Zillians.com, Inc.
+# Copyright (C) 2007-2009 Zillians.com, Inc.
 # For more information see http:#www.zillians.com
 #
 # Zillians MMO is the library and runtime for massive multiplayer online game
@@ -19,9 +19,10 @@
 # Contact Information: info@zillians.com
 #
 
-ADD_SUBDIRECTORY(testzillians-core-api)
-ADD_SUBDIRECTORY(testzillians-net-api)
-ADD_SUBDIRECTORY(testzillians-util-api)
-ADD_SUBDIRECTORY(testzillians-others)
-ADD_SUBDIRECTORY(testzillians-common-networking)
-ADD_SUBDIRECTORY(testzillians-common-threading)
+INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
+
+ADD_EXECUTABLE(DispatcherThreadTest DispatcherThreadTest.cpp) 
+
+TARGET_LINK_LIBRARIES(DispatcherThreadTest
+    zillians-common-core-api 
+    )

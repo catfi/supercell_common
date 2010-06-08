@@ -19,9 +19,4 @@
 # Contact Information: info@zillians.com
 #
 
-ADD_SUBDIRECTORY(testzillians-core-api)
-ADD_SUBDIRECTORY(testzillians-net-api)
-ADD_SUBDIRECTORY(testzillians-util-api)
-ADD_SUBDIRECTORY(testzillians-others)
-ADD_SUBDIRECTORY(testzillians-common-networking)
-ADD_SUBDIRECTORY(testzillians-common-threading)
+ADD_SUBDIRECTORY(DispatcherThreadTest)
