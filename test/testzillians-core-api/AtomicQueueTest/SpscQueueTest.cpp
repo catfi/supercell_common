@@ -174,15 +174,14 @@ int main(int argc, char** argv)
 	int n = atoi(argv[1]);
 	spsc_queue<int> q;
 
+	tbb::tick_count start, end;
+	start = tbb::tick_count::now();
 //	boost::timer timer;
 //	timer.restart();
 //	boost::thread tr(boost::bind(reader, &q, n));
 //	boost::thread tw(boost::bind(, &q, n));
 	tbb::tbb_thread tw(boost::bind(&writer, &q, n));
 	tbb::tbb_thread tr(boost::bind(&reader, &q, n));
-
-	tbb::tick_count start, end;
-	start = tbb::tick_count::now();
 
 	tr.join();
 	tw.join();

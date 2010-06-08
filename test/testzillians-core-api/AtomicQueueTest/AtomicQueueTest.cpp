@@ -125,14 +125,14 @@ int main()
 	atomic::AtomicPipe<int, numElements> atomicPipe;
 //	atomic::AtomicQueue<int, numElements> atomicQueue;
 
+	tbb::tick_count start, end;
+	start = tbb::tick_count::now();
+
 	tbb::tbb_thread threadWriter(boost::bind(&ThreadWriter, &atomicPipe));
 	tbb::tbb_thread threadReader(boost::bind(&ThreadReader, &atomicPipe));
 
 //	tbb::tbb_thread threadWriter(boost::bind(&ThreadWriter));
 //	tbb::tbb_thread threadReader(boost::bind(&ThreadReader));
-
-	tbb::tick_count start, end;
-	start = tbb::tick_count::now();
 
 //	if(threadWriter.joinable())
 		threadWriter.join();

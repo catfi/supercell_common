@@ -27,6 +27,7 @@
 
 namespace zillians { namespace atomic {
 
+#if 0
 struct stack_node
 {
 	stack_node() : _nexts(0)
@@ -97,6 +98,8 @@ public:
 		}
 	}
 };
+
+#endif
 
 } }
 
