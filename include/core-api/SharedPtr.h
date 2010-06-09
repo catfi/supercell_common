@@ -26,23 +26,27 @@
 	#include <boost/shared_ptr.hpp>
 	#include <boost/weak_ptr.hpp>
 	#include <boost/enable_shared_from_this.hpp>
+	#include <boost/make_shared.hpp>
 	using boost::static_pointer_cast;
 	using boost::const_pointer_cast;
 	using boost::dynamic_pointer_cast;
 	using boost::shared_ptr;
 	using boost::weak_ptr;
 	using boost::enable_shared_from_this;
+	using boost::make_shared;
 #else
 	#ifndef __GXX_EXPERIMENTAL_CXX0X__
 		#include <boost/shared_ptr.hpp>
 		#include <boost/weak_ptr.hpp>
 		#include <boost/enable_shared_from_this.hpp>
+		#include <boost/make_shared.hpp>
 		using boost::static_pointer_cast;
 		using boost::const_pointer_cast;
 		using boost::dynamic_pointer_cast;
 		using boost::shared_ptr;
 		using boost::weak_ptr;
 		using boost::enable_shared_from_this;
+		using boost::make_shared;
 	#else
 		#include <memory>
 		using std::static_pointer_cast;
@@ -51,8 +55,19 @@
 		using std::shared_ptr;
 		using std::weak_ptr;
 		using std::enable_shared_from_this;
+		using std::make_shared;
 	#endif
 #endif
+
+namespace zillians {
+
+struct null_deleter
+{
+	void operator()(void const *) const
+	{ }
+};
+
+}
 
 /**
  * @brief Allow direct comparison of shared_ptr and its wrapping type (for "equal to" operator)

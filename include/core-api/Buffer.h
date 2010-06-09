@@ -897,6 +897,8 @@ public:
 	 */
 	inline void wrev(std::size_t bytes) { mWritePos -= bytes; }
 
+	inline byte* baseptr() const { return (byte*)mData; }
+
 public:
 	/**
 	 * @brief Read an arbitrary variable.

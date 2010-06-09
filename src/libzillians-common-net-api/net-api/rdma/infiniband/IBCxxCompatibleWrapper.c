@@ -24,7 +24,7 @@
 
 struct ibv_mr* zillians_ibv_reg_mr(struct ibv_pd* pd, void* addr, size_t length)
 {
-	ibv_reg_mr(pd, addr, length, IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_READ);
+	return ibv_reg_mr(pd, addr, length, IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE | IBV_ACCESS_REMOTE_READ);
 }
 
 int zillians_ibv_dereg_mr(struct ibv_mr* mr)

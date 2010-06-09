@@ -53,7 +53,7 @@ bool IBAcceptor::accept(shared_ptr<Poller> poller, shared_ptr<InetSocketAddress>
 	mAcceptInfo.rchannel = IBFactory::createEventChannel();
 
 	// create listener cm_id
-	mAcceptInfo.listen_id = IBFactory::createManagementId(mAcceptInfo.rchannel.get(), NULL, RDMA_PS_TCP);;
+	mAcceptInfo.listen_id = IBFactory::createManagementId(mAcceptInfo.rchannel.get(), :q, RDMA_PS_TCP);;
 
 	// save poller reference
 	mAcceptInfo.poller = poller;

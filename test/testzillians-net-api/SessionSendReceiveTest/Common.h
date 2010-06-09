@@ -21,10 +21,10 @@
  */
 
 #include "core-api/Prerequisite.h"
-#include "net-api/sys/Session.h"
-#include "net-api/sys/SessionEngine.h"
+#include "networking/sys/Session.h"
+#include "networking/sys/SessionEngine.h"
 
-using namespace zillians::net::sys;
+using namespace zillians::networking::sys;
 
 struct MySessionContext
 {

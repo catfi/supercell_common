@@ -26,8 +26,8 @@ ADD_EXECUTABLE(SessionBasicTestServer Server.cpp)
 
 TARGET_LINK_LIBRARIES(SessionBasicTestClient 
     zillians-common-core-api 
-    zillians-common-net-api)
+    zillians-common-networking-tcp)
 
 TARGET_LINK_LIBRARIES(SessionBasicTestServer 
     zillians-common-core-api 
-    zillians-common-net-api)
+    zillians-common-networking-tcp)

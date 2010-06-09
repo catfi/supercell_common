@@ -46,6 +46,7 @@ struct ContextOwnership
 		transfer	= 1,
 	};
 };
+
 /**
  * ContextHub is a universal storage for arbitrary class with constant access time.
  *

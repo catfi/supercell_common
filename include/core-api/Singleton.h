@@ -29,13 +29,36 @@
 namespace zillians {
 
 /**
- * @brief Simple implementation of Singleton Pattern
+ * Template parameter for Singleton class
+ *
+ * For manual singleton initialization, you have to make instance of the singleton class
+ * (by calling new operator) as well as destroy the instance of it (by calling delete
+ * operator). This is inspired by OGRE to allow program to control the object construction
+ * order and destruction order manually.
+ *
+ * On the other hand, for automatic singleton initialization, the instance is created
+ * if necessary whenever the Singleton::instance() is called, and is destroyed when
+ * program exit.
+ *
+ * @see Singleton
+ */
+struct SingletonInitialization
+{
+	enum type
+	{
+		manual		= 0,
+		automatic	= 1,
+	};
+};
+
+/**
+ * Simple implementation of Singleton Pattern
  *
  * Inspired by OGRE, the Singleton class can be created once, and access through instance() method
  * NOTE: have potential problem when linking against dynamic library (nothing said that...)
  * NOTE: this is NOT thread-safe because the Singleton object can be created in two different threads in the same time
  */
-template <class T, bool AUTO = false>
+template <class T, SingletonInitialization::type Init = SingletonInitialization::manual>
 class Singleton
 {
 public:
@@ -53,7 +76,7 @@ public:
 
 	~Singleton()
 	{
-		if(AUTO)
+		if(Init)
 		{
 			SAFE_DELETE(mInstance);
 		}
@@ -62,7 +85,7 @@ public:
 public:
 	static T* instance()
 	{
-		if(AUTO && !mInstance)
+		if(Init == SingletonInitialization::automatic && !mInstance)
 		{
 			mInstance = new T;
 		}
@@ -74,7 +97,7 @@ private:
 	static T* mInstance;
 };
 
-template <typename T, bool AUTO> T* Singleton<T, AUTO>::mInstance = NULL;
+template <typename T, SingletonInitialization::type Init> T* Singleton<T, Init>::mInstance = NULL;
 
 }
 

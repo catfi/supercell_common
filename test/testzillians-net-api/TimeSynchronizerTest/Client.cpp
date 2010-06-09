@@ -21,9 +21,9 @@
  */
 
 #include "core-api/Prerequisite.h"
-#include "net-api/sys/Session.h"
-#include "net-api/sys/SessionEngine.h"
-#include "net-api/sys/TimeSynchronizer.h"
+#include "networking/sys/Session.h"
+#include "networking/sys/SessionEngine.h"
+#include "networking/sys/TimeSynchronizer.h"
 #include <log4cxx/logger.h>
 #include <log4cxx/basicconfigurator.h>
 #include <boost/bind.hpp>
@@ -32,7 +32,7 @@
 #include <tbb/atomic.h>
 
 using namespace zillians;
-using namespace zillians::net::sys;
+using namespace zillians::networking::sys;
 
 using boost::asio::ip::tcp;
 

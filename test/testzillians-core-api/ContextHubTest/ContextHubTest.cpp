@@ -44,7 +44,7 @@ class F { };
 
 BOOST_AUTO_TEST_CASE( ContextHubTestCase1 )
 {
-	ContextHub<true> hub;
+	ContextHub<ContextOwnership::transfer> hub;
 
 	BOOST_CHECK_NO_THROW(hub.set<A>(new A));
 	BOOST_CHECK_NO_THROW(hub.set<B>(new B));
@@ -85,7 +85,7 @@ typedef Counter<F> CF;
 
 BOOST_AUTO_TEST_CASE( ContextHubTestCase2 )
 {
-	ContextHub<true> hub;
+	ContextHub<ContextOwnership::transfer> hub;
 
 	int ctor_counter = 0;
 	int dtor_counter = 0;
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE( ContextHubTestCase2 )
 
 BOOST_AUTO_TEST_CASE( ContextHubTestCase3 )
 {
-	NamedContextHub<true> hub;
+	NamedContextHub<ContextOwnership::transfer> hub;
 
 	int ctor_counter = 0;
 	int dtor_counter = 0;
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE( ContextHubTestCase3 )
 
 BOOST_AUTO_TEST_CASE( ContextHubTestCase4 )
 {
-	NamedContextHub<true> hub;
+	NamedContextHub<ContextOwnership::transfer> hub;
 
 	int ctor_counter = 0;
 	int dtor_counter = 0;
