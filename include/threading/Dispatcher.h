@@ -45,7 +45,7 @@ public:
 	{
 		BOOST_ASSERT(max_dispatcher_threads <= ZILLIANS_DISPATCHER_MAX_THREADS);
 
-		*mPipes = new ContextPipe[max_dispatcher_threads * max_dispatcher_threads];
+		mPipes = new ContextPipe*[max_dispatcher_threads * max_dispatcher_threads];
 		*mSignalers = new DispatcherThreadSignaler[max_dispatcher_threads];
 		mAttachedFlags = new bool[mMaxThreadContextCount];
 
