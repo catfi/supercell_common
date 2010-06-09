@@ -123,7 +123,6 @@ void ThreadWriter(atomic::AtomicPipe<int, numElements>* pipe)
 int main()
 {
 	atomic::AtomicPipe<int, numElements> atomicPipe;
-//	atomic::AtomicQueue<int, numElements> atomicQueue;
 
 	tbb::tick_count start, end;
 	start = tbb::tick_count::now();
@@ -131,20 +130,12 @@ int main()
 	tbb::tbb_thread threadWriter(boost::bind(&ThreadWriter, &atomicPipe));
 	tbb::tbb_thread threadReader(boost::bind(&ThreadReader, &atomicPipe));
 
-//	tbb::tbb_thread threadWriter(boost::bind(&ThreadWriter));
-//	tbb::tbb_thread threadReader(boost::bind(&ThreadReader));
-
-//	if(threadWriter.joinable())
-		threadWriter.join();
-
-//	if(threadReader.joinable())
-		threadReader.join();
+	threadWriter.join();
+	threadReader.join();
 
 	end = tbb::tick_count::now();
 	float total = (end - start).seconds()*1000.0;
 
-	//	cout << "througput: " << total / numData << endl;
-	//	cout << "time: " << total << endl;
 	cout << "enqueue/dequeue: " << numData << " elements in " << total << " ms" << endl;
 }
 

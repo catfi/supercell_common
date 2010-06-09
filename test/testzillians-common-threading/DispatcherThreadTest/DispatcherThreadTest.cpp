@@ -23,7 +23,7 @@
 
 #include "core-api/Prerequisite.h"
 #include "threading/Dispatcher.h"
-#include "threading/DispatcherThread.h"
+#include "threading/DispatcherThreadContext.h"
 #include "threading/DispatcherDestination.h"
 
 #include <log4cxx/logger.h>
@@ -46,7 +46,7 @@ struct Message
 
 }
 
-void writer_thread(shared_ptr<DispatcherThread<Message> > dt, uint32 destination)
+void writer_thread(shared_ptr<DispatcherThreadContext<Message> > dt, uint32 destination)
 {
 	shared_ptr<DispatcherDestination<Message> > dest = dt->createDestination(destination);
 
@@ -59,21 +59,21 @@ void writer_thread(shared_ptr<DispatcherThread<Message> > dt, uint32 destination
 	}
 }
 
-void read_thread(shared_ptr<DispatcherThread<Message> > dt, uint32 destination)
+void reader_thread(shared_ptr<DispatcherThreadContext<Message> > dt, uint32 source)
 {
 	for(int i=0;i<ITERATIONS;++i)
 	{
 		Message m;
-		while(!dt->read(&m));
+		while(!dt->read(source, m));
 
 		BOOST_ASSERT(m->count == i);
 	}
 }
 
-void writer_reader_thread(shared_ptr<DispatcherThread<Message> > dt, std::vector<uint32> destinations)
+void writer_reader_thread(shared_ptr<DispatcherThreadContext<Message> > dt, std::vector<uint32> destinations)
 {
 	Message m; m.count = 1;
-	for(std::vector<uint32>::iterator it = destination.begin(); it != destinations.end(); ++it)
+	for(std::vector<uint32>::iterator it = destinations.begin(); it != destinations.end(); ++it)
 	{
 		shared_ptr<DispatcherDestination<Message> > dest = dt->createDestination(*it);
 		for(int i=0;i<ITERATIONS;++i)
@@ -86,8 +86,8 @@ void writer_reader_thread(shared_ptr<DispatcherThread<Message> > dt, std::vector
 	{
 		for(int i=0;i<ITERATIONS;++i)
 		{
-			Message m;
-			while(!dt->read(&m));
+			uint32 source;
+			while(!dt->read(source, m));
 
 			BOOST_ASSERT(m->count == 1);
 		}
@@ -102,8 +102,8 @@ int main (int argc, char** argv)
 
 	if(true)
 	{
-		shared_ptr<DispatcherThread<Message> > reader_dt = dispatcher.createThread();
-		shared_ptr<DispatcherThread<Message> > writer_dt = dispatcher.createThread();
+		shared_ptr<DispatcherThreadContext<Message> > reader_dt = dispatcher.createThreadContext();
+		shared_ptr<DispatcherThreadContext<Message> > writer_dt = dispatcher.createThreadContext();
 
 		boost::thread t0(boost::bind(reader_thread, reader_dt, writer_dt->getIdentity()));
 		boost::thread t1(boost::bind(writer_thread, writer_dt, reader_dt->getIdentity()));
@@ -115,15 +115,17 @@ int main (int argc, char** argv)
 	for(int i=0;i<10;++i)
 	{
 		std::vector<uint32> destinations;
-		std::vector<shared_ptr<DispatcherThread<Message> > > dts;
+		std::vector<shared_ptr<DispatcherThreadContext<Message> > > dts;
 		for(int i=0;i<READER_WRITER_THREAD_COUNT;++i)
 		{
-			shared_ptr<DispatcherThread<Message> > dt = dispatcher.createThread();
+			shared_ptr<DispatcherThreadContext<Message> > dt = dispatcher.createThreadContext();
 			destinations.push_back(dt->getIdentity());
 			dts.push_back(dt);
 		}
 
-		boost::thread** wr_threads = new boost::thread[READER_WRITER_THREAD_COUNT];
+//		boost::thread** wr_threads = new boost::thread[READER_WRITER_THREAD_COUNT];
+		boost::thread** wr_threads;
+		*wr_threads = new boost::thread[READER_WRITER_THREAD_COUNT];
 
 		for(int i=0;i<READER_WRITER_THREAD_COUNT;++i)
 		{

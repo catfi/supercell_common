@@ -17,50 +17,57 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * @date Jun 8, 2010 sdk - Initial version created.
+ * @date Jun 9, 2010 zac - Initial version created.
  */
 
-#ifndef ZILLIANS_THREADING_DISPATCHERTHREAD_H_
-#define ZILLIANS_THREADING_DISPATCHERTHREAD_H_
+#ifndef ZILLIANS_DISPATCHER_DISPATCHERTHREADSIGNALER_H_
+#define ZILLIANS_DISPATCHER_DISPATCHERTHREADSIGNALER_H_
 
 #include "core-api/Prerequisite.h"
-#include "core-api/SharedPtr.h"
 #include "core-api/Semaphore.h"
-#include "core-api/ContextHub.h"
-#include "threading/DispatcherNetwork.h"
-#include "threading/DispatcherDestination.h"
+#include "core-api/Atomic.h"
 
 namespace zillians { namespace threading {
 
-template<typename Message>
-class DispatcherThread : public ContextHub<ContextOwnership::transfer>
+class DispatcherThreadSignaler
 {
 public:
-	DispatcherThread(DispatcherNetwork<Message>* dispatcher, uint32 self_id);
-	~DispatcherThread();
+	DispatcherThreadSignaler() : mWaitSignal(sizeof (uint64) * 8 - 1)
+	{ }
+
+	~DispatcherThreadSignaler()
+	{ }
 
 public:
-	uint32 getIdentity() const;
-	DispatcherNetwork<Message>* getDispatcherNetwork() const;
+	void signal(uint32 signal)
+	{
+		if(atomic::bitmap_btsr(mBitmap, signal, mWaitSignal))
+			mSemaphore.post();
+	}
 
-public:
-	shared_ptr<DispatcherDestination> createDestination(uint32 dest);
+	uint64 poll(uint32 id)
+	{
+		uint64 result = 0;
+		result = atomic::bitmap_izte(mBitmap, uint64(1) << mWaitSignal, 0);
 
-public:
-	/**
-	 * Read the first message available from any pipes
-	 * @param source
-	 * @param message
-	 */
-	bool read(uint32& source, Message* message, bool blocking = false);
+		if(!result)
+		{
+			mSemaphore.wait();
+			result = atomic::bitmap_xchg(mBitmap, 0);
+		}
 
-public:
-	Semaphore getSignaler();
+		return result;
+	}
 
-public:
-	void processCommand();
+	uint64 check()
+	{ return atomic::bitmap_xchg(mBitmap, 0); }
+
+private:
+	Semaphore mSemaphore;
+	uint64 mBitmap;
+	const int mWaitSignal;
 };
 
 } }
 
-#endif /* ZILLIANS_THREADING_DISPATCHERTHREAD_H_ */
+#endif /* ZILLIANS_DISPATCHER_DISPATCHERTHREADSIGNALER_H_ */

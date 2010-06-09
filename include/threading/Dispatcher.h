@@ -26,7 +26,7 @@
 #include "core-api/Prerequisite.h"
 #include "core-api/Semaphore.h"
 #include "core-api/AtomicQueue.h"
-#include "threading/DispatcherThread.h"
+#include "threading/DispatcherThreadContext.h"
 #include "threading/DispatcherNetwork.h"
 
 #define ZILLIANS_DISPATCHER_MAX_THREADS		64
@@ -38,38 +38,100 @@ template<typename Message>
 class Dispatcher : public DispatcherNetwork<Message>
 {
 public:
-	Dispatcher(uint32 max_dispatcher_threads)
-	{
+	typedef atomic::AtomicPipe<Message, ZILLIANS_DISPATCHER_PIPE_CHUNK_SIZE> ContextPipe;
 
+public:
+	Dispatcher(uint32 max_dispatcher_threads) : mMaxThreadContextCount(max_dispatcher_threads)
+	{
+		BOOST_ASSERT(max_dispatcher_threads <= ZILLIANS_DISPATCHER_MAX_THREADS);
+
+		*mPipes = new ContextPipe[max_dispatcher_threads * max_dispatcher_threads];
+		*mSignalers = new DispatcherThreadSignaler[max_dispatcher_threads];
+		mAttachedFlags = new bool[mMaxThreadContextCount];
+
+		for(int i = 0; i < mMaxThreadContextCount; ++i)
+		{
+			mSignalers[i] = NULL;
+			mAttachedFlags[i] = false;
+		}
+
+		for(int i = 0; i < mMaxThreadContextCount * mMaxThreadContextCount; ++i)
+		{
+			mPipes[i] = new ContextPipe();
+		}
 	}
 
 	~Dispatcher()
 	{
-
+		for(int i=0;i<mMaxThreadContextCount;++i)
+		{
+			BOOST_ASSERT(!mAttachedFlags[i]);
+		}
+		delete [] mPipes;
+		delete [] mSignalers;
+		delete mAttachedFlags;
 	}
 
 public:
-	shared_ptr<DispatcherThread> createThread()
+	shared_ptr<DispatcherThreadContext<Message> > createThreadContext()
 	{
-		// create dispatcher thread object
+		int contextId = -1;
+		for(int i = 0; i < mMaxThreadContextCount; ++i)
+		{
+			if(!mAttachedFlags[i])
+			{
+				contextId = i;
+				break;
+			}
+		}
+
+		if(contextId < 0)
+		{
+			BOOST_ASSERT("out of thread context" && 0);
+		}
+
+		mAttachedFlags[contextId] = true;
+		shared_ptr<DispatcherThreadContext<Message> > context = shared_ptr<DispatcherThreadContext<Message> >(new DispatcherThreadContext<Message>(this, contextId));
 
 		// store the signaler object into the local signaler array
+		mSignalers[contextId] = &context->getSignaler();
+
+		return context;
+	}
+
+	void distroyThreadContext(uint32 contextId)
+	{
+		BOOST_ASSERT(mAttachedFlags[contextId] == true);
+		mAttachedFlags[contextId] = false;
+		mSignalers[contextId] = NULL;
 	}
 
 public:
 	virtual void write(uint32 source, uint32 destination, const Message& message)
 	{
+		ContextPipe* pipes = mPipes[source * mMaxThreadContextCount + destination];
+		pipes->write(message);
 
+		if(!pipes->flush())
+		{
+			mSignalers[destination]->signal(source);
+		}
 	}
 
 	virtual bool read(uint32 source, uint32 destination, Message* message)
 	{
-		return false;
+		return mPipes[source * mMaxThreadContextCount + destination].read(message);
 	}
 
+public:
+	uint8 getMaxThreadContextCount()
+	{ return mMaxThreadContextCount; }
+
 private:
-	atomic::AtomicPipe<Message, ZILLIANS_DISPATCHER_PIPE_CHUNK_SIZE>** mPipes;
-	Semaphore** mSignalers;
+	ContextPipe** mPipes;
+	DispatcherThreadSignaler** mSignalers;
+	bool* mAttachedFlags;
+	uint8 mMaxThreadContextCount;
 };
 
 } }

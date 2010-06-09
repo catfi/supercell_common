@@ -34,25 +34,60 @@ template<typename Message>
 class DispatcherDestination : public ContextHub<ContextOwnership::transfer>
 {
 public:
-	DispatcherDestination(DispatcherNetwork<Message>* dispatcher);
-	~DispatcherDestination();
+	DispatcherDestination(DispatcherNetwork<Message>* dispatcher, uint32 sourceId, uint32 destId)
+	{
+		mDispatcher = dispatcher;
+		mDestinationId = destId;
+		mSouceId = sourceId;
+	}
+
+	~DispatcherDestination()
+	{ }
 
 public:
 	DispatcherNetwork<Message>* getDispatcherNetwork() const
-	{
-
-	}
+	{ return mDispatcher; }
 
 public:
 	void write(const Message& message)
 	{
+		write(&message, 1);
+	}
 
+	void write(const Message* message, uint32 count)
+	{
+		for(int i=0;i<count;++i)
+			mDispatcher->write(mSouceId, mDestinationId, message[i]);
 	}
 
 	bool read(Message* message, bool blocking = false)
 	{
-		return false;
+		return read(message, 1, blocking);
 	}
+
+	bool read(Message* messages, uint32 count, bool blocking = false)
+	{
+		uint32 n = 0;
+
+		if(UNLIKELY(blocking))
+		{
+			while(!mDispatcher->read(mSouceId, mDestinationId, messages));
+			++n;
+		}
+
+		for(;n < count; ++n)
+		{
+			if(!mDispatcher->read(mSouceId, mDestinationId, messages))
+				break;
+		}
+
+		return n > 0;
+	}
+
+private:
+	DispatcherNetwork<Message>* mDispatcher;
+	uint32 mDestinationId;
+	uint32 mSouceId;
 };
 
 } }
