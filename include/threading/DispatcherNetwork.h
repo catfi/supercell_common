@@ -28,8 +28,9 @@ namespace zillians { namespace threading {
 template<typename Message>
 struct DispatcherNetwork
 {
-	virtual void write(uint32 source, uint32 destination, const Message& message) = 0;
+	virtual void write(uint32 source, uint32 destination, const Message& message, bool incomplete) = 0;
 	virtual bool read(uint32 source, uint32 destination, Message* message) = 0;
+	virtual void distroyThreadContext(uint32 contextId) = 0;
 };
 
 } }

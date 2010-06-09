@@ -1541,7 +1541,7 @@ public:
 	inline void writeBuiltin(const bool& value)
 	{
 		uint8 x = value ? 1 : 0;
-		writeDirect(value);
+		writeDirect(x);
 	}
 
 	/**
@@ -1570,7 +1570,7 @@ public:
 	 */
 	inline void writeBuiltin(const char* value)
 	{
-		int32 length = strlen(value);
+		std::size_t length = strlen(value);
 		if(LIKELY(length <= MAX_STRING_LENGTH))
 		{
 			writeDirect(length);

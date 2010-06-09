@@ -91,7 +91,7 @@ public:
 		}
 
 		mAttachedFlags[contextId] = true;
-		shared_ptr<DispatcherThreadContext<Message> > context = shared_ptr<DispatcherThreadContext<Message> >(new DispatcherThreadContext<Message>(this, contextId));
+		shared_ptr<DispatcherThreadContext<Message> > context = shared_ptr<DispatcherThreadContext<Message> >(new DispatcherThreadContext<Message>(this, contextId, mMaxThreadContextCount));
 
 		// store the signaler object into the local signaler array
 		mSignalers[contextId] = &context->getSignaler();
@@ -99,7 +99,7 @@ public:
 		return context;
 	}
 
-	void distroyThreadContext(uint32 contextId)
+	virtual void distroyThreadContext(uint32 contextId)
 	{
 		BOOST_ASSERT(mAttachedFlags[contextId] == true);
 		mAttachedFlags[contextId] = false;
@@ -107,31 +107,30 @@ public:
 	}
 
 public:
-	virtual void write(uint32 source, uint32 destination, const Message& message)
+	virtual void write(uint32 source, uint32 destination, const Message& message, bool incomplete)
 	{
 		ContextPipe* pipes = mPipes[source * mMaxThreadContextCount + destination];
-		pipes->write(message);
+		pipes->write(message, incomplete);
 
-		if(!pipes->flush())
+		if(!incomplete)
 		{
-			mSignalers[destination]->signal(source);
+			if(!pipes->flush())
+			{
+				mSignalers[destination]->signal(source);
+			}
 		}
 	}
 
 	virtual bool read(uint32 source, uint32 destination, Message* message)
 	{
-		return mPipes[source * mMaxThreadContextCount + destination].read(message);
+		return mPipes[source * mMaxThreadContextCount + destination]->read(message);
 	}
-
-public:
-	uint8 getMaxThreadContextCount()
-	{ return mMaxThreadContextCount; }
 
 private:
 	ContextPipe** mPipes;
 	DispatcherThreadSignaler** mSignalers;
 	bool* mAttachedFlags;
-	uint8 mMaxThreadContextCount;
+	uint32 mMaxThreadContextCount;
 };
 
 } }

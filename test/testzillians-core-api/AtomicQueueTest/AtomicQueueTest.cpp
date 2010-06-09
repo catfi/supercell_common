@@ -116,8 +116,6 @@ void ThreadWriter(atomic::AtomicPipe<int, numElements>* pipe)
 	{
 		pipe->write(i, true);
 	}
-
-
 }
 
 int main()

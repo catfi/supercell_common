@@ -37,11 +37,8 @@ template<typename Message>
 class DispatcherThreadContext : public ContextHub<ContextOwnership::transfer>
 {
 public:
-	DispatcherThreadContext(DispatcherNetwork<Message>* dispatcher, uint32 self_id)
-	{
-		mDispatcher = dispatcher;
-		mId = self_id;
-	}
+	DispatcherThreadContext(DispatcherNetwork<Message>* dispatcher, uint32 id, uint32 max_thread_id) : mId(id), mMaxThreadId(max_thread_id), mDispatcher(dispatcher)
+	{ }
 
 	~DispatcherThreadContext()
 	{
@@ -88,7 +85,7 @@ public:
 
 		if(signals)
 		{
-			for(int i = 0; i < mDispatcher->getMaxThreadContextCount() && n < count; ++i)
+			for(int i = 0; i < mMaxThreadId && n < count; ++i)
 			{
 				if(signals & uint64 (1) << i)
 				{
@@ -110,9 +107,9 @@ public:
 
 private:
 	DispatcherThreadSignaler mSignaler;
-//	DispatcherNetwork<Message>* mDispatcher;
-	Dispatcher<Message>* mDispatcher;
+	DispatcherNetwork<Message>* mDispatcher;
 	uint32 mId;
+	uint32 mMaxThreadId;
 };
 
 } }

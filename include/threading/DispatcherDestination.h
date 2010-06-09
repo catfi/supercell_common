@@ -56,8 +56,9 @@ public:
 
 	void write(const Message* message, uint32 count)
 	{
-		for(int i=0;i<count;++i)
-			mDispatcher->write(mSouceId, mDestinationId, message[i]);
+		for(int i=0;i<count - 1;++i)
+			mDispatcher->write(mSouceId, mDestinationId, message[i], true);
+		mDispatcher->write(mSouceId, mDestinationId, message[count-1], false);
 	}
 
 	bool read(Message* message, bool blocking = false)
@@ -71,7 +72,7 @@ public:
 
 		if(UNLIKELY(blocking))
 		{
-			while(!mDispatcher->read(mSouceId, mDestinationId, messages));
+			while(!mDispatcher->read(mSouceId, mDestinationId, messages)) { }
 			++n;
 		}
 
@@ -81,7 +82,7 @@ public:
 				break;
 		}
 
-		return n > 0;
+		return n > 0U;
 	}
 
 private:

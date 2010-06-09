@@ -132,7 +132,6 @@ inline bool b_cas_ptr(void* volatile* pdst, void* pval, void* pcmp)
 inline bool bitmap_btsr(uint64 bitmap, int index_to_set, int index_to_reset)
 {
 	uint64 bitmap_old;
-	uint64 bitmap_new;
 #if defined(__GNUC__)
 	uint64 dummy;
 	__asm__ volatile (
@@ -182,7 +181,6 @@ inline uint64 bitmap_xchg(uint64 bitmap, uint64 bitmap_new)
 inline uint64 bitmap_izte(uint64 bitmap, uint64 bitmap_then, uint64 bitmap_else)
 {
 	uint64 bitmap_old;
-	uint64 bitmap_new;
 #if defined(__GNUC__)
 	uint64 dummy;
 	__asm__ volatile (
