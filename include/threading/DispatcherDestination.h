@@ -23,9 +23,9 @@
 #ifndef ZILLIANS_THREADING_DISPATCHERDESTINATION_H_
 #define ZILLIANS_THREADING_DISPATCHERDESTINATION_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/SharedPtr.h"
-#include "core-api/ContextHub.h"
+#include "core/Prerequisite.h"
+#include "core/SharedPtr.h"
+#include "core/ContextHub.h"
 #include "threading/DispatcherNetwork.h"
 
 namespace zillians { namespace threading {

@@ -23,9 +23,9 @@
 #ifndef ZILLIANS_NET_GROUP_EXTENDEDVIRTUALSYNCHRONY_H_
 #define ZILLIANS_NET_GROUP_EXTENDEDVIRTUALSYNCHRONY_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/group/DataDispatcher.h"
-#include "net-api/group/MembershipDispatcher.h"
+#include "core/Prerequisite.h"
+#include "networking/group/DataDispatcher.h"
+#include "networking/group/MembershipDispatcher.h"
 #include <corosync/corotypes.h>
 #include <corosync/evs.h>
 

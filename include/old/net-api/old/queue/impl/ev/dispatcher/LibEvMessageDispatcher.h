@@ -22,7 +22,7 @@
 #ifndef LIBEVMESSAGEDISPATCHER_H_
 #define LIBEVMESSAGEDISPATCHER_H_
 
-#include "net-api/dispatcher/BasicMessageDispatcher.h"
+#include "networking/dispatcher/BasicMessageDispatcher.h"
 
 namespace zillians {
 

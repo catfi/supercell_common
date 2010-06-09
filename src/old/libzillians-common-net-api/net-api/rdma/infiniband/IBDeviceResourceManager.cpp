@@ -17,13 +17,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "net-api/rdma/infiniband/IBDeviceResourceManager.h"
-#include "net-api/rdma/infiniband/IBFactory.h"
+#include "networking/rdma/infiniband/IBDeviceResourceManager.h"
+#include "networking/rdma/infiniband/IBFactory.h"
 
 namespace zillians { namespace net { namespace rdma {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr IBDeviceResourceManager::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.rdma.infiniband.IBDeviceResourceManager"));
+log4cxx::LoggerPtr IBDeviceResourceManager::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.rdma.infiniband.IBDeviceResourceManager"));
 
 //////////////////////////////////////////////////////////////////////////
 IBDeviceResourceManager::IBDeviceResourceManager()

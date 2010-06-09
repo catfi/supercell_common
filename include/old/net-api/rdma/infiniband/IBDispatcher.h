@@ -23,12 +23,12 @@
 #ifndef ZILLIANS_NET_RDMA_IBDISPATCHER_H_
 #define ZILLIANS_NET_RDMA_IBDISPATCHER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/rdma/DispatcherTemplate.h"
-#include "net-api/rdma/infiniband/IBConnection.h"
-#include "net-api/rdma/infiniband/IBDataHandler.h"
-#include "net-api/rdma/infiniband/IBCompletionHandler.h"
-#include "net-api/rdma/infiniband/IBConnectionHandler.h"
+#include "core/Prerequisite.h"
+#include "networking/rdma/DispatcherTemplate.h"
+#include "networking/rdma/infiniband/IBConnection.h"
+#include "networking/rdma/infiniband/IBDataHandler.h"
+#include "networking/rdma/infiniband/IBCompletionHandler.h"
+#include "networking/rdma/infiniband/IBConnectionHandler.h"
 
 namespace zillians { namespace net { namespace rdma {
 

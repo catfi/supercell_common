@@ -23,9 +23,9 @@
 #ifndef ZILLIANS_THREADING_DISPATCHERTHREADCONTEXT_H_
 #define ZILLIANS_THREADING_DISPATCHERTHREADCONTEXT_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/SharedPtr.h"
-#include "core-api/ContextHub.h"
+#include "core/Prerequisite.h"
+#include "core/SharedPtr.h"
+#include "core/ContextHub.h"
 #include "threading/Dispatcher.h"
 #include "threading/DispatcherNetwork.h"
 #include "threading/DispatcherDestination.h"

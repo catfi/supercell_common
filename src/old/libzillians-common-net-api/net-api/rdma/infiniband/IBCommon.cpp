@@ -20,7 +20,7 @@
  * @date Mar 1, 2009 sdk - Initial version created.
  */
 
-#include "net-api/rdma/infiniband/IBCommon.h"
+#include "networking/rdma/infiniband/IBCommon.h"
 
 namespace zillians { namespace net { namespace rdma {
 

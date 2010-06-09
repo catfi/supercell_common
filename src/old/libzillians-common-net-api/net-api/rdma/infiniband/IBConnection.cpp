@@ -17,12 +17,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "core-api/ConditionVariable.h"
-#include "core-api/ObjectPool.h"
-#include "net-api/rdma/infiniband/IBConnection.h"
-#include "net-api/rdma/infiniband/IBNetEngine.h"
-#include "net-api/rdma/infiniband/IBDeviceResourceManager.h"
-#include "net-api/rdma/buffer_manager/IBBufferManager.h"
+#include "core/ConditionVariable.h"
+#include "core/ObjectPool.h"
+#include "networking/rdma/infiniband/IBConnection.h"
+#include "networking/rdma/infiniband/IBNetEngine.h"
+#include "networking/rdma/infiniband/IBDeviceResourceManager.h"
+#include "networking/rdma/buffer_manager/IBBufferManager.h"
 #include "tbb/tbb_thread.h"
 
 /**
@@ -294,7 +294,7 @@ const uint32 IBConnection::CONTROL_REG_DIRECT_BUFFER	= 6;//0x60000000;
 const uint32 IBConnection::CONTROL_UNREG_DIRECT_BUFFER	= 7;//0x70000000;
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr IBConnection::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.rdma.infiniband.IBConnection"));
+log4cxx::LoggerPtr IBConnection::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.rdma.infiniband.IBConnection"));
 
 //////////////////////////////////////////////////////////////////////////
 IBConnection::IBConnection(IBNetEngine* engine, shared_ptr<rdma_cm_id> id)

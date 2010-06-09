@@ -24,7 +24,7 @@
 #ifndef ZILLIANS_NET_RDMA_COMPLETIONHANDLERTEMPLATE_H_
 #define ZILLIANS_NET_RDMA_COMPLETIONHANDLERTEMPLATE_H_
 
-#include "core-api/Prerequisite.h"
+#include "core/Prerequisite.h"
 
 namespace zillians { namespace net { namespace rdma {
 

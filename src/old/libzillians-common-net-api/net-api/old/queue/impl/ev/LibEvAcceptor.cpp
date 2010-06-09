@@ -19,9 +19,9 @@
 // Contact Information: info@zillians.com
 //
 
-#include "net-api/queue/impl/ev/LibEvAcceptor.h"
-#include "net-api/queue/impl/ev/LibEvNetEngine.h"
-#include "net-api/queue/impl/ev/LibEvChannel.h"
+#include "networking/queue/impl/ev/LibEvAcceptor.h"
+#include "networking/queue/impl/ev/LibEvNetEngine.h"
+#include "networking/queue/impl/ev/LibEvChannel.h"
 
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -30,7 +30,7 @@
 namespace zillians {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr LibEvAcceptor::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.sys.tcp.TcpAcceptor"));
+log4cxx::LoggerPtr LibEvAcceptor::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.sys.tcp.TcpAcceptor"));
 
 //////////////////////////////////////////////////////////////////////////
 LibEvAcceptor::LibEvAcceptor(LibEvQueueEngine* ref)

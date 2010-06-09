@@ -23,7 +23,7 @@
 #ifndef ZILLIANS_NET_SYS_DISPATCHER_H_
 #define ZILLIANS_NET_SYS_DISPATCHER_H_
 
-#include "core-api/Prerequisite.h"
+#include "core/Prerequisite.h"
 
 /**
  * @note If HANDLE_MESSAGE_TYPE_OVERFLOW_AS_EXCEPTION is set to 1 (true), any buffer

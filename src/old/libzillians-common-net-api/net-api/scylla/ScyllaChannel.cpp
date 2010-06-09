@@ -20,10 +20,10 @@
  * @date Jul 24, 2009 rocet - Initial version created.
  */
 
-#include "net-api/scylla/ScyllaChannel.h"
-#include "net-api/scylla/ScyllaAckMessage.h"
+#include "networking/scylla/ScyllaChannel.h"
+#include "networking/scylla/ScyllaAckMessage.h"
 
-using namespace zillians::net::group;
+using namespace zillians::networking::group;
 
 namespace zillians { namespace net {
 

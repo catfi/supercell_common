@@ -19,8 +19,8 @@
 // Contact Information: info@zillians.com
 //
 
-#include "net-api/group/GroupSessionEngineFactory.h"
-#include "net-api/group/impl/spread/SpreadGroupSessionEngine.h"
+#include "networking/group/GroupSessionEngineFactory.h"
+#include "networking/group/impl/spread/SpreadGroupSessionEngine.h"
 
 namespace zillians {
 

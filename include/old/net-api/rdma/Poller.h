@@ -20,7 +20,7 @@
 #ifndef ZILLIANS_NET_RDMA_POLLER_H_
 #define ZILLIANS_NET_RDMA_POLLER_H_
 
-#include "core-api/Prerequisite.h"
+#include "core/Prerequisite.h"
 #include "tbb/concurrent_queue.h"
 #include "boost/function.hpp"
 
@@ -33,7 +33,7 @@
 #define EV_MULTIPLICITY 1
 #define EV_MAXPRI 0
 #define EV_MINPRI 0
-#include "net-api/rdma/ev/ev++.h"
+#include "networking/rdma/ev/ev++.h"
 
 namespace zillians { namespace net { namespace rdma {
 

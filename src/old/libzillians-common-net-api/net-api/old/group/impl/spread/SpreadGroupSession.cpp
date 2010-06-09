@@ -19,7 +19,7 @@
 // Contact Information: info@zillians.com
 //
 
-#include "net-api/group/impl/spread/SpreadGroupSession.h"
+#include "networking/group/impl/spread/SpreadGroupSession.h"
 
 namespace zillians {
 

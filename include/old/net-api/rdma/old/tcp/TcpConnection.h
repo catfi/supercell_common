@@ -20,11 +20,11 @@
 #ifndef TCPCONNECTION_H_
 #define TCPCONNECTION_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/Buffer.h"
-#include "core-api/HashMap.h"
-#include "net-api/sys/Poller.h"
-#include "net-api/sys/tcp/TcpCommon.h"
+#include "core/Prerequisite.h"
+#include "core/Buffer.h"
+#include "core/HashMap.h"
+#include "networking/sys/Poller.h"
+#include "networking/sys/tcp/TcpCommon.h"
 
 #include "tbb/atomic.h"
 #include "tbb/spin_mutex.h"

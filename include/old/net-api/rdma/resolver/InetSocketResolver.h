@@ -22,7 +22,7 @@
 #ifndef ZILLIANS_NET_RDMA_INETSOCKETRESOLVER_H_
 #define ZILLIANS_NET_RDMA_INETSOCKETRESOLVER_H_
 
-#include "net-api/rdma/address/InetSocketAddress.h"
+#include "networking/rdma/address/InetSocketAddress.h"
 
 namespace zillians { namespace net { namespace rdma {
 

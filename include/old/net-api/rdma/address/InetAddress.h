@@ -20,7 +20,7 @@
 #ifndef ZILLIANS_NET_RDMA_INETADDRESS_H_
 #define ZILLIANS_NET_RDMA_INETADDRESS_H_
 
-#include "core-api/Prerequisite.h"
+#include "core/Prerequisite.h"
 #include <netinet/in.h>
 
 namespace zillians { namespace net { namespace rdma {

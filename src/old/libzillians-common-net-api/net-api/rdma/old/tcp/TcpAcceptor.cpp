@@ -17,8 +17,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "net-api/sys/tcp/TcpAcceptor.h"
-#include "net-api/sys/tcp/TcpNetEngine.h"
+#include "networking/sys/tcp/TcpAcceptor.h"
+#include "networking/sys/tcp/TcpNetEngine.h"
 
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -27,7 +27,7 @@
 namespace zillians { namespace net {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr TcpAcceptor::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.sys.tcp.TcpAcceptor"));
+log4cxx::LoggerPtr TcpAcceptor::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.sys.tcp.TcpAcceptor"));
 
 /////////////////////////////////ServerHandler/////////////////////////////////////////
 TcpAcceptor::TcpAcceptor(TcpNetEngine* engine)

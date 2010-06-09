@@ -164,7 +164,7 @@ void test_concurrent_queue_push_pop(int iterations)
 
 
 /*
-#include "core-api/ConcurrentQueue.h"
+#include "core/ConcurrentQueue.h"
 
 class test_my_concurrent_queue
 {

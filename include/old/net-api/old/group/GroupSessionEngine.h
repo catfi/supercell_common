@@ -22,11 +22,11 @@
 #ifndef GROUPSESSIONENGINE_H_
 #define GROUPSESSIONENGINE_H_
 
-#include "core-api/Types.h"
-#include "net-api/Address.h"
-#include "net-api/MessageDispatcher.h"
-#include "net-api/group/GroupSessionEventDispatcher.h"
-#include "net-api/Resolver.h"
+#include "core/Types.h"
+#include "networking/Address.h"
+#include "networking/MessageDispatcher.h"
+#include "networking/group/GroupSessionEventDispatcher.h"
+#include "networking/Resolver.h"
 
 namespace zillians {
 

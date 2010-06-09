@@ -22,11 +22,11 @@
 #ifndef QUEUEENGINE_H_
 #define QUEUEENGINE_H_
 
-#include "core-api/Types.h"
-#include "net-api/Address.h"
-#include "net-api/MessageDispatcher.h"
-#include "net-api/queue/QueueEventDispatcher.h"
-#include "net-api/Resolver.h"
+#include "core/Types.h"
+#include "networking/Address.h"
+#include "networking/MessageDispatcher.h"
+#include "networking/queue/QueueEventDispatcher.h"
+#include "networking/Resolver.h"
 
 namespace zillians {
 

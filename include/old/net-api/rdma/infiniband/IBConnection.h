@@ -20,14 +20,14 @@
 #ifndef ZILLIANS_NET_RDMA_IBCONNECTION_H_
 #define ZILLIANS_NET_RDMA_IBCONNECTION_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/Buffer.h"
-#include "core-api/HashMap.h"
-#include "core-api/ContextHub.h"
-#include "net-api/rdma/Poller.h"
-#include "net-api/rdma/infiniband/IBCommon.h"
-#include "net-api/rdma/infiniband/IBDeviceResource.h"
-#include "net-api/rdma/infiniband/IBFactory.h"
+#include "core/Prerequisite.h"
+#include "core/Buffer.h"
+#include "core/HashMap.h"
+#include "core/ContextHub.h"
+#include "networking/rdma/Poller.h"
+#include "networking/rdma/infiniband/IBCommon.h"
+#include "networking/rdma/infiniband/IBDeviceResource.h"
+#include "networking/rdma/infiniband/IBFactory.h"
 
 #include "tbb/atomic.h"
 #include "tbb/spin_mutex.h"

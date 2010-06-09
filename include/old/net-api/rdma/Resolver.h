@@ -20,8 +20,8 @@
 #ifndef ZILLIANS_NET_RDMA_RESOLVER_H_
 #define ZILLIANS_NET_RDMA_RESOLVER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/rdma/Address.h"
+#include "core/Prerequisite.h"
+#include "networking/rdma/Address.h"
 
 namespace zillians { namespace net { namespace rdma {
 

@@ -20,7 +20,7 @@
  * @date Sep 4, 2009 rocet - Initial version created.
  */
 
-#include "net-api/Channel.h"
+#include "networking/Channel.h"
 
 namespace zillians { namespace net {
 

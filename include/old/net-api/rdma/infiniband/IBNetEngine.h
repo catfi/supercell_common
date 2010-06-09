@@ -20,12 +20,12 @@
 #ifndef ZILLIANS_NET_RDMA_IBNETENGINE_H_
 #define ZILLIANS_NET_RDMA_IBNETENGINE_H_
 
-#include "net-api/rdma/RdmaNetEngineTemplate.h"
-#include "net-api/rdma/infiniband/IBCommon.h"
-#include "net-api/rdma/infiniband/IBConnection.h"
-#include "net-api/rdma/infiniband/IBConnector.h"
-#include "net-api/rdma/infiniband/IBAcceptor.h"
-#include "net-api/rdma/infiniband/IBDispatcher.h"
+#include "networking/rdma/RdmaNetEngineTemplate.h"
+#include "networking/rdma/infiniband/IBCommon.h"
+#include "networking/rdma/infiniband/IBConnection.h"
+#include "networking/rdma/infiniband/IBConnector.h"
+#include "networking/rdma/infiniband/IBAcceptor.h"
+#include "networking/rdma/infiniband/IBDispatcher.h"
 
 namespace zillians { namespace net { namespace rdma {
 

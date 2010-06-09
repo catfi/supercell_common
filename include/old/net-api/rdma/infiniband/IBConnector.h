@@ -20,12 +20,12 @@
 #ifndef ZILLIANS_NET_RDMA_IBCONNECTOR_H_
 #define ZILLIANS_NET_RDMA_IBCONNECTOR_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/HashMap.h"
-#include "net-api/rdma/Poller.h"
-#include "net-api/rdma/address/InetSocketAddress.h"
-#include "net-api/rdma/infiniband/IBCommon.h"
-#include "net-api/rdma/infiniband/IBConnection.h"
+#include "core/Prerequisite.h"
+#include "core/HashMap.h"
+#include "networking/rdma/Poller.h"
+#include "networking/rdma/address/InetSocketAddress.h"
+#include "networking/rdma/infiniband/IBCommon.h"
+#include "networking/rdma/infiniband/IBConnection.h"
 
 //using namespace std;
 using namespace zillians;

@@ -24,7 +24,7 @@
 #ifndef TCPCOMMON_H_
 #define TCPCOMMON_H_
 
-#include "core-api/Buffer.h"
+#include "core/Buffer.h"
 #include <sys/uio.h>
 
 //////////////////////////////////////////////////////////////////////////

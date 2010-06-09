@@ -31,7 +31,7 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <fcntl.h>
-#include "net-api/queue/impl/ev/modified/ev++.h"
-#include "core-api/Errno.h"
+#include "networking/queue/impl/ev/modified/ev++.h"
+#include "core/Errno.h"
 
 #endif /*LIBEVWRAPPER_H_*/

@@ -23,10 +23,10 @@
 #ifndef ZILLIANS_NET_RDMA_DISPATCHERTEMPLATE_H_
 #define ZILLIANS_NET_RDMA_DISPATCHERTEMPLATE_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/rdma/DataHandlerTemplate.h"
-#include "net-api/rdma/ConnectionHandlerTemplate.h"
-#include "net-api/rdma/CompletionHandlerTemplate.h"
+#include "core/Prerequisite.h"
+#include "networking/rdma/DataHandlerTemplate.h"
+#include "networking/rdma/ConnectionHandlerTemplate.h"
+#include "networking/rdma/CompletionHandlerTemplate.h"
 #include "tbb/spin_rw_mutex.h"
 
 using namespace zillians;
@@ -192,7 +192,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 template<class Connection, class DataHandler, class CompletionHandler, class ConnectionHandler>
-log4cxx::LoggerPtr DispatcherTemplate<Connection,DataHandler,CompletionHandler,ConnectionHandler>::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.sys.rdma.Dispatcher"));
+log4cxx::LoggerPtr DispatcherTemplate<Connection,DataHandler,CompletionHandler,ConnectionHandler>::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.sys.rdma.Dispatcher"));
 
 } } }
 

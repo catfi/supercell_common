@@ -22,7 +22,7 @@
 #ifndef LIBEVRESOLVER_H_
 #define LIBEVRESOLVER_H_
 
-#include "net-api/resolver/InetSocketResolver.h"
+#include "networking/resolver/InetSocketResolver.h"
 
 namespace zillians {
 

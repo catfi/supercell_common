@@ -22,9 +22,9 @@
 #ifndef CHANNEL_H_
 #define CHANNEL_H_
 
-#include "core-api/Types.h"
-#include "net-api/Address.h"
-#include "net-api/Message.h"
+#include "core/Types.h"
+#include "networking/Address.h"
+#include "networking/Message.h"
 
 namespace zillians {
 

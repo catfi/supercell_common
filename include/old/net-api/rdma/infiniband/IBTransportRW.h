@@ -23,7 +23,7 @@
 #ifndef ZILLIANS_NET_RDMA_IBTRANSPORTRW_H_
 #define ZILLIANS_NET_RDMA_IBTRANSPORTRW_H_
 
-#include "net-api/rdma/infiniband/IBTransport.h"
+#include "networking/rdma/infiniband/IBTransport.h"
 
 namespace zillians { namespace net { namespace rdma {
 

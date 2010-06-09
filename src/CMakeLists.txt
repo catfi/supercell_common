@@ -19,7 +19,7 @@
 # Contact Information: info@zillians.com
 #
 
-ADD_SUBDIRECTORY(libzillians-common-core-api)
+ADD_SUBDIRECTORY(libzillians-common-core)
 ADD_SUBDIRECTORY(libzillians-common-networking)
 ADD_SUBDIRECTORY(libzillians-common-networking-tcp)
 
@@ -31,4 +31,4 @@ IF(COROSYNC_FOUND)
     ADD_SUBDIRECTORY(libzillians-common-networking-cpg)
 ENDIF(COROSYNC_FOUND)
 
-ADD_SUBDIRECTORY(libzillians-common-util-api)
+ADD_SUBDIRECTORY(libzillians-common-utility)

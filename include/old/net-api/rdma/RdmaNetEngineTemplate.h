@@ -20,13 +20,13 @@
 #ifndef ZILLIANS_NET_RDMA_NETENGINETEMPLATE_H_
 #define ZILLIANS_NET_RDMA_NETENGINETEMPLATE_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/HashMap.h"
-#include "core-api/BufferManager.h"
-#include "net-api/rdma/Poller.h"
-#include "net-api/rdma/address/InetSocketAddress.h"
-#include "net-api/rdma/resolver/InetSocketResolver.h"
-#include "core-api/Future.h"
+#include "core/Prerequisite.h"
+#include "core/HashMap.h"
+#include "core/BufferManager.h"
+#include "networking/rdma/Poller.h"
+#include "networking/rdma/address/InetSocketAddress.h"
+#include "networking/rdma/resolver/InetSocketResolver.h"
+#include "core/Future.h"
 #include "tbb/spin_mutex.h"
 
 //using namespace std;
@@ -208,7 +208,7 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 template <class Connection, class Connector, class Acceptor, class Dispatcher>
-log4cxx::LoggerPtr RdmaNetEngineTemplate<Connection,Connector,Acceptor,Dispatcher>::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.sys.NetEngine"));
+log4cxx::LoggerPtr RdmaNetEngineTemplate<Connection,Connector,Acceptor,Dispatcher>::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.sys.NetEngine"));
 
 } } }
 

@@ -22,7 +22,7 @@
 #ifndef QUEUE_H_
 #define QUEUE_H_
 
-#include "net-api/Channel.h"
+#include "networking/Channel.h"
 
 namespace zillians {
 

@@ -19,8 +19,8 @@
 // Contact Information: info@0zillians.com
 //
 
-#include "net-api/queue/impl/ev/LibEvQueue.h"
-#include "net-api/queue/impl/ev/LibEvQueueEngine.h"
+#include "networking/queue/impl/ev/LibEvQueue.h"
+#include "networking/queue/impl/ev/LibEvQueueEngine.h"
 
 #define MESSAGE_HEADER_SIZE  (sizeof(int) + sizeof(uint))
 #define MESSAGE_TYPE(x)      (*(int*)((byte*)x + 0))
@@ -29,7 +29,7 @@
 namespace zillians {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr LibEvQueue::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.provider.ev.LibEvQueue"));
+log4cxx::LoggerPtr LibEvQueue::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.provider.ev.LibEvQueue"));
 
 //////////////////////////////////////////////////////////////////////////
 LibEvQueue::LibEvQueue(const handle_t &handle, const InetSocketAddress &address, LibEvNetEngine* ref)

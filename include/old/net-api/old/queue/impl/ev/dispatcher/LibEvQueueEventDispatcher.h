@@ -22,7 +22,7 @@
 #ifndef LIBEVQUEUEEVENTDISPATCHER_H_
 #define LIBEVQUEUEEVENTDISPATCHER_H_
 
-#include "net-api/queue/impl/shared/BasicQueueEventDispatcher.h"
+#include "networking/queue/impl/shared/BasicQueueEventDispatcher.h"
 
 namespace zillians {
 

@@ -22,9 +22,9 @@
 #ifndef MESSAGE_H_
 #define MESSAGE_H_
 
-#include "core-api/Types.h"
-#include "core-api/SharedCount.h"
-#include "core-api/ByteBuffer.h"
+#include "core/Types.h"
+#include "core/SharedCount.h"
+#include "core/ByteBuffer.h"
 #include <boost/shared_ptr.hpp>
 
 namespace zillians {

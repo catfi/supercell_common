@@ -22,8 +22,8 @@
 #ifndef MESSAGEFACTORY_H_
 #define MESSAGEFACTORY_H_
 
-#include "core-api/Types.h"
-#include "net-api/Message.h"
+#include "core/Types.h"
+#include "networking/Message.h"
 
 namespace zillians {
 

@@ -22,9 +22,9 @@
 #ifndef GROUPSESSIONEVENTDISPATCHER_H_
 #define GROUPSESSIONEVENTDISPATCHER_H_
 
-#include "core-api/Types.h"
-#include "net-api/group/GroupSession.h"
-#include "net-api/group/GroupSessionEventListener.h"
+#include "core/Types.h"
+#include "networking/group/GroupSession.h"
+#include "networking/group/GroupSessionEventListener.h"
 
 namespace zillians {
 

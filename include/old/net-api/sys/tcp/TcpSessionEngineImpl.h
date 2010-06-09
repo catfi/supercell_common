@@ -24,12 +24,12 @@
 #ifndef ZILLIANS_NET_SYS_TCPSESSIONENGINEIMPL_H_
 #define ZILLIANS_NET_SYS_TCPSESSIONENGINEIMPL_H_
 
-#include "core-api/Prerequisite.h"
-#include "util-api/StringUtil.h"
-#include "net-api/sys/SessionCommon.h"
-#include "net-api/sys/Session.h"
-#include "net-api/sys/Placeholders.h"
-#include "net-api/sys/Dispatcher.h"
+#include "core/Prerequisite.h"
+#include "utility/StringUtil.h"
+#include "networking/sys/SessionCommon.h"
+#include "networking/sys/Session.h"
+#include "networking/sys/Placeholders.h"
+#include "networking/sys/Dispatcher.h"
 
 namespace zillians { namespace net { namespace sys {
 

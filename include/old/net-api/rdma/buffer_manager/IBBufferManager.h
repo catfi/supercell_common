@@ -23,12 +23,12 @@
 #ifndef ZILLIANS_NET_RDMA_IBBUFFERMANAGER_H_
 #define ZILLIANS_NET_RDMA_IBBUFFERMANAGER_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/Singleton.h"
-#include "core-api/BufferManager.h"
-#include "core-api/ScalablePoolAllocator.h"
-#include "net-api/rdma/infiniband/IBDeviceResource.h"
-#include "net-api/rdma/infiniband/IBDeviceResourceManager.h"
+#include "core/Prerequisite.h"
+#include "core/Singleton.h"
+#include "core/BufferManager.h"
+#include "core/ScalablePoolAllocator.h"
+#include "networking/rdma/infiniband/IBDeviceResource.h"
+#include "networking/rdma/infiniband/IBDeviceResourceManager.h"
 
 using namespace zillians;
 

@@ -22,7 +22,7 @@
 #ifndef BASICQUEUEEVENTDISPATCHER_H_
 #define BASICQUEUEEVENTDISPATCHER_H_
 
-#include "net-api/queue/QueueEventDispatcher.h"
+#include "networking/queue/QueueEventDispatcher.h"
 #include <ext/hash_set>
 
 namespace zillians {

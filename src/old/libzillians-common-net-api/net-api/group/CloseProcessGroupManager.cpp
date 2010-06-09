@@ -20,7 +20,7 @@
  * @date Oct 8, 2009 sdk - Initial version created.
  */
 
-#include "net-api/group/CloseProcessGroupManager.h"
+#include "networking/group/CloseProcessGroupManager.h"
 #include <tbb/tbb_thread.h>
 
 namespace zillians { namespace net { namespace group {

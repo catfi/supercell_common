@@ -20,7 +20,7 @@
 //
 
 #include <stdlib.h>
-//#include "core-api/Types.h"
+//#include "core/Types.h"
 #include "boost/function.hpp"
 #include "boost/bind.hpp"
 #include "tbb/tick_count.h"

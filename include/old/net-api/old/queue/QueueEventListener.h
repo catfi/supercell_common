@@ -22,7 +22,7 @@
 #ifndef QUEUEEVENTLISTENER_H_
 #define QUEUEEVENTLISTENER_H_
 
-#include "net-api/queue/Queue.h"
+#include "networking/queue/Queue.h"
 
 namespace zillians {
 

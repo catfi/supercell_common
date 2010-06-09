@@ -23,8 +23,8 @@
 #ifndef ZILLIANS_NET_SCYLLANODEDB_H_
 #define ZILLIANS_NET_SCYLLANODEDB_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/scylla/ScyllaChannel.h"
+#include "core/Prerequisite.h"
+#include "networking/scylla/ScyllaChannel.h"
 #include <tbb/concurrent_hash_map.h>
 
 namespace zillians { namespace net {

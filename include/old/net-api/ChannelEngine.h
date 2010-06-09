@@ -23,8 +23,8 @@
 #ifndef ZILLIANS_NET_CHANNELENGINE_H_
 #define ZILLIANS_NET_CHANNELENGINE_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/Channel.h"
+#include "core/Prerequisite.h"
+#include "networking/Channel.h"
 
 namespace zillians { namespace net {
 

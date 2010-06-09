@@ -22,8 +22,8 @@
 #ifndef QUEUEENGINEFACTORY_H_
 #define QUEUEENGINEFACTORY_H_
 
-#include "core-api/Types.h"
-#include "net-api/queue/QueueEngine.h"
+#include "core/Types.h"
+#include "networking/queue/QueueEngine.h"
 
 namespace zillians {
 

@@ -22,11 +22,11 @@
 #ifndef BASICMESSAGEDISPATCHER_H_
 #define BASICMESSAGEDISPATCHER_H_
 
-#include "net-api/Message.h"
-#include "net-api/MessageDispatcher.h"
-#include "net-api/MessageFactory.h"
-#include "net-api/MessageHandler.h"
-#include "net-api/Channel.h"
+#include "networking/Message.h"
+#include "networking/MessageDispatcher.h"
+#include "networking/MessageFactory.h"
+#include "networking/MessageHandler.h"
+#include "networking/Channel.h"
 #include <ext/hash_map>
 
 namespace zillians {

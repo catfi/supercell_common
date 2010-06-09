@@ -25,7 +25,7 @@
 
 #include "protocol/TimeSynchronizationRequestMsg.h"
 #include "protocol/TimeSynchronizationResponseMsg.h"
-#include "net-api/sys/Placeholders.h"
+#include "networking/sys/Placeholders.h"
 #include <tbb/tick_count.h>
 #include <tbb/tbb_thread.h>
 #include <tbb/spin_rw_mutex.h>

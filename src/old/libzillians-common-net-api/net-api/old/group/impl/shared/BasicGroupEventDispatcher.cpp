@@ -19,7 +19,7 @@
 // Contact Information: info@zillians.com
 //
 
-#include "net-api/group/impl/BasicGroupEventDispatcher.h"
+#include "networking/group/impl/BasicGroupEventDispatcher.h"
 
 namespace zillians {
 

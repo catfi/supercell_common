@@ -20,7 +20,7 @@
  * @date Oct 8, 2009 sdk - Initial version created.
  */
 
-#include "net-api/group/ExtendedVirtualSynchrony.h"
+#include "networking/group/ExtendedVirtualSynchrony.h"
 
 namespace zillians { namespace net { namespace group {
 

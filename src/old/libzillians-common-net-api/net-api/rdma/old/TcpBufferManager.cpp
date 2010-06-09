@@ -20,12 +20,12 @@
  * @date May 21, 2009 sdk - Initial version created.
  */
 
-#include "net-api/sys/buffer_manager/TcpBufferManager.h"
+#include "networking/sys/buffer_manager/TcpBufferManager.h"
 
 namespace zillians { namespace net {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr TcpBufferManager::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.sys.buffermgr.TcpBufferManager"));
+log4cxx::LoggerPtr TcpBufferManager::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.sys.buffermgr.TcpBufferManager"));
 
 //////////////////////////////////////////////////////////////////////////
 TcpBufferManager::TcpBufferManager(size_t poolSize)

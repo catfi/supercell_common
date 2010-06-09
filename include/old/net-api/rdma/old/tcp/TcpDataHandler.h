@@ -23,9 +23,9 @@
 #ifndef TCPDATAHANDLER_H_
 #define TCPDATAHANDLER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/sys/DataHandlerTemplate.h"
-#include "net-api/sys/tcp/TcpConnection.h"
+#include "core/Prerequisite.h"
+#include "networking/sys/DataHandlerTemplate.h"
+#include "networking/sys/tcp/TcpConnection.h"
 
 namespace zillians { namespace net {
 

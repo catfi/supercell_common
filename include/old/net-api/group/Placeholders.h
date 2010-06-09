@@ -83,21 +83,21 @@ inline boost::arg<4> size()
 
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1400)
 
-static boost::arg<1>& source_ref = zillians::net::group::placeholders::detail::placeholder<1>::get();
-static boost::arg<2>& type = zillians::net::group::placeholders::detail::placeholder<2>::get();
-static boost::arg<2>& message_ref = zillians::net::group::placeholders::detail::placeholder<2>::get();
-static boost::arg<3>& buffer_ref = zillians::net::group::placeholders::detail::placeholder<3>::get();
-static boost::arg<4>& size = zillians::net::group::placeholders::detail::placeholder<4>::get();
+static boost::arg<1>& source_ref = zillians::networking::group::placeholders::detail::placeholder<1>::get();
+static boost::arg<2>& type = zillians::networking::group::placeholders::detail::placeholder<2>::get();
+static boost::arg<2>& message_ref = zillians::networking::group::placeholders::detail::placeholder<2>::get();
+static boost::arg<3>& buffer_ref = zillians::networking::group::placeholders::detail::placeholder<3>::get();
+static boost::arg<4>& size = zillians::networking::group::placeholders::detail::placeholder<4>::get();
 
 #else
 
 namespace
 {
-	boost::arg<1>& source_ref = zillians::net::group::placeholders::detail::placeholder<1>::get();
-	boost::arg<2>& type = zillians::net::group::placeholders::detail::placeholder<2>::get();
-	boost::arg<2>& message_ref = zillians::net::group::placeholders::detail::placeholder<2>::get();
-	boost::arg<3>& buffer_ref = zillians::net::group::placeholders::detail::placeholder<3>::get();
-	boost::arg<4>& size = zillians::net::group::placeholders::detail::placeholder<4>::get();
+	boost::arg<1>& source_ref = zillians::networking::group::placeholders::detail::placeholder<1>::get();
+	boost::arg<2>& type = zillians::networking::group::placeholders::detail::placeholder<2>::get();
+	boost::arg<2>& message_ref = zillians::networking::group::placeholders::detail::placeholder<2>::get();
+	boost::arg<3>& buffer_ref = zillians::networking::group::placeholders::detail::placeholder<3>::get();
+	boost::arg<4>& size = zillians::networking::group::placeholders::detail::placeholder<4>::get();
 } // namespace
 
 #endif
@@ -137,17 +137,17 @@ inline boost::arg<3> reason()
 
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1400)
 
-static boost::arg<1>& group_name = zillians::net::group::placeholders::detail::placeholder<1>::get();
-static boost::arg<2>& source_info = zillians::net::group::placeholders::detail::placeholder<2>::get();
-static boost::arg<3>& reason = zillians::net::group::placeholders::detail::placeholder<3>::get();
+static boost::arg<1>& group_name = zillians::networking::group::placeholders::detail::placeholder<1>::get();
+static boost::arg<2>& source_info = zillians::networking::group::placeholders::detail::placeholder<2>::get();
+static boost::arg<3>& reason = zillians::networking::group::placeholders::detail::placeholder<3>::get();
 
 #else
 
 namespace
 {
-	boost::arg<1>& group_name = zillians::net::group::placeholders::detail::placeholder<1>::get();
-	boost::arg<2>& source_info = zillians::net::group::placeholders::detail::placeholder<2>::get();
-	boost::arg<3>& reason = zillians::net::group::placeholders::detail::placeholder<3>:get();
+	boost::arg<1>& group_name = zillians::networking::group::placeholders::detail::placeholder<1>::get();
+	boost::arg<2>& source_info = zillians::networking::group::placeholders::detail::placeholder<2>::get();
+	boost::arg<3>& reason = zillians::networking::group::placeholders::detail::placeholder<3>:get();
 } // namespace
 
 #endif

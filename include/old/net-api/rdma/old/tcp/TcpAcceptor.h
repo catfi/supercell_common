@@ -20,11 +20,11 @@
 #ifndef TCPACCEPTOR_H_
 #define TCPACCEPTOR_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/sys/Poller.h"
-#include "net-api/sys/address/InetSocketAddress.h"
-#include "net-api/sys/tcp/TcpCommon.h"
-#include "net-api/sys/tcp/TcpConnection.h"
+#include "core/Prerequisite.h"
+#include "networking/sys/Poller.h"
+#include "networking/sys/address/InetSocketAddress.h"
+#include "networking/sys/tcp/TcpCommon.h"
+#include "networking/sys/tcp/TcpConnection.h"
 
 using namespace std;
 using namespace zillians;

@@ -23,11 +23,11 @@
 #ifndef ZILLIANS_NET_SYS_SESSIONENGINE_H_
 #define ZILLIANS_NET_SYS_SESSIONENGINE_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/sys/SessionCommon.h"
-#include "net-api/sys/Session.h"
-#include "net-api/sys/Placeholders.h"
-#include "net-api/sys/Dispatcher.h"
+#include "core/Prerequisite.h"
+#include "networking/sys/SessionCommon.h"
+#include "networking/sys/Session.h"
+#include "networking/sys/Placeholders.h"
+#include "networking/sys/Dispatcher.h"
 
 namespace zillians { namespace net { namespace sys {
 
@@ -40,6 +40,6 @@ class SessionEngineT;
 } } }
 
 // include implementations here
-#include "net-api/sys/tcp/TcpSessionEngineImpl.h"
+#include "networking/sys/tcp/TcpSessionEngineImpl.h"
 
 #endif/*ZILLIANS_NET_SYS_SESSIONENGINE_H_*/

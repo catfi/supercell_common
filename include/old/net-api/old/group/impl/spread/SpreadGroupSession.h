@@ -22,7 +22,7 @@
 #ifndef SPREADGROUPSESSION_H_
 #define SPREADGROUPSESSION_H_
 
-#include "net-api/group/GroupSession.h"
+#include "networking/group/GroupSession.h"
 
 namespace zillians {
 

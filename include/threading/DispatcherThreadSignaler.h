@@ -23,9 +23,9 @@
 #ifndef ZILLIANS_DISPATCHER_DISPATCHERTHREADSIGNALER_H_
 #define ZILLIANS_DISPATCHER_DISPATCHERTHREADSIGNALER_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/Semaphore.h"
-#include "core-api/Atomic.h"
+#include "core/Prerequisite.h"
+#include "core/Semaphore.h"
+#include "core/Atomic.h"
 
 namespace zillians { namespace threading {
 

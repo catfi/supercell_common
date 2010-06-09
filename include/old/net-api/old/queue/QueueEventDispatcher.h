@@ -22,9 +22,9 @@
 #ifndef QUEUEEVENTDISPATCHER_H_
 #define QUEUEEVENTDISPATCHER_H_
 
-#include "core-api/Types.h"
-#include "net-api/queue/Queue.h"
-#include "net-api/queue/QueueEventListener.h"
+#include "core/Types.h"
+#include "networking/queue/Queue.h"
+#include "networking/queue/QueueEventListener.h"
 
 namespace zillians {
 

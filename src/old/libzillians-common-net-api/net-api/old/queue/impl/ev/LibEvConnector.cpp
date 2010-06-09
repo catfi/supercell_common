@@ -19,13 +19,13 @@
 // Contact Information: info@zillians.com
 //
 
-#include "net-api/queue/impl/ev/LibEvConnector.h"
-#include "net-api/queue/impl/ev/LibEvNetEngine.h"
+#include "networking/queue/impl/ev/LibEvConnector.h"
+#include "networking/queue/impl/ev/LibEvNetEngine.h"
 
 namespace zillians {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr LibEvConnector::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.queue.impl.ev.LibEvConnector"));
+log4cxx::LoggerPtr LibEvConnector::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.queue.impl.ev.LibEvConnector"));
 
 //////////////////////////////////////////////////////////////////////////
 LibEvConnector::LibEvConnector(LibEvQueueEngine* ref)

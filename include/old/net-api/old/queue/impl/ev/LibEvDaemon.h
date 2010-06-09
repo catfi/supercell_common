@@ -22,9 +22,9 @@
 #ifndef LIBEVDAEMON_H_
 #define LIBEVDAEMON_H_
 
-#include "core-api/Types.h"
-#include "net-api/queue/impl/ev/LibEvWrapper.h"
-#include "net-api/queue/impl/ev/LibEvProcessor.h"
+#include "core/Types.h"
+#include "networking/queue/impl/ev/LibEvWrapper.h"
+#include "networking/queue/impl/ev/LibEvProcessor.h"
 
 namespace zillians {
 

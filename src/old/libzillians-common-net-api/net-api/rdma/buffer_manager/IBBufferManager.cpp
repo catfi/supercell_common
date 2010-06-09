@@ -20,12 +20,12 @@
  * @date Feb 16, 2009 sdk - Initial version created.
  */
 
-#include "net-api/rdma/buffer_manager/IBBufferManager.h"
+#include "networking/rdma/buffer_manager/IBBufferManager.h"
 
 namespace zillians { namespace net { namespace rdma {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr IBBufferManager::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.rdma.buffermgr.IBBufferManager"));
+log4cxx::LoggerPtr IBBufferManager::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.rdma.buffermgr.IBBufferManager"));
 
 //////////////////////////////////////////////////////////////////////////
 IBBufferManager::IBBufferManager(size_t poolSize)

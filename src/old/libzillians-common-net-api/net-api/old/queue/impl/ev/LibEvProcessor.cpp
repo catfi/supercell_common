@@ -19,12 +19,12 @@
 // Contact Information: info@zillians.com
 //
 
-#include "net-api/queue/impl/ev/LibEvProcessor.h"
+#include "networking/queue/impl/ev/LibEvProcessor.h"
 
 namespace zillians {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr LibEvProcessor::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.provider.ev.LibEvProcessor"));
+log4cxx::LoggerPtr LibEvProcessor::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.provider.ev.LibEvProcessor"));
 
 //////////////////////////////////////////////////////////////////////////
 LibEvProcessor::LibEvProcessor(const ev::loop_ref &loop) : mLoop(loop)

@@ -68,15 +68,15 @@ inline boost::arg<2> byte_transferred()
 
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1400)
 
-static boost::arg<1>& error = zillians::net::sys::placeholders::detail::placeholder<1>::get();
-static boost::arg<2>& byte_transferred = zillians::net::sys::placeholders::detail::placeholder<2>::get();
+static boost::arg<1>& error = zillians::networking::sys::placeholders::detail::placeholder<1>::get();
+static boost::arg<2>& byte_transferred = zillians::networking::sys::placeholders::detail::placeholder<2>::get();
 
 #else
 
 namespace
 {
-	boost::arg<1>& error = zillians::net::sys::placeholders::detail::placeholder<1>::get();
-	boost::arg<2>& byte_transferred = zillians::net::sys::placeholders::detail::placeholder<2>::get();
+	boost::arg<1>& error = zillians::networking::sys::placeholders::detail::placeholder<1>::get();
+	boost::arg<2>& byte_transferred = zillians::networking::sys::placeholders::detail::placeholder<2>::get();
 } // namespace
 
 #endif
@@ -138,29 +138,29 @@ inline boost::arg<2> error()
 
 #if BOOST_WORKAROUND(BOOST_MSVC, < 1400)
 
-static boost::arg<1>& source_ref = zillians::net::sys::placeholders::detail::placeholder<1>::get();
+static boost::arg<1>& source_ref = zillians::networking::sys::placeholders::detail::placeholder<1>::get();
 
-static boost::arg<2>& message_ref = zillians::net::sys::placeholders::detail::placeholder<2>::get();
+static boost::arg<2>& message_ref = zillians::networking::sys::placeholders::detail::placeholder<2>::get();
 
-static boost::arg<2>& type = zillians::net::sys::placeholders::detail::placeholder<2>::get();
-static boost::arg<3>& buffer_ref = zillians::net::sys::placeholders::detail::placeholder<3>::get();
-static boost::arg<3>& size = zillians::net::sys::placeholders::detail::placeholder<4>::get();
+static boost::arg<2>& type = zillians::networking::sys::placeholders::detail::placeholder<2>::get();
+static boost::arg<3>& buffer_ref = zillians::networking::sys::placeholders::detail::placeholder<3>::get();
+static boost::arg<3>& size = zillians::networking::sys::placeholders::detail::placeholder<4>::get();
 
-static boost::arg<2>& error = zillians::net::sys::placeholders::detail::placeholder<2>::get();
+static boost::arg<2>& error = zillians::networking::sys::placeholders::detail::placeholder<2>::get();
 
 #else
 
 namespace
 {
-	boost::arg<1>& source_ref = zillians::net::sys::placeholders::detail::placeholder<1>::get();
+	boost::arg<1>& source_ref = zillians::networking::sys::placeholders::detail::placeholder<1>::get();
 
-	boost::arg<2>& message_ref = zillians::net::sys::placeholders::detail::placeholder<2>::get();
+	boost::arg<2>& message_ref = zillians::networking::sys::placeholders::detail::placeholder<2>::get();
 
-	boost::arg<2>& type = zillians::net::sys::placeholders::detail::placeholder<2>::get();
-	boost::arg<3>& buffer_ref = zillians::net::sys::placeholders::detail::placeholder<3>::get();
-	boost::arg<4>& size = zillians::net::sys::placeholders::detail::placeholder<4>::get();
+	boost::arg<2>& type = zillians::networking::sys::placeholders::detail::placeholder<2>::get();
+	boost::arg<3>& buffer_ref = zillians::networking::sys::placeholders::detail::placeholder<3>::get();
+	boost::arg<4>& size = zillians::networking::sys::placeholders::detail::placeholder<4>::get();
 
-	boost::arg<2>& error = zillians::net::sys::placeholders::detail::placeholder<2>::get();
+	boost::arg<2>& error = zillians::networking::sys::placeholders::detail::placeholder<2>::get();
 } // namespace
 
 #endif

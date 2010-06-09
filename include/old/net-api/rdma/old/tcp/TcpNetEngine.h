@@ -20,11 +20,11 @@
 #ifndef TCPNETENGINE_H_
 #define TCPNETENGINE_H_
 
-#include "net-api/sys/NetEngineTemplate.h"
-#include "net-api/sys/tcp/TcpConnection.h"
-#include "net-api/sys/tcp/TcpConnector.h"
-#include "net-api/sys/tcp/TcpAcceptor.h"
-#include "net-api/sys/tcp/TcpDispatcher.h"
+#include "networking/sys/NetEngineTemplate.h"
+#include "networking/sys/tcp/TcpConnection.h"
+#include "networking/sys/tcp/TcpConnector.h"
+#include "networking/sys/tcp/TcpAcceptor.h"
+#include "networking/sys/tcp/TcpDispatcher.h"
 
 namespace zillians { namespace net {
 

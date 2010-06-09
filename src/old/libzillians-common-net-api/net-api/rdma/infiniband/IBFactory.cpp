@@ -17,7 +17,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "net-api/rdma/infiniband/IBFactory.h"
+#include "networking/rdma/infiniband/IBFactory.h"
 #include <fcntl.h>
 
 extern "C" struct ibv_mr* zillians_ibv_reg_mr(struct ibv_pd* pd, void* addr, size_t length);
@@ -26,7 +26,7 @@ extern "C" int zillians_ibv_dereg_mr(struct ibv_mr* pd);
 namespace zillians { namespace net { namespace rdma {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr IBFactory::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.rdma.infiniband.IBFactory"));
+log4cxx::LoggerPtr IBFactory::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.rdma.infiniband.IBFactory"));
 
 //////////////////////////////////////////////////////////////////////////
 IBFactory::IBFactory()

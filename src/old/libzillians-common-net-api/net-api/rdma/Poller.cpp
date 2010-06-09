@@ -17,12 +17,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "net-api/rdma/Poller.h"
+#include "networking/rdma/Poller.h"
 
 namespace zillians { namespace net { namespace rdma {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr Poller::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.sys.Poller"));
+log4cxx::LoggerPtr Poller::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.sys.Poller"));
 
 //////////////////////////////////////////////////////////////////////////
 Poller::Poller(const ev::loop_ref &loop) : mLoop(loop)

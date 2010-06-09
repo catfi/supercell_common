@@ -21,9 +21,9 @@
 
 #include "LibEvQueueEngine.h"
 
-#include "net-api/queue/impl/ev/LibEvNetEngine.h"
-#include "net-api/address/InetAddress.h"
-#include "net-api/address/InetSocketAddress.h"
+#include "networking/queue/impl/ev/LibEvNetEngine.h"
+#include "networking/address/InetAddress.h"
+#include "networking/address/InetSocketAddress.h"
 
 namespace zillians {
 

@@ -23,12 +23,12 @@
 #ifndef ZILLIANS_NET_SCYLLACHANNEL_H_
 #define ZILLIANS_NET_SCYLLACHANNEL_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/BufferManager.h"
-#include "core-api/ConditionVariable.h"
-#include "core-api/Worker.h"
-#include "net-api/Channel.h"
-#include "net-api/group/CloseProcessGroup.h"
+#include "core/Prerequisite.h"
+#include "core/BufferManager.h"
+#include "core/ConditionVariable.h"
+#include "core/Worker.h"
+#include "networking/Channel.h"
+#include "networking/group/CloseProcessGroup.h"
 
 #define SCYLLACHANNEL_CVARRAY_SIZE	5000
 

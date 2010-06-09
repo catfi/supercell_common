@@ -22,16 +22,16 @@
 #ifndef LIBEVQUEUEENGINE_H_
 #define LIBEVQUEUEENGINE_H_
 
-#include "net-api/Address.h"
-#include "net-api/queue/QueueEngine.h"
-#include "net-api/queue/impl/ev/LibEvQueue.h"
-#include "net-api/queue/impl/ev/LibEvAcceptor.h"
-#include "net-api/queue/impl/ev/LibEvConnector.h"
-#include "net-api/address/InetSocketAddress.h"
-#include "net-api/queue/impl/ev/LibEvDaemon.h"
-#include "net-api/queue/impl/ev/LibEvResolver.h"
-#include "net-api/queue/impl/ev/dispatcher/LibEvMessageDispatcher.h"
-#include "net-api/queue/impl/ev/dispatcher/LibEvQueueEventDispatcher.h"
+#include "networking/Address.h"
+#include "networking/queue/QueueEngine.h"
+#include "networking/queue/impl/ev/LibEvQueue.h"
+#include "networking/queue/impl/ev/LibEvAcceptor.h"
+#include "networking/queue/impl/ev/LibEvConnector.h"
+#include "networking/address/InetSocketAddress.h"
+#include "networking/queue/impl/ev/LibEvDaemon.h"
+#include "networking/queue/impl/ev/LibEvResolver.h"
+#include "networking/queue/impl/ev/dispatcher/LibEvMessageDispatcher.h"
+#include "networking/queue/impl/ev/dispatcher/LibEvQueueEventDispatcher.h"
 #include <ext/hash_map>
 
 namespace zillians {

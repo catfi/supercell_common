@@ -21,7 +21,7 @@
  */
 
 
-#include "core-api/Prerequisite.h"
+#include "core/Prerequisite.h"
 #include "threading/Dispatcher.h"
 #include "threading/DispatcherThreadContext.h"
 #include "threading/DispatcherDestination.h"
@@ -64,9 +64,9 @@ void reader_thread(shared_ptr<DispatcherThreadContext<Message> > dt, uint32 sour
 	for(int i=0;i<ITERATIONS;++i)
 	{
 		Message m;
-		while(!dt->read(source, m));
+		while(!dt->read(source, m)) { }
 
-		BOOST_ASSERT(m->count == i);
+		BOOST_ASSERT(m.count == i);
 	}
 }
 
@@ -84,12 +84,12 @@ void writer_reader_thread(shared_ptr<DispatcherThreadContext<Message> > dt, std:
 
 	for(int i=0;i<destinations.size() * ITERATIONS;++i)
 	{
-		for(int i=0;i<ITERATIONS;++i)
+		for(uint32 i=0;i<ITERATIONS;++i)
 		{
 			uint32 source;
 			while(!dt->read(source, m));
 
-			BOOST_ASSERT(m->count == 1);
+			BOOST_ASSERT(m.count == 1);
 		}
 	}
 }

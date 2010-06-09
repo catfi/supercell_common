@@ -23,9 +23,9 @@
 #ifndef ZILLIANS_THREADING_DISPATCHER_H_
 #define ZILLIANS_THREADING_DISPATCHER_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/Semaphore.h"
-#include "core-api/AtomicQueue.h"
+#include "core/Prerequisite.h"
+#include "core/Semaphore.h"
+#include "core/AtomicQueue.h"
 #include "threading/DispatcherThreadContext.h"
 #include "threading/DispatcherNetwork.h"
 
@@ -49,13 +49,13 @@ public:
 		*mSignalers = new DispatcherThreadSignaler[max_dispatcher_threads];
 		mAttachedFlags = new bool[mMaxThreadContextCount];
 
-		for(int i = 0; i < mMaxThreadContextCount; ++i)
+		for(uint32 i = 0; i < mMaxThreadContextCount; ++i)
 		{
 			mSignalers[i] = NULL;
 			mAttachedFlags[i] = false;
 		}
 
-		for(int i = 0; i < mMaxThreadContextCount * mMaxThreadContextCount; ++i)
+		for(uint32 i = 0; i < mMaxThreadContextCount * mMaxThreadContextCount; ++i)
 		{
 			mPipes[i] = new ContextPipe();
 		}
@@ -76,7 +76,7 @@ public:
 	shared_ptr<DispatcherThreadContext<Message> > createThreadContext()
 	{
 		int contextId = -1;
-		for(int i = 0; i < mMaxThreadContextCount; ++i)
+		for(uint32 i = 0; i < mMaxThreadContextCount; ++i)
 		{
 			if(!mAttachedFlags[i])
 			{

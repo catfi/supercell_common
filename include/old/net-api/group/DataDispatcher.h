@@ -23,9 +23,9 @@
 #ifndef ZILLIANS_NET_GROUP_DATADISPATCHER_H_
 #define ZILLIANS_NET_GROUP_DATADISPATCHER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/group/Placeholders.h"
-#include "core-api/Buffer.h"
+#include "core/Prerequisite.h"
+#include "networking/group/Placeholders.h"
+#include "core/Buffer.h"
 
 namespace zillians { namespace net { namespace group {
 

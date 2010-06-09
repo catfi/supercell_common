@@ -20,7 +20,7 @@
  * @date Jul 22, 2009 sdk - Initial version created.
  */
 
-#include "net-api/sys/Session.h"
+#include "networking/sys/Session.h"
 
 namespace zillians { namespace net { namespace sys {
 

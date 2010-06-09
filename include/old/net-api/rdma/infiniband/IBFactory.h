@@ -20,8 +20,8 @@
 #ifndef ZILLIANS_NET_RDMA_IBFACTORY_H_
 #define ZILLIANS_NET_RDMA_IBFACTORY_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/rdma/infiniband/IBCommon.h"
+#include "core/Prerequisite.h"
+#include "networking/rdma/infiniband/IBCommon.h"
 
 namespace zillians { namespace net { namespace rdma {
 

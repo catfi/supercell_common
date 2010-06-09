@@ -23,9 +23,9 @@
 #ifndef TCPCOMPLETIONHANDLER_H_
 #define TCPCOMPLETIONHANDLER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/sys/CompletionHandlerTemplate.h"
-#include "net-api/sys/tcp/TcpConnection.h"
+#include "core/Prerequisite.h"
+#include "networking/sys/CompletionHandlerTemplate.h"
+#include "networking/sys/tcp/TcpConnection.h"
 
 namespace zillians { namespace net {
 

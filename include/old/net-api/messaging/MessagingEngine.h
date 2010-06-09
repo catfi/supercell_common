@@ -23,16 +23,16 @@
 #ifndef ZILLIANS_MESSAGING_MESSAGINGENGINE_H_
 #define ZILLIANS_MESSAGING_MESSAGINGENGINE_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/rdma/infiniband/IBDeviceResourceManager.h"
-#include "net-api/rdma/infiniband/IBNetEngine.h"
-#include "net-api/rdma/infiniband/IBDispatcher.h"
-#include "net-api/rdma/buffer_manager/IBBufferManager.h"
-#include "net-api/rdma/Poller.h"
-#include "net-api/messaging/ControlHandler.h"
+#include "core/Prerequisite.h"
+#include "networking/rdma/infiniband/IBDeviceResourceManager.h"
+#include "networking/rdma/infiniband/IBNetEngine.h"
+#include "networking/rdma/infiniband/IBDispatcher.h"
+#include "networking/rdma/buffer_manager/IBBufferManager.h"
+#include "networking/rdma/Poller.h"
+#include "networking/messaging/ControlHandler.h"
 #include <ext/hash_map>
 
-using namespace zillians::net::rdma;
+using namespace zillians::networking::rdma;
 using namespace __gnu_cxx;
 
 namespace zillians { namespace messaging {

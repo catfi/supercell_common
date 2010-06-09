@@ -23,15 +23,15 @@
 #ifndef ZILLIANS_NET_SCYLLACHANNELENGINE_H_
 #define ZILLIANS_NET_SCYLLACHANNELENGINE_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/BufferManager.h"
-#include "core-api/Worker.h"
-#include "net-api/ChannelEngine.h"
-#include "net-api/scylla/ScyllaNodeDB.h"
-#include "net-api/scylla/ScyllaAckMessage.h"
-#include "net-api/scylla/ScyllaHelloMessage.h"
-#include "net-api/group/CloseProcessGroup.h"
-#include "net-api/group/CloseProcessGroupManager.h"
+#include "core/Prerequisite.h"
+#include "core/BufferManager.h"
+#include "core/Worker.h"
+#include "networking/ChannelEngine.h"
+#include "networking/scylla/ScyllaNodeDB.h"
+#include "networking/scylla/ScyllaAckMessage.h"
+#include "networking/scylla/ScyllaHelloMessage.h"
+#include "networking/group/CloseProcessGroup.h"
+#include "networking/group/CloseProcessGroupManager.h"
 #include <tbb/tbb_thread.h>
 #include <tbb/concurrent_hash_map.h>
 

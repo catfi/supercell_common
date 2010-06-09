@@ -24,12 +24,12 @@
 #ifndef TCPDISPATCHER_H_
 #define TCPDISPATCHER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/sys/DispatcherTemplate.h"
-#include "net-api/sys/tcp/TcpConnection.h"
-#include "net-api/sys/tcp/TcpDataHandler.h"
-#include "net-api/sys/tcp/TcpCompletionHandler.h"
-#include "net-api/sys/tcp/TcpConnectionHandler.h"
+#include "core/Prerequisite.h"
+#include "networking/sys/DispatcherTemplate.h"
+#include "networking/sys/tcp/TcpConnection.h"
+#include "networking/sys/tcp/TcpDataHandler.h"
+#include "networking/sys/tcp/TcpCompletionHandler.h"
+#include "networking/sys/tcp/TcpConnectionHandler.h"
 
 namespace zillians { namespace net {
 

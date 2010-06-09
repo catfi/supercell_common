@@ -22,13 +22,13 @@
 #ifndef LIBEVQUEUE_H_
 #define LIBEVQUEUE_H_
 
-#include "core-api/ByteBuffer.h"
-#include "core-api/Callback.h"
-#include "net-api/Message.h"
-#include "net-api/queue/Queue.h"
-#include "net-api/queue/QueueEngine.h"
-#include "net-api/address/InetSocketAddress.h"
-#include "net-api/queue/impl/ev/LibEvWrapper.h"
+#include "core/ByteBuffer.h"
+#include "core/Callback.h"
+#include "networking/Message.h"
+#include "networking/queue/Queue.h"
+#include "networking/queue/QueueEngine.h"
+#include "networking/address/InetSocketAddress.h"
+#include "networking/queue/impl/ev/LibEvWrapper.h"
 #include "tbb/concurrent_queue.h"
 #include "tbb/spin_mutex.h"
 

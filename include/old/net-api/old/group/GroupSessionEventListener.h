@@ -22,7 +22,7 @@
 #ifndef GROUPSESSIONEVENTLISTENER_H_
 #define GROUPSESSIONEVENTLISTENER_H_
 
-#include "core-api/Types.h"
+#include "core/Types.h"
 
 namespace zillians {
 

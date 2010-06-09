@@ -20,9 +20,9 @@
  * @date Jul 3, 2009 sdk - Initial version created.
  */
 
-#include "net-api/scylla/ScyllaNodeDB.h"
+#include "networking/scylla/ScyllaNodeDB.h"
 
-using namespace zillians::net::group;
+using namespace zillians::networking::group;
 
 namespace zillians { namespace net {
 

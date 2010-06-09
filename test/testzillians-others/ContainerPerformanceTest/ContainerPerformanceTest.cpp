@@ -21,7 +21,7 @@
 
 #define TEST_STLPORT 0
 
-#include "core-api/Types.h"
+#include "core/Types.h"
 
 #if TEST_STLPORT
 	#include "STLPortContainerPerformance.h"

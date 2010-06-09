@@ -23,9 +23,9 @@
 #ifndef TCPCONNECTIONHANDLER_H_
 #define TCPCONNECTIONHANDLER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/sys/ConnectionHandlerTemplate.h"
-#include "net-api/sys/tcp/TcpConnection.h"
+#include "core/Prerequisite.h"
+#include "networking/sys/ConnectionHandlerTemplate.h"
+#include "networking/sys/tcp/TcpConnection.h"
 
 namespace zillians { namespace net {
 

@@ -23,8 +23,8 @@
 #ifndef ZILLIANS_NET_GROUP_CLOSEPROCESSGROUPMANAGER_H_
 #define ZILLIANS_NET_GROUP_CLOSEPROCESSGROUPMANAGER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/group/CloseProcessGroup.h"
+#include "core/Prerequisite.h"
+#include "networking/group/CloseProcessGroup.h"
 #include <boost/tr1/unordered_set.hpp>
 #include <tbb/queuing_rw_mutex.h>
 #include <tbb/atomic.h>

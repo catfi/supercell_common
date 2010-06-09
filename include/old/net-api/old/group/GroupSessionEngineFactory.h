@@ -22,8 +22,8 @@
 #ifndef GROUPSESSIONENGINEFACTORY_H_
 #define GROUPSESSIONENGINEFACTORY_H_
 
-#include "core-api/Types.h"
-#include "net-api/group/GroupSessionEngine.h"
+#include "core/Types.h"
+#include "networking/group/GroupSessionEngine.h"
 
 namespace zillians {
 

@@ -17,8 +17,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "net-api/sys/tcp/TcpConnector.h"
-#include "net-api/sys/tcp/TcpNetEngine.h"
+#include "networking/sys/tcp/TcpConnector.h"
+#include "networking/sys/tcp/TcpNetEngine.h"
 
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -27,7 +27,7 @@
 namespace zillians { namespace net {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr TcpConnector::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.sys.tcp.TcpConnector"));
+log4cxx::LoggerPtr TcpConnector::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.sys.tcp.TcpConnector"));
 
 //////////////////////////////////////////////////////////////////////////
 TcpConnector::TcpConnector(TcpNetEngine* engine) : mEngine(engine)

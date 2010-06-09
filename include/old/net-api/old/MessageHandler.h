@@ -22,9 +22,9 @@
 #ifndef MESSAGEHANDLER_H_
 #define MESSAGEHANDLER_H_
 
-#include "core-api/Types.h"
-#include "net-api/Channel.h"
-#include "net-api/Message.h"
+#include "core/Types.h"
+#include "networking/Channel.h"
+#include "networking/Message.h"
 
 namespace zillians {
 

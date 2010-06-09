@@ -9,8 +9,8 @@
 #include "tbb/tbb_thread.h"
 #include <boost/bind.hpp>
 
-//#include <core-api/SharedCount.h>
-//#include <core-api/ObjectPool.h>
+//#include <core/SharedCount.h>
+//#include <core/ObjectPool.h>
 
 //using namespace zillians;
 

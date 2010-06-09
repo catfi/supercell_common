@@ -22,9 +22,9 @@
 #ifndef LIBEVPROCESSOR_H_
 #define LIBEVPROCESSOR_H_
 
-#include "core-api/Types.h"
-#include "core-api/Callback.h"
-#include "net-api/queue/impl/ev/LibEvWrapper.h"
+#include "core/Types.h"
+#include "core/Callback.h"
+#include "networking/queue/impl/ev/LibEvWrapper.h"
 #include "tbb/concurrent_queue.h"
 #include "boost/function.hpp"
 

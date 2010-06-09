@@ -19,12 +19,12 @@
 // Contact Information: info@zillians.com
 //
 
-#include "net-api/dispatcher/BasicMessageDispatcher.h"
+#include "networking/dispatcher/BasicMessageDispatcher.h"
 
 namespace zillians {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr BasicMessageDispatcher::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.provider.shared.BasicMessageDispatcher"));
+log4cxx::LoggerPtr BasicMessageDispatcher::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.provider.shared.BasicMessageDispatcher"));
 
 //////////////////////////////////////////////////////////////////////////
 BasicMessageDispatcher::BasicMessageDispatcher()

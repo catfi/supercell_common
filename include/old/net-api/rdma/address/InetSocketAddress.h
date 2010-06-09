@@ -20,9 +20,9 @@
 #ifndef ZILLIANS_NET_RDMA_INETSOCKETADDRESS_H_
 #define ZILLIANS_NET_RDMA_INETSOCKETADDRESS_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/rdma/Address.h"
-#include "net-api/rdma/address/InetAddress.h"
+#include "core/Prerequisite.h"
+#include "networking/rdma/Address.h"
+#include "networking/rdma/address/InetAddress.h"
 #include <sys/socket.h>
 
 namespace zillians { namespace net { namespace rdma {

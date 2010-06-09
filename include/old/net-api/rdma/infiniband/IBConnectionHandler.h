@@ -23,9 +23,9 @@
 #ifndef ZILLIANS_NET_RDMA_IBCONNECTIONHANDLER_H_
 #define ZILLIANS_NET_RDMA_IBCONNECTIONHANDLER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/rdma/ConnectionHandlerTemplate.h"
-#include "net-api/rdma/infiniband/IBConnection.h"
+#include "core/Prerequisite.h"
+#include "networking/rdma/ConnectionHandlerTemplate.h"
+#include "networking/rdma/infiniband/IBConnection.h"
 
 namespace zillians { namespace net { namespace rdma {
 

@@ -17,8 +17,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "net-api/sys/tcp/TcpConnection.h"
-#include "net-api/sys/tcp/TcpNetEngine.h"
+#include "networking/sys/tcp/TcpConnection.h"
+#include "networking/sys/tcp/TcpNetEngine.h"
 
 namespace zillians { namespace net {
 
@@ -27,7 +27,7 @@ namespace zillians { namespace net {
 #define BUFFER_HEADER_LENGTH(x)    (*(uint32*)((byte*)x + sizeof(uint32)))
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr TcpConnection::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.sys.tcp.TcpConnection"));
+log4cxx::LoggerPtr TcpConnection::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.sys.tcp.TcpConnection"));
 
 //////////////////////////////////////////////////////////////////////////
 TcpConnection::TcpConnection(TcpNetEngine* engine, handle_t id)

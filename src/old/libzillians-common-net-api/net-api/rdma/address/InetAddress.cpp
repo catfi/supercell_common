@@ -17,7 +17,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "net-api/rdma/address/InetAddress.h"
+#include "networking/rdma/address/InetAddress.h"
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>

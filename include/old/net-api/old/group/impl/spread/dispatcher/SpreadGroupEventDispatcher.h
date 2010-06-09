@@ -22,7 +22,7 @@
 #ifndef SPREADGROUPEVENTDISPATCHER_H_
 #define SPREADGROUPEVENTDISPATCHER_H_
 
-#include "net-api/group/impl/shared/BasicGroupEventDispatcher.h"
+#include "networking/group/impl/shared/BasicGroupEventDispatcher.h"
 
 namespace zillians {
 

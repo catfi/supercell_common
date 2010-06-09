@@ -23,7 +23,7 @@
 #ifndef ZILLIANS_NET_SYS_TCPSESSIONIMPL_H_
 #define ZILLIANS_NET_SYS_TCPSESSIONIMPL_H_
 
-#include "core-api/Prerequisite.h"
+#include "core/Prerequisite.h"
 #include <boost/asio.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/function.hpp>

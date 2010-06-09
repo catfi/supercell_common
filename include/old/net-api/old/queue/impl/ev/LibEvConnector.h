@@ -22,9 +22,9 @@
 #ifndef LIBEVCONNECTOR_H_
 #define LIBEVCONNECTOR_H_
 
-#include "core-api/Types.h"
-#include "net-api/address/InetSocketAddress.h"
-#include "net-api/queue/impl/ev/LibEvWrapper.h"
+#include "core/Types.h"
+#include "networking/address/InetSocketAddress.h"
+#include "networking/queue/impl/ev/LibEvWrapper.h"
 #include <ext/hash_set>
 
 namespace zillians {

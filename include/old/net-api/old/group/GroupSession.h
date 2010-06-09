@@ -22,7 +22,7 @@
 #ifndef GROUPSESSION_H_
 #define GROUPSESSION_H_
 
-#include "net-api/Channel.h"
+#include "networking/Channel.h"
 
 namespace zillians {
 

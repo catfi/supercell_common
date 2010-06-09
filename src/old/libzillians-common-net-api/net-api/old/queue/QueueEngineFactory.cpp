@@ -19,8 +19,8 @@
 // Contact Information: info@zillians.com
 //
 
-#include "net-api/queue/QueueEngineFactory.h"
-#include "net-api/queue/impl/ev/LibEvQueueEngine.h"
+#include "networking/queue/QueueEngineFactory.h"
+#include "networking/queue/impl/ev/LibEvQueueEngine.h"
 
 namespace zillians {
 

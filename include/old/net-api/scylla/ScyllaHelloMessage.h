@@ -23,7 +23,7 @@
 #ifndef ZILLIANS_NET_SCYLLAHELLOMESSAGE_H_
 #define ZILLIANS_NET_SCYLLAHELLOMESSAGE_H_
 
-#include "core-api/Prerequisite.h"
+#include "core/Prerequisite.h"
 
 namespace zillians { namespace net {
 

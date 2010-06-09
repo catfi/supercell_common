@@ -20,18 +20,18 @@
  * @date Jun 30, 2009 sdk - Initial version created.
  */
 
-#include "net-api/scylla/ScyllaChannelEngine.h"
-#include "net-api/scylla/ScyllaChannel.h"
+#include "networking/scylla/ScyllaChannelEngine.h"
+#include "networking/scylla/ScyllaChannel.h"
 
 #define GLOBAL_GROUP_UUID	"3fbcb6e8-b583-11de-8d64-001d92648328"
 
-using namespace zillians::net;
-using namespace zillians::net::group;
+using namespace zillians::networking;
+using namespace zillians::networking::group;
 
 namespace zillians { namespace net {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr ScyllaChannelEngine::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.scylla.ScyllaChannelEngine"));
+log4cxx::LoggerPtr ScyllaChannelEngine::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.scylla.ScyllaChannelEngine"));
 
 //////////////////////////////////////////////////////////////////////////
 struct null_deleter

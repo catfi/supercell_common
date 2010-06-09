@@ -23,7 +23,7 @@
 #ifndef ZILLIANS_NET_RDMA_DATAHANDLERTEMPLATE_H_
 #define ZILLIANS_NET_RDMA_DATAHANDLERTEMPLATE_H_
 
-#include "core-api/Prerequisite.h"
+#include "core/Prerequisite.h"
 
 using namespace zillians;
 

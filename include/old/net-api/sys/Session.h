@@ -23,9 +23,9 @@
 #ifndef ZILLIANS_NET_SYS_SESSION_H_
 #define ZILLIANS_NET_SYS_SESSION_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/sys/SessionCommon.h"
-#include "net-api/sys/Placeholders.h"
+#include "core/Prerequisite.h"
+#include "networking/sys/SessionCommon.h"
+#include "networking/sys/Placeholders.h"
 
 namespace zillians { namespace net { namespace sys {
 
@@ -40,6 +40,6 @@ template <typename Protocol> class SessionT;
 } } }
 
 // include implementations here
-#include "net-api/sys/tcp/TcpSessionImpl.h"
+#include "networking/sys/tcp/TcpSessionImpl.h"
 
 #endif/*ZILLIANS_NET_SYS_SESSION_H_*/

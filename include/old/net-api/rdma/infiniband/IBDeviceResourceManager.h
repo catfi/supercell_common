@@ -20,10 +20,10 @@
 #ifndef ZILLIANS_NET_RDMA_IBDEVICERESOURCEMANAGER_H_
 #define ZILLIANS_NET_RDMA_IBDEVICERESOURCEMANAGER_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/Singleton.h"
-#include "net-api/rdma/infiniband/IBCommon.h"
-#include "net-api/rdma/infiniband/IBDeviceResource.h"
+#include "core/Prerequisite.h"
+#include "core/Singleton.h"
+#include "networking/rdma/infiniband/IBCommon.h"
+#include "networking/rdma/infiniband/IBDeviceResource.h"
 
 namespace zillians { namespace net { namespace rdma {
 

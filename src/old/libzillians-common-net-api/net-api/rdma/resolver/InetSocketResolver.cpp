@@ -17,9 +17,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "net-api/rdma/resolver/InetSocketResolver.h"
-#include "net-api/rdma/address/InetAddress.h"
-#include "net-api/rdma/address/InetSocketAddress.h"
+#include "networking/rdma/resolver/InetSocketResolver.h"
+#include "networking/rdma/address/InetAddress.h"
+#include "networking/rdma/address/InetSocketAddress.h"
 
 namespace zillians { namespace net { namespace rdma {
 

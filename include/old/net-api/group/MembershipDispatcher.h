@@ -23,8 +23,8 @@
 #ifndef MEMBERSHIPDISPATCHER_H_
 #define MEMBERSHIPDISPATCHER_H_
 
-#include "core-api/Prerequisite.h"
-#include "net-api/group/Placeholders.h"
+#include "core/Prerequisite.h"
+#include "networking/group/Placeholders.h"
 #include <boost/tr1/unordered_map.hpp>
 #include <boost/tuple/tuple.hpp>
 

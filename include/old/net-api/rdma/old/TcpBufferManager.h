@@ -23,10 +23,10 @@
 #ifndef TCPBUFFERMANAGER_H_
 #define TCPBUFFERMANAGER_H_
 
-#include "core-api/Prerequisite.h"
-#include "core-api/Singleton.h"
-#include "core-api/BufferManager.h"
-#include "core-api/ScalablePoolAllocator.h"
+#include "core/Prerequisite.h"
+#include "core/Singleton.h"
+#include "core/BufferManager.h"
+#include "core/ScalablePoolAllocator.h"
 
 namespace zillians { namespace net {
 

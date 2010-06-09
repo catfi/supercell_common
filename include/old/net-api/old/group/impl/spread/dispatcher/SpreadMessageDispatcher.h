@@ -22,7 +22,7 @@
 #ifndef SPREADMESSAGEDISPATCHER_H_
 #define SPREADMESSAGEDISPATCHER_H_
 
-#include "net-api/dispatcher/BasicMessageDispatcher.h"
+#include "networking/dispatcher/BasicMessageDispatcher.h"
 
 namespace zillians {
 

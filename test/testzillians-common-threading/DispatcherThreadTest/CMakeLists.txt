@@ -24,5 +24,5 @@ INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
 ADD_EXECUTABLE(DispatcherThreadTest DispatcherThreadTest.cpp) 
 
 TARGET_LINK_LIBRARIES(DispatcherThreadTest
-    zillians-common-core-api 
+    zillians-common-core 
     )

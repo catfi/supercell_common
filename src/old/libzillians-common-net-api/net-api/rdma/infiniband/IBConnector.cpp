@@ -17,13 +17,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "net-api/rdma/infiniband/IBConnector.h"
-#include "net-api/rdma/infiniband/IBNetEngine.h"
+#include "networking/rdma/infiniband/IBConnector.h"
+#include "networking/rdma/infiniband/IBNetEngine.h"
 
 namespace zillians { namespace net { namespace rdma {
 
 //////////////////////////////////////////////////////////////////////////
-log4cxx::LoggerPtr IBConnector::mLogger(log4cxx::Logger::getLogger("zillians.common.net-api.rdma.infiniband.IBConnector"));
+log4cxx::LoggerPtr IBConnector::mLogger(log4cxx::Logger::getLogger("zillians.common.networking.rdma.infiniband.IBConnector"));
 
 //////////////////////////////////////////////////////////////////////////
 IBConnector::IBConnector(IBNetEngine* engine) : mEngine(engine)
