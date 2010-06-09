@@ -98,10 +98,13 @@ public:
     {
     	boost::mutex::scoped_lock lock(mMutex);
     	prevent_spurious_wakeup_predicate p(mQueue);
-    	mConditionVariable.timed_wait(lock, absolute, p);
+    	if(!mConditionVariable.timed_wait(lock, absolute, p))
+    		return false;
 
     	value = mQueue.front();
         mQueue.pop();
+
+        return true;
     }
 
     template<typename DurationType>
@@ -109,10 +112,13 @@ public:
     {
     	boost::mutex::scoped_lock lock(mMutex);
     	prevent_spurious_wakeup_predicate p(mQueue);
-    	mConditionVariable.timed_wait(lock, relative, p);
+    	if(!mConditionVariable.timed_wait(lock, relative, p))
+    		return false;
 
     	value = mQueue.front();
         mQueue.pop();
+
+        return true;
     }
 
 private:

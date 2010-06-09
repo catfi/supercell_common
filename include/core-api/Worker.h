@@ -230,11 +230,11 @@ protected:
 	}
 
 protected:
-	bool mConditionTableOwner;
-	bool mTerminated;
 	boost::asio::io_service mIoService;
+	bool mTerminated;
+	bool mConditionTableOwner;
+	uint32 mConditionTableSize;
 	boost::thread mThread;
-	int mConditionTableSize;
 	tbb::concurrent_bounded_queue<uint32>* mConditionSlots;
 	zillians::ConditionVariable<uint32>** mConditions;
 };
@@ -277,13 +277,13 @@ public:
 		// create all workers with shared condition variables and slots
 		mWorkerSize = workers;
 		mWorkers = new Worker*[workers];
-		for(int i=0;i<workers;++i)
+		for(std::size_t i=0;i<workers;++i)
 		{
 			mWorkers[i] = new Worker(mConditions, mConditionSlots);
 
 			// spawn default threads on each worker
 			// (note that there's one thread associated with the worker by default, that's why we minus one here)
-			for(int j=0;j<threads_per_worker - 1;++j)
+			for(std::size_t j=0;j<threads_per_worker - 1;++j)
 			{
 				boost::thread *t = new boost::thread(boost::bind(&Worker::run, mWorkers[i]));
 				mWorkerThreads.push_back(t);
@@ -395,7 +395,7 @@ protected:
 		} least_load_first;
 	} mLoadBalancingContext;
 	std::vector<boost::thread*> mWorkerThreads;
-	int mConditionTableSize;
+	uint32 mConditionTableSize;
 	tbb::concurrent_bounded_queue<uint32>* mConditionSlots;
 	zillians::ConditionVariable<uint32>** mConditions;
 };

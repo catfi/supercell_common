@@ -196,7 +196,7 @@ public:
     template<typename DurationType>
     bool timed_wait(T& result, const DurationType& relative)
     {
-    	mQueue.timed_wait(result, relative);
+    	return mQueue.timed_wait(result, relative);
     }
 
 	void signal(const T& result)

@@ -48,7 +48,7 @@ class SessionT< SessionTransport::tcp >
 
 public:
 	SessionT(IoService& io_service) :
-		mSocket(io_service), mIoService(io_service)
+		mIoService(io_service), mSocket(io_service)
 	{
 		mDeletionMark = false;
 		mPendingCompletions = 0;
@@ -60,7 +60,7 @@ public:
 
 		mTlsWriteBuffer.reset();
 		mTlsReadBuffer.reset();
-		for(int i=0;i<ksMaximumSupportedContextTypes;++i)
+		for(uint32 i=0;i<ksMaximumSupportedContextTypes;++i)
 		{
 			mContext[i].reset();
 		}

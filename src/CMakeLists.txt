@@ -20,7 +20,6 @@
 #
 
 ADD_SUBDIRECTORY(libzillians-common-core-api)
-ADD_SUBDIRECTORY(libzillians-common-net-api)
 ADD_SUBDIRECTORY(libzillians-common-networking)
 ADD_SUBDIRECTORY(libzillians-common-networking-tcp)
 

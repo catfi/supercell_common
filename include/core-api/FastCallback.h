@@ -45,7 +45,7 @@ class FastCallback0 : public FastCallback
 {
 public:
 	FastCallback0() { clear(); }
-	FastCallback0(const FastCallback0 &obj)
+	FastCallback0(const FastCallback0 &obj) : FastCallback()
 	{
 		mFastCallback = obj.mFastCallback;
 		mReference = obj.mReference;
@@ -105,7 +105,7 @@ class FastCallback1 : public FastCallback
 {
 public:
 	FastCallback1() { clear(); }
-	FastCallback1(const FastCallback1 &obj)
+	FastCallback1(const FastCallback1 &obj) : FastCallback()
 	{
 		mFastCallback = obj.mFastCallback;
 		mReference = obj.mReference;
@@ -171,7 +171,7 @@ class FastCallback2 : public FastCallback
 {
 public:
 	FastCallback2() { clear(); }
-	FastCallback2(const FastCallback2 &obj)
+	FastCallback2(const FastCallback2 &obj) : FastCallback()
 	{
 		mFastCallback = obj.mFastCallback;
 		mReference = obj.mReference;
@@ -243,7 +243,7 @@ class FastCallback3 : public FastCallback
 {
 public:
 	FastCallback3() { clear(); }
-	FastCallback3(const FastCallback3 &obj)
+	FastCallback3(const FastCallback3 &obj) : FastCallback()
 	{
 		mFastCallback = obj.mFastCallback;
 		mReference = obj.mReference;

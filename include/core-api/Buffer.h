@@ -1917,7 +1917,6 @@ public:
 	inline char& operator[] (std::size_t position)
 	{
 		BOOST_ASSERT(position < mWritePos);
-		BOOST_ASSERT(position >= 0);
 		return mData[position];
 	}
 
