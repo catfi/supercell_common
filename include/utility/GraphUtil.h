@@ -27,8 +27,6 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graph_traits.hpp>
 
-using namespace boost;
-
 enum edge_indirect_reference_t { edge_indirect_reference };
 enum vertex_indirect_reference_t { vertex_indirect_reference };
 
@@ -162,8 +160,8 @@ inline void copy(
 		const indirect_graph_mapping< IndirectGraphTraits, typename Graph::vertex_descriptor, typename Graph::edge_descriptor>& m_
 		)
 {
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
 
 	// copy the graph
 	g_new_ = g_;
@@ -173,16 +171,16 @@ inline void copy(
 
 	// rebuild the vertex mapping
 	indirect_vertex_property_map prop_map_v = get(vertex_indirect_reference, g_new_);
-	typename graph_traits<Graph>::vertex_iterator vi, vend;
-	for(tie(vi,vend) = vertices(g_new_); vi != vend; ++vi)
+	typename boost::graph_traits<Graph>::vertex_iterator vi, vend;
+	for(boost::tie(vi,vend) = vertices(g_new_); vi != vend; ++vi)
 	{
 		m_new_.addVertexReference(prop_map_v[*vi], *vi);
 	}
 
 	// rebuild the edge mapping
 	indirect_edge_property_map prop_map_e = get(edge_indirect_reference, g_new_);
-	typename graph_traits<Graph>::edge_iterator ei, eend;
-	for(tie(ei,eend) = edges(g_new_); ei != eend; ++ei)
+	typename boost::graph_traits<Graph>::edge_iterator ei, eend;
+	for(boost::tie(ei,eend) = edges(g_new_); ei != eend; ++ei)
 	{
 		const typename IndirectGraphTraits::edge_reference_type er = prop_map_e[*ei];
 		typename Graph::edge_descriptor ed = *ei;
@@ -209,8 +207,8 @@ inline typename Graph::vertex_descriptor add_vertex(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	typename Graph::vertex_descriptor u = boost::add_vertex(g_);
 	if(!m_.addVertexReference(ru_, u))
@@ -235,8 +233,8 @@ inline typename Graph::vertex_descriptor add_vertex(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	typename Graph::vertex_descriptor u = boost::add_vertex(p_, g_);
 	if(!m_.addVertexReference(ru_, u))
@@ -261,8 +259,8 @@ inline void remove_vertex(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	typename Graph::vertex_descriptor u;
 
@@ -282,8 +280,8 @@ inline void remove_vertex(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	typename Graph::vertex_descriptor dummy;
 
@@ -307,8 +305,8 @@ inline const typename IndirectGraphTraits::vertex_reference_type& vertex_ref(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	indirect_vertex_property_map prop_map = get(vertex_indirect_reference, g_);
 	return prop_map[u_];
@@ -322,8 +320,8 @@ inline typename Graph::vertex_descriptor vertex(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	typename Graph::vertex_descriptor u;
 	if(!m_.findVertexReference(ru_, u))
@@ -345,13 +343,13 @@ inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	// check if the edge reference type in our graph mapping is equal to the edge reference property type defined in graph
 	typedef typename IndirectGraphTraits::edge_reference_type indirect_edge_reference_type;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
 
     typename Graph::vertex_descriptor u, v;
 	if(!m_.findVertexReference(ru_, u) || !m_.findVertexReference(rv_, v))
@@ -373,8 +371,8 @@ inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
 {
 	// check if the edge reference type in our graph mapping is equal to the edge reference property type defined in graph
 	typedef typename IndirectGraphTraits::edge_reference_type indirect_edge_reference_type;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
 
 	std::pair<typename Graph::edge_descriptor, bool> result = boost::add_edge(u_, v_, p_, g_);
 	if(!result.second)
@@ -405,13 +403,13 @@ inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	// check if the edge reference type in our graph mapping is equal to the edge reference property type defined in graph
 	typedef typename IndirectGraphTraits::edge_reference_type indirect_edge_reference_type;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
 
 	typename Graph::edge_property_type p;
 	return add_edge(re_, ru_, rv_, p, g_, m_);
@@ -427,8 +425,8 @@ inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
 {
 	// check if the edge reference type in our graph mapping is equal to the edge reference property type defined in graph
 	typedef typename IndirectGraphTraits::edge_reference_type indirect_edge_reference_type;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
 
 	typename Graph::edge_property_type p;
 	return add_edge(re_, u_, v_, p, g_, m_);
@@ -444,8 +442,8 @@ inline void remove_edge(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
     typename Graph::vertex_descriptor u, v;
 	if(!m_.findVertexReference(ru_, u) || !m_.findVertexReference(rv_, v))
@@ -465,13 +463,13 @@ inline void remove_edge(
 {
 	// check if the edge reference type in our graph mapping is equal to the edge reference property type defined in graph
 	typedef typename IndirectGraphTraits::edge_reference_type indirect_edge_reference_type;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
 
 	// find the edge descriptor from given source and target vertex descriptors
 	bool found = false;
 	typename Graph::edge_descriptor e;
-	tie(e, found) = edge(u_, v_, g_);
+	boost::tie(e, found) = edge(u_, v_, g_);
 	if(!found)
 	{
 		throw std::invalid_argument("cannot find edge descriptor from the given source and target vertex descriptors");
@@ -494,8 +492,8 @@ inline void remove_edge(
 {
 	// check if the edge reference type in our graph mapping is equal to the edge reference property type defined in graph
 	typedef typename IndirectGraphTraits::edge_reference_type indirect_edge_reference_type;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
 
 	typename Graph::edge_descriptor e;
 
@@ -515,8 +513,8 @@ inline void remove_edge(
 {
 	// check if the edge reference type in our graph mapping is equal to the edge reference property type defined in graph
 	typedef typename IndirectGraphTraits::edge_reference_type indirect_edge_reference_type;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
 
 	typename Graph::edge_descriptor dummy;
 
@@ -613,7 +611,7 @@ inline void clear_out_edges(
 	typedef typename Graph::edge_descriptor ed;
 
 	typename Graph::out_edge_iterator it_oe, it_oe_end;
-	tie(it_oe, it_oe_end) = out_edges(u_, g_);
+	boost::tie(it_oe, it_oe_end) = out_edges(u_, g_);
 	int count = out_degree(u_, g_);
 	ed* ed_array = new ed[count];
 	for(int c = 0; it_oe != it_oe_end; ++it_oe, ++c)
@@ -650,7 +648,7 @@ inline void clear_in_edges(
 	typedef typename Graph::edge_descriptor ed;
 
 	typename Graph::in_edge_iterator it_ie, it_ie_end;
-	tie(it_ie, it_ie_end) = in_edges(u_, g_);
+	boost::tie(it_ie, it_ie_end) = in_edges(u_, g_);
 	int count = in_degree(u_, g_);
 	ed* ed_array = new ed[count];
 	for(int c = 0; it_ie != it_ie_end; ++it_ie, ++c)
@@ -677,8 +675,8 @@ inline const typename IndirectGraphTraits::edge_reference_type edge_ref(
 {
 	// check if the edge reference type in our graph mapping is equal to the edge reference property type defined in graph
 	typedef typename IndirectGraphTraits::edge_reference_type indirect_edge_reference_type;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
 
 	indirect_edge_property_map prop_map = get(edge_indirect_reference, g_);
 
@@ -693,13 +691,13 @@ inline typename Graph::edge_descriptor edge(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	// check if the edge reference type in our graph mapping is equal to the edge reference property type defined in graph
 	typedef typename IndirectGraphTraits::edge_reference_type indirect_edge_reference_type;
-	typedef typename property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, edge_indirect_reference_t>::type indirect_edge_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_edge_reference_type, typename indirect_edge_property_map::value_type>::value));
 
 	typename Graph::edge_descriptor e;
 	if(!m_.findEdgeReference(re_, e))
@@ -719,8 +717,8 @@ inline std::pair<typename Graph::edge_descriptor, bool> edge(
 {
 	// check if the vertex reference type in our graph mapping is equal to the vertex reference property type defined in graph
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
-	typedef typename property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
-	BOOST_STATIC_ASSERT((!!is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
+	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
 	typename Graph::vertex_descriptor u, v;
 	if(!m_.findVertexReference(ru_, u) || !m_.findVertexReference(rv_, v))

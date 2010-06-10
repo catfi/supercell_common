@@ -43,8 +43,8 @@ public:
 
 	template<typename ForwardIterator> inline static ForwardIterator tolower(ForwardIterator first, ForwardIterator last, const std::locale& locale_ref = std::locale())
 	{
-		using namespace boost;
-		using namespace std;
+//		using namespace boost;
+//		using namespace std;
 
 		typedef	typename std::iterator_traits<ForwardIterator>::value_type value_type;
 
@@ -59,8 +59,8 @@ public:
 
 	template < typename ForwardIterator> inline static ForwardIterator toupper(ForwardIterator first, ForwardIterator last, const std::locale& locale_ref = std::locale())
 	{
-		using namespace boost;
-		using namespace std;
+//		using namespace boost;
+//		using namespace std;
 
 		typedef typename std::iterator_traits<ForwardIterator>::value_type value_type;
 
