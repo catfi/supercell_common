@@ -89,6 +89,7 @@ public:
 			{
 				if(signals & uint64 (1) << i)
 				{
+					mSignaler.bitZeroSet(i);
 					for(; n < count; ++n)
 					{
 						if(!mDispatcher->read(i, mId, &message[n]))
@@ -98,6 +99,7 @@ public:
 							source[n] = i;
 					}
 				}
+//				mSignaler.reset();
 			}
 			BOOST_ASSERT(n > 0);
 		}

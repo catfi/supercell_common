@@ -46,7 +46,7 @@ public:
 		BOOST_ASSERT(max_dispatcher_threads <= ZILLIANS_DISPATCHER_MAX_THREADS);
 
 		mPipes = new ContextPipe*[max_dispatcher_threads * max_dispatcher_threads];
-		*mSignalers = new DispatcherThreadSignaler[max_dispatcher_threads];
+		mSignalers = new DispatcherThreadSignaler*[max_dispatcher_threads];
 		mAttachedFlags = new bool[mMaxThreadContextCount];
 
 		for(uint32 i = 0; i < mMaxThreadContextCount; ++i)
@@ -110,14 +110,13 @@ public:
 	virtual void write(uint32 source, uint32 destination, const Message& message, bool incomplete)
 	{
 		ContextPipe* pipes = mPipes[source * mMaxThreadContextCount + destination];
-		pipes->write(message, incomplete);
+//		pipes->write(message, incomplete);
+		pipes->write(message, true);
 
 		if(!incomplete)
 		{
-			if(!pipes->flush())
-			{
-				mSignalers[destination]->signal(source);
-			}
+//			pipes->flush();
+			mSignalers[destination]->signal(source);
 		}
 	}
 

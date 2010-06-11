@@ -101,8 +101,8 @@ void ThreadReader(atomic::AtomicPipe<int, numElements>* pipe)
 	int ret;
 	for(int i = 0; i < numData; ++i)
 	{
-		pipe->read(&ret);
-		BOOST_ASSERT(ret == i);
+		if(pipe->read(&ret))
+			BOOST_ASSERT(ret == i);
 	}
 }
 
