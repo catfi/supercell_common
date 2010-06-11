@@ -105,26 +105,48 @@ struct is_std_string< std::basic_string<_CharT, _Traits, _Alloc> >
 
 /**
  * @brief BufferContext allows user structure to be associated with (or
- * super-imposed on) Buffer object.
+ * super-imposed on) BufferBase object.
  */
 typedef shared_ptr<void> BufferContext;
 
+struct BufferMode
+{
+	enum type
+	{
+		plain,
+		circular
+	};
+};
+
+struct BufferObjectPoolStrategy
+{
+	enum type
+	{
+		none,
+		pooled,
+		concurrently_pooled
+	};
+};
+
 /**
- * @brief Buffer is a generic buffer implementation with super-imposed context
- * object that allows other structure to be related to Buffer class.
+ * @brief BufferBase is a generic buffer implementation with super-imposed context
+ * object that allows other structure to be related to BufferBase class.
  *
- * Buffer provides a very high performance implementation of generic
+ * BufferBase provides a very high performance implementation of generic
  * buffered array. We can read from or write to buffers through various
  * methods it provides or simply use the overloaded << or >> operator to
- * append or extract data from the internal data array. Buffer supports
+ * append or extract data from the internal data array. BufferBase supports
  * context object to let to impose some relationship among buffer classes.
  */
-class Buffer : public ConcurrentObjectPool<Buffer>
+template<BufferMode::type Mode>
+class BufferBase
 {
 	template <typename T>
 	struct is_buffer
 	{
-		enum { value = boost::is_same<T, Buffer>::value };
+		//enum { value = boost::is_same<T, BufferBase >::value };
+		//enum { value = boost::is_base_and_derived<typename boost::remove_const<T>::type, BufferBase<Mode> >::value };
+		enum { value = boost::is_base_and_derived<BufferBase<Mode>, T>::value };
 	};
 
 	/**
@@ -139,7 +161,9 @@ class Buffer : public ConcurrentObjectPool<Buffer>
 			detail::is_std_vector<T>::value ||
 			detail::is_std_list<T>::value ||
 			detail::is_std_map<T>::value ||
-			boost::is_same<T, Buffer>::value
+			//boost::is_same<T, BufferBase >::value
+			//boost::is_base_and_derived<typename boost::remove_const<T>::type, BufferBase>::value
+			is_buffer<T>::value
 			};
 	};
 
@@ -186,7 +210,9 @@ class Buffer : public ConcurrentObjectPool<Buffer>
 			detail::is_std_map<T>::value ||
 			detail::is_boost_array<T>::value ||
 			boost::is_same<typename boost::remove_const<T>::type, boost::system::error_code>::value ||
-			boost::is_same<typename boost::remove_const<T>::type, Buffer>::value
+			//boost::is_same<typename boost::remove_const<T>::type, BufferBase >::value
+			//boost::is_base_and_derived<typename boost::remove_const<T>::type, BufferBase>::value
+			is_buffer<T>::value
 			};
 	};
 
@@ -201,7 +227,7 @@ class Buffer : public ConcurrentObjectPool<Buffer>
 	struct is_direct_types
 	{
 		enum { value =
-			//boost::is_same<T, bool>::value || // because bool is treated as int8 in Buffer, so it's not a direct type
+			//boost::is_same<T, bool>::value || // because bool is treated as int8 in BufferBase, so it's not a direct type
 			boost::is_same<T, char>::value ||
 			boost::is_same<T, short>::value ||
 			boost::is_same<T, int>::value ||
@@ -229,7 +255,7 @@ class Buffer : public ConcurrentObjectPool<Buffer>
 	};
 
 public:
-	Buffer()
+	BufferBase()
 	{
 		mOwner = true; mReadOnly = false; mOnDemand = true;
 		mData = NULL;
@@ -240,14 +266,14 @@ public:
 	}
 
 	/**
-	 * Construct a Buffer object with specific size.
+	 * Construct a BufferBase object with specific size.
 	 *
-	 * @note the internal data is allocated by the Buffer object and will
-	 * be freed in the Buffer's destructor.
+	 * @note the internal data is allocated by the BufferBase object and will
+	 * be freed in the BufferBase's destructor.
 	 *
 	 * @param size The internal data size.
 	 */
-	Buffer(std::size_t size)
+	BufferBase(std::size_t size)
 	{
 		BOOST_ASSERT(size > 0);
 		mOwner = true; mReadOnly = false; mOnDemand = false;
@@ -258,15 +284,15 @@ public:
 	}
 
 	/**
-	 * @brief Construct a Buffer object with given data pointer and size.
+	 * @brief Construct a BufferBase object with given data pointer and size.
 	 *
 	 * @note the internal data is owned by the caller and will NOT
-	 * be freed in the Buffer's destructor.
+	 * be freed in the BufferBase's destructor.
 	 *
 	 * @param data The internal data pointer.
 	 * @param size The internal data size.
 	 */
-	Buffer(byte* data, std::size_t size)
+	BufferBase(byte* data, std::size_t size)
 	{
 		mOwner = false; mReadOnly = false; mOnDemand = false;
 		mData = data;
@@ -276,19 +302,19 @@ public:
 	}
 
 	/**
-	 * @brief Consutrct a read-only Buffer object with given const data pointer and size.
+	 * @brief Consutrct a read-only BufferBase object with given const data pointer and size.
 	 *
 	 * @note the internal data is owned by the caller and will NOT
-	 * be freed in the Buffer's destructor.
+	 * be freed in the BufferBase's destructor.
 	 *
-	 * @note the Buffer is not mutable, you can only read from the Buffer
+	 * @note the BufferBase is not mutable, you can only read from the BufferBase
 	 * object. Any write operation will fail and throw out exception.
 	 *
 	 * @param data The internal data pointer.
 	 * @param size The internal data size.
 	 * @return
 	 */
-	Buffer(const byte* data, std::size_t size)
+	BufferBase(const byte* data, std::size_t size)
 	{
 		mOwner = false; mReadOnly = true; mOnDemand = false;
 		mData = (byte*)data;
@@ -303,7 +329,7 @@ public:
 	 * @param buffer The buffer to be cloned
 	 * @return
 	 */
-	Buffer(const Buffer& buffer)
+	BufferBase(const BufferBase& buffer)
 	{
 		if(buffer.mOwner)
 		{
@@ -334,7 +360,7 @@ public:
 	}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	Buffer(Buffer&& buffer)
+	BufferBase(BufferBase&& buffer)
 	{
 		mOwner = buffer.mOwner;
 		mReadOnly = buffer.mReadOnly;
@@ -359,9 +385,9 @@ public:
 #endif
 
 	/**
-	 * @brief Destruct the Buffer object.
+	 * @brief Destruct the BufferBase object.
 	 */
-	~Buffer()
+	~BufferBase()
 	{
 		if(mOwner && mData)
 		{
@@ -370,7 +396,7 @@ public:
 	}
 
 public:
-	Buffer& operator = (const Buffer& buffer)
+	BufferBase& operator = (const BufferBase& buffer)
 	{
 		if(mOwner && mData)
 		{
@@ -406,7 +432,7 @@ public:
 	}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	Buffer& operator = (Buffer&& buffer)
+	BufferBase& operator = (BufferBase&& buffer)
 	{
 		if(this == &buffer)
 			return *this;
@@ -444,7 +470,7 @@ public:
 	/**
 	 * @brief Probe the actual data size of a given type.
 	 *
-	 * @return The actual size stored in Buffer object.
+	 * @return The actual size stored in BufferBase object.
 	 */
 	template <typename T>
 	inline static std::size_t probeSize()
@@ -459,7 +485,7 @@ public:
 	 * @brief Probe the actual data size of a given variable.
 	 *
 	 * @param value The variable to probe its actual data size.
-	 * @return The actual data size of the variable stored in the Buffer object.
+	 * @return The actual data size of the variable stored in the BufferBase object.
 	 */
 	template <typename T>
 	inline static std::size_t probeSize(const T &value)
@@ -484,7 +510,7 @@ public:
 	 * @brief Probe the actual data size of a given std::vector.
 	 *
 	 * @param value The std::vector to probe its actual data size.
-	 * @return The actual data size of the std::vector stored in the Buffer object.
+	 * @return The actual data size of the std::vector stored in the BufferBase object.
 	 */
 	template <typename T>
 	inline static std::size_t probeSizeBuiltin(const std::vector<T> &value)
@@ -518,7 +544,7 @@ public:
 	 * @brief Probe the actual data size of a given std::list.
 	 *
 	 * @param value The std::list to probe its actual data size.
-	 * @return The actual data size of the std::list stored in the Buffer object.
+	 * @return The actual data size of the std::list stored in the BufferBase object.
 	 */
 	template <typename T>
 	inline static std::size_t probeSizeBuiltin(const std::list<T> &value)
@@ -552,7 +578,7 @@ public:
 	 * @brief Probe the actual data size of a given std::map.
 	 *
 	 * @param value The std::map to probe its actual data size.
-	 * @return The actual data size of the std::map stored in the Buffer object.
+	 * @return The actual data size of the std::map stored in the BufferBase object.
 	 */
 	template <typename K, typename V>
 	inline static std::size_t probeSizeBuiltin(const std::map<K,V> &value)
@@ -587,7 +613,7 @@ public:
 	 * @brief Probe the actual data size of a given boost::array.
 	 *
 	 * @param value The boost::array to probe its actual data size.
-	 * @return The actual data size of the boost::array stored in the Buffer object.
+	 * @return The actual data size of the boost::array stored in the BufferBase object.
 	 */
 	template <typename T, std::size_t N>
 	inline static std::size_t probeSizeBuiltin(const boost::array<T,N> &value)
@@ -601,7 +627,7 @@ public:
 	 * @note Note that we store boolean variables in just 1 byte.
 	 *
 	 * @param value The boolean variable to probe its actual data size.
-	 * @return The actual data size of the boolean variable stored in the Buffer object.
+	 * @return The actual data size of the boolean variable stored in the BufferBase object.
 	 */
 	inline static std::size_t probeSizeBuiltin(const bool& value)
 	{
@@ -616,7 +642,7 @@ public:
 	 * some other way to count the length of the given buffer.
 	 *
 	 * @param value The const data pointer variable to probe its actual data size.
-	 * @return The actual data size of the const data pointer variable stored in the Buffer object.
+	 * @return The actual data size of the const data pointer variable stored in the BufferBase object.
 	 */
 	inline static std::size_t probeSizeBuiltin(const char* value)
 	{
@@ -627,7 +653,7 @@ public:
 	 * @brief Probe the actual data size of a given const std::string.
 	 *
 	 * @param value The const std::string reference to probe its actual data size.
-	 * @return The actual data size of the const std::string reference stored in the Buffer object.
+	 * @return The actual data size of the const std::string reference stored in the BufferBase object.
 	 */
 	inline static std::size_t probeSizeBuiltin(const std::string &value)
 	{
@@ -635,12 +661,12 @@ public:
 	}
 
 	/**
-	 * @brief Probe the actual data size of a given const Buffer object.
+	 * @brief Probe the actual data size of a given const BufferBase object.
 	 *
-	 * @param value The const Buffer reference to probe its actual data size.
-	 * @return The actual data size of the const Buffer reference stored in the Buffer object.
+	 * @param value The const BufferBase reference to probe its actual data size.
+	 * @return The actual data size of the const BufferBase reference stored in the BufferBase object.
 	 */
-	inline static std::size_t probeSizeBuiltin(const Buffer &value)
+	inline static std::size_t probeSizeBuiltin(const BufferBase &value)
 	{
 		return value.dataSize() + sizeof(uint32);
 	}
@@ -651,7 +677,7 @@ public:
 	 * @note Note that we store boolean variables in just 1 byte.
 	 *
 	 * @param value The boost::system::error variable to probe its actual data size.
-	 * @return The actual data size of the boost::system::error variable stored in the Buffer object.
+	 * @return The actual data size of the boost::system::error variable stored in the BufferBase object.
 	 */
 	inline static std::size_t probeSizeBuiltin(const boost::system::error_code& value)
 	{
@@ -665,7 +691,7 @@ public:
 	 * believed to be sized to sizeof(T)
 	 *
 	 * @param value The const variable to probe.
-	 * @return The actual data size of the const variable stored in the Buffer object.
+	 * @return The actual data size of the const variable stored in the BufferBase object.
 	 */
 	template<typename T>
 	inline static std::size_t probeSizeBuiltin(const T& value)
@@ -684,7 +710,7 @@ public:
 		template <typename T>
 		void operator & (T& v)
 		{
-			size += Buffer::probeSize(v);
+			size += BufferBase::probeSize(v);
 		}
 
 		std::size_t size;
@@ -712,7 +738,7 @@ public:
 	 * @endcode
 	 *
 	 * @param t The non-const reference to the given serializable data structure.
-	 * @return The actual data size of the given serializable data structure stored in the Buffer object.
+	 * @return The actual data size of the given serializable data structure stored in the BufferBase object.
 	 */
 	template <typename T>
 	inline static std::size_t probeSizeSerializable(const T& t)
@@ -725,7 +751,7 @@ public:
 
 public:
 	/**
-	 * @brief Reset the read and write pointer of the Buffer object.
+	 * @brief Reset the read and write pointer of the BufferBase object.
 	 *
 	 * @note Note that the actual data is not altered but just the pointers reset.
 	 */
@@ -749,12 +775,43 @@ public:
 	 */
 	inline void crunch()
 	{
-		if(dataSize() > 0 && rpos() > 0)
+		if(Mode == BufferMode::plain)
 		{
-			std::size_t size = dataSize();
-			if(LIKELY(size > 0))
+			if(dataSize() > 0 && rpos() > 0)
 			{
-				::memmove(mData, mData + rpos(), size);
+				std::size_t size = dataSize();
+				if(LIKELY(size > 0))
+				{
+					::memmove(mData, mData + rpos(), size);
+				}
+				wpos(size);
+				rpos(0);
+			}
+		}
+		else
+		{
+			std::size_t size;
+			if(wpos() < rpos())
+			{
+				std::size_t size_to_end = allocatedSize() - rpos();
+				std::size_t size_from_begin = wpos();
+				size = size_to_end + size_from_begin;
+				if(LIKELY(size > 0))
+				{
+					byte* temporary = new byte[size];
+					::memmove(temporary, mData + rpos(), size_to_end);
+					::memmove(temporary + size_to_end, mData, size_from_begin);
+					::memmove(mData, temporary, size);
+					delete[] temporary;
+				}
+			}
+			else
+			{
+				size = wpos() - rpos();
+				if(LIKELY(size > 0))
+				{
+					::memmove(mData, mData + rpos(), size);
+				}
 			}
 			wpos(size);
 			rpos(0);
@@ -802,7 +859,7 @@ public:
 	 */
 	inline std::size_t freeSize() const
 	{
-		return mAllocatedSize - wpos();
+		return allocatedSize() - dataSize();
 	}
 
 	/**
@@ -815,7 +872,21 @@ public:
 	 */
 	inline std::size_t dataSize() const
 	{
-		return wpos() - rpos();
+		if(Mode == BufferMode::plain)
+		{
+			return wpos() - rpos();
+		}
+		else
+		{
+			if(wpos() < rpos())
+			{
+				return wpos() + allocatedSize() - rpos();
+			}
+			else
+			{
+				return wpos() - rpos();
+			}
+		}
 	}
 
 public:
@@ -874,30 +945,91 @@ public:
 	 *
 	 * @param bytes The number of bytes to skip reading.
 	 */
-	inline void rskip(std::size_t bytes) { mReadPos += bytes; }
+	inline void rskip(std::size_t bytes)
+	{
+		BOOST_ASSERT(bytes <= allocatedSize());
+		if(Mode == BufferMode::plain)
+		{
+			mReadPos += bytes;
+			BOOST_ASSERT(mReadPos <= allocatedSize());
+		}
+		else
+		{
+			mReadPos += bytes;
+			if(mReadPos >= allocatedSize())
+				mReadPos -= allocatedSize();
+		}
+	}
 
 	/**
 	 * @brief Move forward the current write pointer by given number of bytes.
 	 *
 	 * @param bytes The number of bytes to skip writing.
 	 */
-	inline void wskip(std::size_t bytes) { mWritePos += bytes; }
+	inline void wskip(std::size_t bytes)
+	{
+		BOOST_ASSERT(bytes <= allocatedSize());
+		if(Mode == BufferMode::plain)
+		{
+			mWritePos += bytes;
+			BOOST_ASSERT(mWritePos <= allocatedSize());
+		}
+		else
+		{
+			mWritePos += bytes;
+			if(mWritePos >= allocatedSize())
+				mWritePos -= allocatedSize();
+		}
+	}
 
 	/**
 	 * @brief Move backward the current read pointer by given number of bytes.
 	 *
 	 * @param bytes The number of bytes to move backward.
 	 */
-	inline void rrev(std::size_t bytes) { mReadPos -= bytes; }
+	inline void rrev(std::size_t bytes)
+	{
+		BOOST_ASSERT(bytes <= allocatedSize());
+		if(Mode == BufferMode::plain)
+		{
+			BOOST_ASSERT(mReadPos >= bytes);
+			mReadPos -= bytes;
+		}
+		else
+		{
+			if(mReadPos < bytes)
+				mReadPos = allocatedSize() - (bytes - mReadPos);
+			else
+				mReadPos -= bytes;
+		}
+	}
 
 	/**
 	 * @brief Move backward the current write pointer by given number of bytes.
 	 *
 	 * @param bytes The number of bytes to move backward.
 	 */
-	inline void wrev(std::size_t bytes) { mWritePos -= bytes; }
+	inline void wrev(std::size_t bytes)
+	{
+		BOOST_ASSERT(bytes <= allocatedSize());
+		if(Mode == BufferMode::plain)
+		{
+			BOOST_ASSERT(mWritePos >= bytes);
+			mWritePos -= bytes;
+		}
+		else
+		{
+			if(mWritePos < bytes)
+				mWritePos = allocatedSize() - (bytes - mWritePos);
+			else
+				mWritePos -= bytes;
+		}
+	}
 
-	inline byte* baseptr() const { return (byte*)mData; }
+	inline byte* baseptr() const
+	{
+		return (byte*)mData;
+	}
 
 public:
 	/**
@@ -914,7 +1046,6 @@ public:
 		readDispatch(value, boost::mpl::bool_< is_builtin_types<T>::value >() );
 	}
 
-//private:
 	/**
 	 * @brief Helper function to call readBuiltin() due to the lack of partial specialization of function template.
 	 *
@@ -925,7 +1056,7 @@ public:
 	template <typename T>
 	inline void readDispatch(T& value, boost::mpl::true_ /*is_builtin_types*/)
 	{
-		readBuiltin(value);
+		readDispatchBuiltin(value, boost::mpl::bool_< is_buffer<T>::value >() );
 	}
 
 	/**
@@ -939,6 +1070,18 @@ public:
 	inline void readDispatch(T& value, boost::mpl::false_ /*is_builtin_types*/)
 	{
 		readSerializable(value);
+	}
+
+	template <typename T>
+	inline void readDispatchBuiltin(T& value, boost::mpl::true_ /*is_buffer*/)
+	{
+		readBuiltin(&value);
+	}
+
+	template <typename T>
+	inline void readDispatchBuiltin(T& value, boost::mpl::false_ /*is_buffer*/)
+	{
+		readBuiltin(value);
 	}
 
 	/**
@@ -957,7 +1100,7 @@ public:
 	 */
 	struct ReadProxyArchive
 	{
-		ReadProxyArchive(Buffer& buffer) : mBuffer(buffer) { }
+		ReadProxyArchive(BufferBase& buffer) : mBuffer(buffer) { }
 
 		template <typename T>
 		inline void operator & (T& v)
@@ -970,9 +1113,9 @@ public:
 			mBuffer.rskip(size);
 		}
 
-		Buffer& buffer() { return mBuffer; }
+		BufferBase& buffer() { return mBuffer; }
 
-		Buffer& mBuffer;
+		BufferBase& mBuffer;
 	};
 
 	/**
@@ -1121,7 +1264,23 @@ public:
 		if(LIKELY(length <= MAX_STRING_LENGTH))
 		{
 			value.clear();
-			value.append((char*)rptr(), length);
+			if(Mode == BufferMode::plain)
+			{
+				value.append((char*)rptr(), length);
+			}
+			else
+			{
+				if(rpos() + length < allocatedSize())
+				{
+					value.append((char*)rptr(), length);
+				}
+				else
+				{
+					std::size_t size_to_end = allocatedSize() - rpos();
+					value.append((char*)rptr(), size_to_end);
+					value.append((char*)baseptr(), length - size_to_end);
+				}
+			}
 		}
 		else
 		{
@@ -1285,18 +1444,18 @@ public:
 	}
 
 	/**
-	 * @brief Read another Buffer object.
+	 * @brief Read another BufferBase object.
 	 *
-	 * @param value The Buffer variable to be read.
+	 * @param value The BufferBase variable to be read.
 	 */
-	inline void readBuiltin(Buffer& value)
+	inline void readBuiltin(BufferBase* value)
 	{
 		uint32 length; readDirect(length);
 
 		BOOST_ASSERT(value.freeSize() >= length);
 		BOOST_ASSERT(dataSize() >= length);
 
-		value.append(*this, length);
+		value->append(*this, length);
 	}
 
 	/**
@@ -1332,9 +1491,8 @@ public:
 	template <typename T>
 	inline void readDirect(T& value)
 	{
-		getDirect(value, mReadPos);
-
-		mReadPos += sizeof(T);
+		getDirect(value, rpos());
+		rskip(sizeof(T));
 	}
 
 	/**
@@ -1347,9 +1505,8 @@ public:
 	{
 		if(UNLIKELY(!dest))	return;
 
-		getArray(dest, mReadPos, size);
-
-		mReadPos += size;
+		getArray(dest, rpos(), size);
+		rskip(size);
 	}
 
 public:
@@ -1359,17 +1516,28 @@ public:
 		writeDispatch(value, boost::mpl::bool_< is_builtin_types<T>::value >() );
 	}
 
-//private:
 	template <typename T>
 	inline void writeDispatch(const T& value, boost::mpl::true_ /*is_builtin_types*/)
 	{
-		writeBuiltin(value);
+		writeDispatchBuiltin(value, boost::mpl::bool_< is_buffer<T>::value >() );
 	}
 
 	template <typename T>
 	inline void writeDispatch(const T& value, boost::mpl::false_ /*is_builtin_types*/)
 	{
 		writeSerializable(value);
+	}
+
+	template <typename T>
+	inline void writeDispatchBuiltin(const T& value, boost::mpl::true_ /*is_buffer*/)
+	{
+		writeBuiltin((BufferBase*)&value);
+	}
+
+	template <typename T>
+	inline void writeDispatchBuiltin(const T& value, boost::mpl::false_ /*is_buffer*/)
+	{
+		writeBuiltin(value);
 	}
 
 	/**
@@ -1386,7 +1554,7 @@ public:
 
 	struct WriteProxyArchive
 	{
-		WriteProxyArchive(Buffer& buffer) : mBuffer(buffer) { }
+		WriteProxyArchive(BufferBase& buffer) : mBuffer(buffer) { }
 
 		template <typename T>
 		inline void operator & (const T& v)
@@ -1399,9 +1567,9 @@ public:
 			mBuffer.wskip(size);
 		}
 
-		Buffer& buffer() { return mBuffer; }
+		BufferBase& buffer() { return mBuffer; }
 
-		Buffer& mBuffer;
+		BufferBase& mBuffer;
 	};
 
 	/**
@@ -1570,7 +1738,7 @@ public:
 	 */
 	inline void writeBuiltin(const char* value)
 	{
-		std::size_t length = strlen(value);
+		uint32 length = strlen(value);
 		if(LIKELY(length <= MAX_STRING_LENGTH))
 		{
 			writeDirect(length);
@@ -1715,19 +1883,19 @@ public:
 	}
 
 	/**
-	 * @brief Write another Buffer object.
+	 * @brief Write another BufferBase object.
 	 *
-	 * @param value Another Buffer object to be written.
+	 * @param value Another BufferBase object to be written.
 	 */
-	inline void writeBuiltin(const Buffer& value)
+	inline void writeBuiltin(const BufferBase* value)
 	{
-		uint32 length = value.dataSize();
+		uint32 length = value->dataSize();
 		writeDirect(length);
 
 		BOOST_ASSERT(freeSize() >= length);
 
-		Buffer& non_const_value = const_cast<Buffer&>(value);
-		append(non_const_value, length);
+		BufferBase* non_const_value = const_cast<BufferBase*>(value);
+		append(*non_const_value, length);
 	}
 
 	/**
@@ -1764,19 +1932,19 @@ public:
 	inline void writeDirect(const T& t)
 	{
 		BOOST_ASSERT(!mReadOnly);
+
 		if(!mOnDemand)
 		{
-			BOOST_ASSERT(mAllocatedSize >= mWritePos + sizeof(T));
+			BOOST_ASSERT(allocatedSize() >= wpos() + sizeof(T));
 		}
-		else if(mAllocatedSize < mWritePos + sizeof(T))
+		else if(allocatedSize() < wpos() + sizeof(T))
 		{
-			std::size_t s = mWritePos + sizeof(T);
+			std::size_t s = wpos() + sizeof(T);
 			resize(round_up_to_nearest_power_of_two(s));
 		}
 
-		setDirect(t, mWritePos);
-
-		mWritePos += sizeof(T);
+		setDirect(t, wpos());
+		wskip(sizeof(T));
 	}
 
 	/**
@@ -1788,22 +1956,21 @@ public:
 	inline void writeArray(const char* source, std::size_t size)
 	{
 		BOOST_ASSERT(!mReadOnly);
+
 		if(!mOnDemand)
 		{
-			BOOST_ASSERT(mAllocatedSize >= mWritePos + size);
+			BOOST_ASSERT(allocatedSize() >= wpos() + size);
 		}
-		else if(mAllocatedSize < mWritePos + size)
+		else if(allocatedSize() < wpos() + size)
 		{
-			std::size_t s = mWritePos + size;
+			std::size_t s = wpos() + size;
 			resize(round_up_to_nearest_power_of_two(s));
 		}
 
-		setArray(source, mWritePos, size);
-
-		mWritePos += size;
+		setArray(source, wpos(), size);
+		wskip(size);
 	}
 
-//private:
 	/**
 	 * @brief Get an object from the buffer at specific buffer position.
 	 *
@@ -1815,7 +1982,24 @@ public:
 	template <typename T>
 	inline void getDirect(T& t, std::size_t position)
 	{
-		t = *((T*)(mData + position));
+		if(Mode == BufferMode::plain)
+		{
+			t = *((T*)(mData + position));
+		}
+		else
+		{
+			// if we just cross the boundary
+			if(position + sizeof(T) > allocatedSize())
+			{
+				std::size_t size_to_end = allocatedSize() - position;
+				::memcpy(((byte*)&t), mData + position, size_to_end);
+				::memcpy(((byte*)&t) + size_to_end, mData, sizeof(T) - size_to_end);
+			}
+			else
+			{
+				t = *((T*)(mData + position));
+			}
+		}
 	}
 
 	/**
@@ -1831,9 +2015,25 @@ public:
 	{
 		BOOST_ASSERT(size <= dataSize());
 
-		if(UNLIKELY(size == 0)) return;
-
-		::memcpy(dest, mData + position, size);
+		if(Mode == BufferMode::plain)
+		{
+			if(UNLIKELY(size == 0)) return;
+			::memcpy(dest, mData + position, size);
+		}
+		else
+		{
+			// if we just cross the boundary
+			if(position + size > allocatedSize())
+			{
+				std::size_t size_to_end = allocatedSize() - position;
+				::memcpy(dest, mData + position, size_to_end);
+				::memcpy(dest + size_to_end, mData, size - size_to_end);
+			}
+			else
+			{
+				::memcpy(dest, mData + position, size);
+			}
+		}
 	}
 
 	/**
@@ -1847,7 +2047,24 @@ public:
 	template <typename T>
 	inline void setDirect(const T& t, std::size_t position)
 	{
-		*((T*)(mData + position)) = t;
+		if(Mode == BufferMode::plain)
+		{
+			*((T*)(mData + position)) = t;
+		}
+		else
+		{
+			// if we just cross the boundary
+			if(position + sizeof(T) > allocatedSize())
+			{
+				std::size_t size_to_end = allocatedSize() - position;
+				::memcpy(mData + position, ((byte*)&t), size_to_end);
+				::memcpy(mData, ((byte*)&t) + size_to_end, sizeof(T) - size_to_end);
+			}
+			else
+			{
+				*((T*)(mData + position)) = t;
+			}
+		}
 	}
 
 	/**
@@ -1863,9 +2080,25 @@ public:
 	{
 		BOOST_ASSERT(size <= freeSize());
 
-		if(UNLIKELY(size == 0)) return;
-
-		::memcpy(mData + position, source, size);
+		if(Mode == BufferMode::plain)
+		{
+			if(UNLIKELY(size == 0)) return;
+			::memcpy(mData + position, source, size);
+		}
+		else
+		{
+			// if we just cross the boundary
+			if(position + size > allocatedSize())
+			{
+				std::size_t size_to_end = allocatedSize() - position;
+				::memcpy(mData + position, source, size_to_end);
+				::memcpy(mData, source + size_to_end, size - size_to_end);
+			}
+			else
+			{
+				::memcpy(mData + position, source, size);
+			}
+		}
 	}
 
 public:
@@ -1876,7 +2109,7 @@ public:
 	 *
 	 * @param source The buffer object to be read.
 	 */
-	inline void append(Buffer &source)
+	inline void append(BufferBase &source)
 	{
 		BOOST_ASSERT(source.dataSize() <= freeSize());
 		append(source, source.dataSize());
@@ -1890,7 +2123,7 @@ public:
 	 * @param source The buffer object to be read.
 	 * @param size The specific data size to append.
 	 */
-	inline void append(Buffer &source, std::size_t size)
+	inline void append(BufferBase &source, std::size_t size)
 	{
 		BOOST_ASSERT(size <= freeSize());
 		BOOST_ASSERT(size <= source.dataSize());
@@ -1902,6 +2135,11 @@ public:
 	{
 		BOOST_ASSERT(mOnDemand);
 		BOOST_ASSERT(size > mAllocatedSize);
+
+		if(Mode == BufferMode::circular)
+		{
+			crunch();
+		}
 
 		mData = (byte*)realloc((void*)mData, size);
 		mAllocatedSize = size;
@@ -1930,7 +2168,7 @@ public:
 	 * @return
 	 */
 	template <typename T>
-	inline Buffer& operator<< (const T& value)
+	inline BufferBase& operator<< (const T& value)
 	{
 		write(value);
 		return *this;
@@ -1946,7 +2184,7 @@ public:
 	 * @return
 	 */
 	template <typename T>
-	inline Buffer& operator>> (T& value)
+	inline BufferBase& operator>> (T& value)
 	{
 		read(value);
 		return *this;
@@ -1954,7 +2192,7 @@ public:
 
 public:
 	/**
-	 * @brief Get the context object associated with the Buffer object.
+	 * @brief Get the context object associated with the BufferBase object.
 	 *
 	 * @return The context object in shared_ptr<void> form.
 	 */
@@ -1964,7 +2202,7 @@ public:
 	}
 
 	/**
-	 * @brief Set the context object associated with the Buffer object.
+	 * @brief Set the context object associated with the BufferBase object.
 	 *
 	 * @param c The context object in shared_ptr<void> form.
 	 */
@@ -1974,7 +2212,7 @@ public:
 	}
 
 	/**
-	 * @brief Clear or reset the context object associated with the Buffer object.
+	 * @brief Clear or reset the context object associated with the BufferBase object.
 	 */
 	inline void clearContext()
 	{
@@ -2003,6 +2241,117 @@ private:
 
 	BufferContext mContext;
 };
+
+template<BufferMode::type Mode, BufferObjectPoolStrategy::type ObjectPoolStrategy>
+class BufferT;
+
+template<BufferMode::type Mode>
+class BufferT<Mode, BufferObjectPoolStrategy::none> : public BufferBase<Mode>
+{
+public:
+	BufferT() : BufferBase<Mode>()
+	{
+	}
+
+	BufferT(std::size_t size) : BufferBase<Mode>(size)
+	{
+	}
+
+	BufferT(byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	{
+	}
+
+	BufferT(const byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	{
+	}
+
+	BufferT(const BufferT& buffer) : BufferBase<Mode>(buffer)
+	{
+	}
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	BufferT(BufferT&& buffer) : BufferBase<Mode>(std::move(buffer))
+	{ }
+
+	BufferT& operator=(BufferT&& x)   // rvalues bind here
+	{
+		BufferBase<Mode>::operator=(std::move(x));
+	}
+#endif
+};
+
+template<BufferMode::type Mode>
+class BufferT<Mode, BufferObjectPoolStrategy::concurrently_pooled> : public BufferBase<Mode>, public ConcurrentObjectPool< BufferT<Mode, BufferObjectPoolStrategy::concurrently_pooled> >
+{
+public:
+	BufferT() : BufferBase<Mode>()
+	{
+	}
+
+	BufferT(std::size_t size) : BufferBase<Mode>(size)
+	{
+	}
+
+	BufferT(byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	{
+	}
+
+	BufferT(const byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	{
+	}
+
+	BufferT(const BufferT& buffer) : BufferBase<Mode>(buffer)
+	{
+	}
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	BufferT(BufferT&& buffer) : BufferBase<Mode>(std::move(buffer))
+	{ }
+
+	BufferT& operator=(BufferT&& x)   // rvalues bind here
+	{
+		BufferBase<Mode>::operator=(std::move(x));
+	}
+#endif
+};
+
+template<BufferMode::type Mode>
+class BufferT<Mode, BufferObjectPoolStrategy::pooled> : public BufferBase<Mode>, public ObjectPool< BufferT<Mode, BufferObjectPoolStrategy::pooled> >
+{
+public:
+	BufferT() : BufferBase<Mode>()
+	{
+	}
+
+	BufferT(std::size_t size) : BufferBase<Mode>(size)
+	{
+	}
+
+	BufferT(byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	{
+	}
+
+	BufferT(const byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	{
+	}
+
+	BufferT(const BufferT& buffer) : BufferBase<Mode>(buffer)
+	{
+	}
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	BufferT(BufferT&& buffer) : BufferBase<Mode>(std::move(buffer))
+	{ }
+
+	BufferT& operator=(BufferT&& x)   // rvalues bind here
+	{
+		BufferBase<Mode>::operator=(std::move(x));
+	}
+#endif
+};
+
+typedef BufferT<BufferMode::plain, BufferObjectPoolStrategy::concurrently_pooled> Buffer;
+typedef BufferT<BufferMode::circular, BufferObjectPoolStrategy::concurrently_pooled> CircularBuffer;
 
 inline std::ostream& operator << (std::ostream &stream, Buffer& b)
 {
