@@ -118,6 +118,15 @@ struct BufferMode
 	};
 };
 
+struct BufferConcurrency
+{
+	enum type
+	{
+		none,
+		spsc
+	};
+};
+
 struct BufferObjectPoolStrategy
 {
 	enum type
@@ -127,6 +136,25 @@ struct BufferObjectPoolStrategy
 		concurrently_pooled
 	};
 };
+
+namespace {
+
+template<BufferConcurrency::type Concurrency>
+struct position_type_selector;
+
+template<>
+struct position_type_selector<BufferConcurrency::none>
+{
+	typedef std::size_t type;
+};
+
+template<>
+struct position_type_selector<BufferConcurrency::spsc>
+{
+	typedef volatile std::size_t type;	// we use volatile to prevent GCC optimization around buffer pointers to get correct set/get ordering
+};
+
+}
 
 /**
  * @brief BufferBase is a generic buffer implementation with super-imposed context
@@ -138,15 +166,17 @@ struct BufferObjectPoolStrategy
  * append or extract data from the internal data array. BufferBase supports
  * context object to let to impose some relationship among buffer classes.
  */
-template<BufferMode::type Mode>
+template<BufferMode::type Mode, BufferConcurrency::type Concurrency>
 class BufferBase
 {
+	typedef typename position_type_selector<Concurrency>::type position_t;
+
 	template <typename T>
 	struct is_buffer
 	{
 		//enum { value = boost::is_same<T, BufferBase >::value };
 		//enum { value = boost::is_base_and_derived<typename boost::remove_const<T>::type, BufferBase<Mode> >::value };
-		enum { value = boost::is_base_and_derived<BufferBase<Mode>, T>::value };
+		enum { value = boost::is_base_and_derived<BufferBase<Mode,Concurrency>, T>::value };
 	};
 
 	/**
@@ -267,8 +297,8 @@ public:
 		}
 		else
 		{
-			mReadPos = 0; mWritePos = 1;
-			mReadPosMarked = 0; mWritePosMarked = 1;
+			mReadPos = mWritePos = 0;
+			mReadPosMarked = mWritePosMarked = 0;
 		}
 	}
 
@@ -823,12 +853,13 @@ public:
 		}
 		else
 		{
+			//TODO
 			std::size_t size;
 			if(wpos() < rpos())
 			{
 				std::size_t size_to_end = mAllocatedSize - rpos();
 				std::size_t size_from_begin = wpos();
-				size = size_to_end + size_from_begin - 1;
+				size = size_to_end + size_from_begin;
 				if(LIKELY(size > 0))
 				{
 					byte* temporary = new byte[size];
@@ -841,7 +872,7 @@ public:
 			else
 			{
 				size = wpos() - rpos();
-				if(LIKELY(size > 0))
+				if(LIKELY(size > 0 && rpos() > 0))
 				{
 					::memmove(mData, mData + rpos(), size);
 				}
@@ -918,13 +949,15 @@ public:
 		}
 		else
 		{
-			if(wpos() <= rpos())
+			std::size_t current_wpos = wpos();	// get snapshot of wpos
+			std::size_t current_rpos = rpos();	// get snapshot of rpos
+			if(current_wpos < current_rpos)
 			{
-				return wpos() + mAllocatedSize - rpos() - 1;
+				return current_wpos + mAllocatedSize - current_rpos;
 			}
 			else
 			{
-				return wpos() - rpos() - 1;
+				return current_wpos - current_rpos;
 			}
 		}
 	}
@@ -987,20 +1020,28 @@ public:
 	 */
 	inline void rskip(std::size_t bytes)
 	{
-		BOOST_ASSERT(bytes <= allocatedSize());
 		if(Mode == BufferMode::plain)
 		{
+			BOOST_ASSERT(bytes <= mAllocatedSize);
+
 			mReadPos += bytes;
-			BOOST_ASSERT(mReadPos <= allocatedSize());
+			BOOST_ASSERT(mReadPos <= mAllocatedSize);
 		}
 		else
 		{
+			BOOST_ASSERT(bytes <= mAllocatedSize - 1);
+
 			if(bytes > dataSize())
 				throw std::length_error("out of data buffer");
+
+			//std::size_t size_before = dataSize();
 
 			mReadPos += bytes;
 			if(mReadPos >= mAllocatedSize)
 				mReadPos -= mAllocatedSize;
+
+			//std::size_t size_after = dataSize();
+			//BOOST_ASSERT(size_before - bytes == size_after);
 		}
 	}
 
@@ -1011,20 +1052,28 @@ public:
 	 */
 	inline void wskip(std::size_t bytes)
 	{
-		BOOST_ASSERT(bytes <= allocatedSize());
 		if(Mode == BufferMode::plain)
 		{
+			BOOST_ASSERT(bytes <= mAllocatedSize);
+
 			mWritePos += bytes;
-			BOOST_ASSERT(mWritePos <= allocatedSize());
+			BOOST_ASSERT(mWritePos <= mAllocatedSize);
 		}
 		else
 		{
+			BOOST_ASSERT(bytes <= mAllocatedSize - 1);
+
 			if(bytes > freeSize())
 				throw std::length_error("out of free buffer");
+
+			//std::size_t size_before = dataSize();
 
 			mWritePos += bytes;
 			if(mWritePos >= mAllocatedSize)
 				mWritePos -= mAllocatedSize;
+
+			//std::size_t size_after = dataSize();
+			//BOOST_ASSERT(size_before + bytes == size_after);
 		}
 	}
 
@@ -1035,14 +1084,17 @@ public:
 	 */
 	inline void rrev(std::size_t bytes)
 	{
-		BOOST_ASSERT(bytes <= allocatedSize());
 		if(Mode == BufferMode::plain)
 		{
+			BOOST_ASSERT(bytes <= mAllocatedSize);
+
 			BOOST_ASSERT(mReadPos >= bytes);
 			mReadPos -= bytes;
 		}
 		else
 		{
+			BOOST_ASSERT(bytes <= mAllocatedSize - 1);
+
 			if(mReadPos < bytes)
 				mReadPos = mAllocatedSize - (bytes - mReadPos);
 			else
@@ -1057,14 +1109,17 @@ public:
 	 */
 	inline void wrev(std::size_t bytes)
 	{
-		BOOST_ASSERT(bytes <= allocatedSize());
 		if(Mode == BufferMode::plain)
 		{
+			BOOST_ASSERT(bytes <= mAllocatedSize);
+
 			BOOST_ASSERT(mWritePos >= bytes);
 			mWritePos -= bytes;
 		}
 		else
 		{
+			BOOST_ASSERT(bytes <= mAllocatedSize - 1);
+
 			if(mWritePos < bytes)
 				mWritePos = mAllocatedSize - (bytes - mWritePos);
 			else
@@ -1321,15 +1376,15 @@ public:
 			}
 			else
 			{
-				if(rpos() + length < allocatedSize())
+				if(rpos() + length <= mAllocatedSize)
 				{
 					value.append((char*)rptr(), length);
 				}
 				else
 				{
-					std::size_t size_to_end = allocatedSize() - rpos();
+					std::size_t size_to_end = mAllocatedSize - rpos();
 					value.append((char*)rptr(), size_to_end);
-					value.append((char*)baseptr(), length - size_to_end);
+					value.append((char*)mData, length - size_to_end);
 				}
 			}
 		}
@@ -1503,7 +1558,6 @@ public:
 	{
 		uint32 length; readDirect(length);
 
-		BOOST_ASSERT(value->freeSize() >= length);
 		BOOST_ASSERT(dataSize() >= length);
 
 		value->append(*this, length);
@@ -1943,7 +1997,7 @@ public:
 		uint32 length = value->dataSize();
 		writeDirect(length);
 
-		BOOST_ASSERT(freeSize() >= length);
+		BOOST_ASSERT(value->dataSize() >= length);
 
 		BufferBase* non_const_value = const_cast<BufferBase*>(value);
 		append(*non_const_value, length);
@@ -1990,9 +2044,9 @@ public:
 
 			if(!mOnDemand)
 			{
-				BOOST_ASSERT(allocatedSize() >= wpos() + sizeof(T));
+				BOOST_ASSERT(mAllocatedSize >= wpos() + sizeof(T));
 			}
-			else if(allocatedSize() < wpos() + sizeof(T))
+			else if(mAllocatedSize < wpos() + sizeof(T))
 			{
 				std::size_t s = current_wpos + sizeof(T);
 				resize(round_up_to_nearest_power_of_two(s));
@@ -2007,12 +2061,12 @@ public:
 
 			if(!mOnDemand)
 			{
-				BOOST_ASSERT(allocatedSize() >= current_size + sizeof(T));
+				BOOST_ASSERT(mAllocatedSize >= current_size + sizeof(T) + 1);
 			}
-			else if(allocatedSize() < current_size + sizeof(T))
+			else if(mAllocatedSize < current_size + sizeof(T) + 1)
 			{
 				std::size_t s = current_size + sizeof(T);
-				resize(round_up_to_nearest_power_of_two(s));
+				resize(round_up_to_nearest_power_of_two(s) + 1);
 			}
 
 			setDirect(t, wpos());
@@ -2036,9 +2090,9 @@ public:
 
 			if(!mOnDemand)
 			{
-				BOOST_ASSERT(allocatedSize() >= current_wpos + size);
+				BOOST_ASSERT(mAllocatedSize >= current_wpos + size);
 			}
-			else if(allocatedSize() < current_wpos + size)
+			else if(mAllocatedSize < current_wpos + size)
 			{
 				std::size_t s = current_wpos + size;
 				resize(round_up_to_nearest_power_of_two(s));
@@ -2053,12 +2107,12 @@ public:
 
 			if(!mOnDemand)
 			{
-				BOOST_ASSERT(allocatedSize() >= current_size + size);
+				BOOST_ASSERT(mAllocatedSize >= current_size + size + 1);
 			}
-			else if(allocatedSize() < current_size + size)
+			else if(mAllocatedSize < current_size + size + 1)
 			{
 				std::size_t s = current_size + size;
-				resize(round_up_to_nearest_power_of_two(s));
+				resize(round_up_to_nearest_power_of_two(s) + 1);
 			}
 
 			setArray(source, wpos(), size);
@@ -2221,7 +2275,6 @@ public:
 	 */
 	inline void append(BufferBase &source, std::size_t size)
 	{
-		BOOST_ASSERT(size <= freeSize());
 		BOOST_ASSERT(size <= source.dataSize());
 		writeArray(source.rptr(), size);
 		source.rskip(size);
@@ -2237,7 +2290,14 @@ public:
 			crunch();
 		}
 
-		mData = (byte*)realloc((void*)mData, size);
+		if(mData)
+		{
+			mData = (byte*)realloc((void*)mData, size);
+		}
+		else
+		{
+			mData = (byte*)malloc(size);
+		}
 		mAllocatedSize = size;
 	}
 
@@ -2330,124 +2390,126 @@ private:
 	bool mReadOnly;
 	bool mOnDemand;
 
-	std::size_t mReadPos;
-	std::size_t mWritePos;
-	std::size_t mReadPosMarked;
-	std::size_t mWritePosMarked;
+	position_t mReadPos;
+	position_t mWritePos;
+	position_t mReadPosMarked;
+	position_t mWritePosMarked;
 
 	BufferContext mContext;
 };
 
-template<BufferMode::type Mode, BufferObjectPoolStrategy::type ObjectPoolStrategy>
+template<BufferMode::type Mode, BufferConcurrency::type Concurrency, BufferObjectPoolStrategy::type ObjectPoolStrategy>
 class BufferT;
 
-template<BufferMode::type Mode>
-class BufferT<Mode, BufferObjectPoolStrategy::none> : public BufferBase<Mode>
+template<BufferMode::type Mode,BufferConcurrency::type Concurrency>
+class BufferT<Mode, Concurrency, BufferObjectPoolStrategy::none> : public BufferBase<Mode,Concurrency>
 {
 public:
-	BufferT() : BufferBase<Mode>()
+	BufferT() : BufferBase<Mode,Concurrency>()
 	{
 	}
 
-	BufferT(std::size_t size) : BufferBase<Mode>(size)
+	BufferT(std::size_t size) : BufferBase<Mode,Concurrency>(size)
 	{
 	}
 
-	BufferT(byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	BufferT(byte* data, std::size_t size) : BufferBase<Mode,Concurrency>(data, size)
 	{
 	}
 
-	BufferT(const byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	BufferT(const byte* data, std::size_t size) : BufferBase<Mode,Concurrency>(data, size)
 	{
 	}
 
-	BufferT(const BufferT& buffer) : BufferBase<Mode>(buffer)
+	BufferT(const BufferT& buffer) : BufferBase<Mode,Concurrency>(buffer)
 	{
 	}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	BufferT(BufferT&& buffer) : BufferBase<Mode>(std::move(buffer))
+	BufferT(BufferT&& buffer) : BufferBase<Mode,Concurrency>(std::move(buffer))
 	{ }
 
 	BufferT& operator=(BufferT&& x)   // rvalues bind here
 	{
-		BufferBase<Mode>::operator=(std::move(x));
+		BufferBase<Mode,Concurrency>::operator=(std::move(x));
 	}
 #endif
 };
 
-template<BufferMode::type Mode>
-class BufferT<Mode, BufferObjectPoolStrategy::concurrently_pooled> : public BufferBase<Mode>, public ConcurrentObjectPool< BufferT<Mode, BufferObjectPoolStrategy::concurrently_pooled> >
+template<BufferMode::type Mode, BufferConcurrency::type Concurrency>
+class BufferT<Mode, Concurrency, BufferObjectPoolStrategy::concurrently_pooled> : public BufferBase<Mode,Concurrency>, public ConcurrentObjectPool< BufferT<Mode, Concurrency, BufferObjectPoolStrategy::concurrently_pooled> >
 {
 public:
-	BufferT() : BufferBase<Mode>()
+	BufferT() : BufferBase<Mode,Concurrency>()
 	{
 	}
 
-	BufferT(std::size_t size) : BufferBase<Mode>(size)
+	BufferT(std::size_t size) : BufferBase<Mode,Concurrency>(size)
 	{
 	}
 
-	BufferT(byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	BufferT(byte* data, std::size_t size) : BufferBase<Mode,Concurrency>(data, size)
 	{
 	}
 
-	BufferT(const byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	BufferT(const byte* data, std::size_t size) : BufferBase<Mode,Concurrency>(data, size)
 	{
 	}
 
-	BufferT(const BufferT& buffer) : BufferBase<Mode>(buffer)
+	BufferT(const BufferT& buffer) : BufferBase<Mode,Concurrency>(buffer)
 	{
 	}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	BufferT(BufferT&& buffer) : BufferBase<Mode>(std::move(buffer))
+	BufferT(BufferT&& buffer) : BufferBase<Mode,Concurrency>(std::move(buffer))
 	{ }
 
 	BufferT& operator=(BufferT&& x)   // rvalues bind here
 	{
-		BufferBase<Mode>::operator=(std::move(x));
+		BufferBase<Mode,Concurrency>::operator=(std::move(x));
 	}
 #endif
 };
 
-template<BufferMode::type Mode>
-class BufferT<Mode, BufferObjectPoolStrategy::pooled> : public BufferBase<Mode>, public ObjectPool< BufferT<Mode, BufferObjectPoolStrategy::pooled> >
+template<BufferMode::type Mode, BufferConcurrency::type Concurrency>
+class BufferT<Mode, Concurrency, BufferObjectPoolStrategy::pooled> : public BufferBase<Mode,Concurrency>, public ObjectPool< BufferT<Mode, Concurrency, BufferObjectPoolStrategy::pooled> >
 {
 public:
-	BufferT() : BufferBase<Mode>()
+	BufferT() : BufferBase<Mode,Concurrency>()
 	{
 	}
 
-	BufferT(std::size_t size) : BufferBase<Mode>(size)
+	BufferT(std::size_t size) : BufferBase<Mode,Concurrency>(size)
 	{
 	}
 
-	BufferT(byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	BufferT(byte* data, std::size_t size) : BufferBase<Mode,Concurrency>(data, size)
 	{
 	}
 
-	BufferT(const byte* data, std::size_t size) : BufferBase<Mode>(data, size)
+	BufferT(const byte* data, std::size_t size) : BufferBase<Mode,Concurrency>(data, size)
 	{
 	}
 
-	BufferT(const BufferT& buffer) : BufferBase<Mode>(buffer)
+	BufferT(const BufferT& buffer) : BufferBase<Mode,Concurrency>(buffer)
 	{
 	}
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-	BufferT(BufferT&& buffer) : BufferBase<Mode>(std::move(buffer))
+	BufferT(BufferT&& buffer) : BufferBase<Mode,Concurrency>(std::move(buffer))
 	{ }
 
 	BufferT& operator=(BufferT&& x)   // rvalues bind here
 	{
-		BufferBase<Mode>::operator=(std::move(x));
+		BufferBase<Mode,Concurrency>::operator=(std::move(x));
 	}
 #endif
 };
 
-typedef BufferT<BufferMode::plain, BufferObjectPoolStrategy::concurrently_pooled> Buffer;
-typedef BufferT<BufferMode::circular, BufferObjectPoolStrategy::concurrently_pooled> CircularBuffer;
+typedef BufferT<BufferMode::plain, BufferConcurrency::none, BufferObjectPoolStrategy::concurrently_pooled> Buffer;
+typedef BufferT<BufferMode::circular, BufferConcurrency::none, BufferObjectPoolStrategy::concurrently_pooled> CircularBuffer;
+typedef BufferT<BufferMode::plain, BufferConcurrency::spsc, BufferObjectPoolStrategy::concurrently_pooled> SpscBuffer;
+typedef BufferT<BufferMode::circular, BufferConcurrency::spsc, BufferObjectPoolStrategy::concurrently_pooled> SpscCircularBuffer;
 
 inline std::ostream& operator << (std::ostream &stream, Buffer& b)
 {

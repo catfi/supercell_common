@@ -879,7 +879,7 @@ BOOST_AUTO_TEST_CASE( CircularBufferBasicTest2 )
 {
 	CircularBuffer b(256);
 
-	for(int iter = 0; iter = 256; ++iter)
+	for(int iter = 0; iter < 256; ++iter)
 	{
 		BOOST_CHECK(b.freeSize() == 256);
 
@@ -901,12 +901,11 @@ BOOST_AUTO_TEST_CASE( CircularBufferBasicTest2 )
 	}
 }
 
-
 BOOST_AUTO_TEST_CASE( CircularBufferStrideTest )
 {
 	CircularBuffer b(257);
 
-	for(int iter = 0; iter = 256; ++iter)
+	for(int iter = 0; iter < 256; ++iter)
 	{
 		BOOST_CHECK(b.freeSize() == 257);
 
@@ -925,6 +924,95 @@ BOOST_AUTO_TEST_CASE( CircularBufferStrideTest )
 		}
 
 		BOOST_CHECK(b.freeSize() == 257);
+	}
+}
+
+BOOST_AUTO_TEST_CASE( CircularBufferCrunchTest )
+{
+	CircularBuffer b(257);
+
+	for(int iter = 0; iter < 256; ++iter)
+	{
+		BOOST_CHECK(b.freeSize() == 257);
+
+		for(int i=0;i<64;++i)
+		{
+			BOOST_CHECK_NO_THROW(b << i);
+		}
+
+		b.crunch();
+
+		BOOST_CHECK(b.freeSize() == 1);
+
+		for(int i=0;i<64;++i)
+		{
+			int x;
+			BOOST_CHECK_NO_THROW(b >> x);
+			BOOST_CHECK(x == i);
+		}
+
+		BOOST_CHECK(b.freeSize() == 257);
+	}
+}
+
+BOOST_AUTO_TEST_CASE( CircularBufferOnDemandResizingTest )
+{
+	CircularBuffer b;
+
+	for(int iter = 0; iter < 256; ++iter)
+	{
+		for(int i=0;i<64;++i)
+		{
+			BOOST_CHECK_NO_THROW(b << i);
+		}
+
+		b.crunch();
+
+		for(int i=0;i<64;++i)
+		{
+			int x;
+			BOOST_CHECK_NO_THROW(b >> x);
+			BOOST_CHECK(x == i);
+		}
+	}
+}
+
+void CircularBuffer_SPSC_Reader(SpscCircularBuffer* b)
+{
+	for(int i=0;i<64;++i)
+	{
+		std::size_t data_size;
+		while((data_size = b->dataSize()) < sizeof(int)) { }
+
+		int x;
+		//BOOST_CHECK_NO_THROW(*b >> x);
+		*b >> x;
+		BOOST_CHECK(x == i);
+	}
+}
+
+void CircularBuffer_SPSC_Writer(SpscCircularBuffer* b)
+{
+	for(int i=0;i<64;++i)
+	{
+		std::size_t free_size;
+		while((free_size = b->freeSize()) < sizeof(int)) { }
+		//BOOST_CHECK_NO_THROW(*b << i);
+		*b << i;
+	}
+}
+
+BOOST_AUTO_TEST_CASE( CircularBufferSingleProducerSingleConsumerTest )
+{
+	SpscCircularBuffer b(256);
+
+	for(int iter = 0; iter < 256; ++iter)
+	{
+		boost::thread reader(boost::bind(CircularBuffer_SPSC_Reader, &b));
+		boost::thread writer(boost::bind(CircularBuffer_SPSC_Writer, &b));
+
+		reader.join();
+		writer.join();
 	}
 }
 
