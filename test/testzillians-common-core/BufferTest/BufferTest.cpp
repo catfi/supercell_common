@@ -851,4 +851,81 @@ BOOST_AUTO_TEST_CASE( BufferOnDemandResizingTest )
 	}
 }
 
+BOOST_AUTO_TEST_CASE( CircularBufferBasicTest1 )
+{
+	CircularBuffer b(12);
+	BOOST_CHECK(b.freeSize() == 12);
+
+	int x = 1;
+	int y = 2;
+	int z = 3;
+
+	BOOST_CHECK_NO_THROW(b << x);
+	BOOST_CHECK_NO_THROW(b << y);
+	BOOST_CHECK_NO_THROW(b << z);
+
+	BOOST_CHECK(b.dataSize() == 12);
+	BOOST_CHECK(b.freeSize() == 0);
+
+	int xx; b >> xx; BOOST_CHECK(x == xx);
+	int yy; b >> yy; BOOST_CHECK(y == yy);
+	int zz; b >> zz; BOOST_CHECK(z == zz);
+
+	BOOST_CHECK(b.dataSize() == 0);
+	BOOST_CHECK(b.freeSize() == 12);
+}
+
+BOOST_AUTO_TEST_CASE( CircularBufferBasicTest2 )
+{
+	CircularBuffer b(256);
+
+	for(int iter = 0; iter = 256; ++iter)
+	{
+		BOOST_CHECK(b.freeSize() == 256);
+
+		for(int i=0;i<64;++i)
+		{
+			BOOST_CHECK_NO_THROW(b << i);
+		}
+
+		BOOST_CHECK(b.freeSize() == 0);
+
+		for(int i=0;i<64;++i)
+		{
+			int x;
+			BOOST_CHECK_NO_THROW(b >> x);
+			BOOST_CHECK(x == i);
+		}
+
+		BOOST_CHECK(b.freeSize() == 256);
+	}
+}
+
+
+BOOST_AUTO_TEST_CASE( CircularBufferStrideTest )
+{
+	CircularBuffer b(257);
+
+	for(int iter = 0; iter = 256; ++iter)
+	{
+		BOOST_CHECK(b.freeSize() == 257);
+
+		for(int i=0;i<64;++i)
+		{
+			BOOST_CHECK_NO_THROW(b << i);
+		}
+
+		BOOST_CHECK(b.freeSize() == 1);
+
+		for(int i=0;i<64;++i)
+		{
+			int x;
+			BOOST_CHECK_NO_THROW(b >> x);
+			BOOST_CHECK(x == i);
+		}
+
+		BOOST_CHECK(b.freeSize() == 257);
+	}
+}
+
 BOOST_AUTO_TEST_SUITE_END()

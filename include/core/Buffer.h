@@ -260,9 +260,16 @@ public:
 		mOwner = true; mReadOnly = false; mOnDemand = true;
 		mData = NULL;
 		mAllocatedSize = 0;
-		mReadPos = mWritePos = 0;
-		mReadPosMarked = mWritePosMarked = 0;
-
+		if(Mode == BufferMode::plain)
+		{
+			mReadPos = mWritePos = 0;
+			mReadPosMarked = mWritePosMarked = 0;
+		}
+		else
+		{
+			mReadPos = 0; mWritePos = 1;
+			mReadPosMarked = 0; mWritePosMarked = 1;
+		}
 	}
 
 	/**
@@ -277,10 +284,20 @@ public:
 	{
 		BOOST_ASSERT(size > 0);
 		mOwner = true; mReadOnly = false; mOnDemand = false;
-		mData = (byte*)malloc(size);
-		mAllocatedSize = size;
-		mReadPos = mWritePos = 0;
-		mReadPosMarked = mWritePosMarked = 0;
+		if(Mode == BufferMode::plain)
+		{
+			mData = (byte*)malloc(size);
+			mAllocatedSize = size;
+			mReadPos = mWritePos = 0;
+			mReadPosMarked = mWritePosMarked = 0;
+		}
+		else
+		{
+			mData = (byte*)malloc(size + 1);
+			mAllocatedSize = size + 1;
+			mReadPos = mWritePos = 0;
+			mReadPosMarked = mWritePosMarked = 0;
+		}
 	}
 
 	/**
@@ -297,8 +314,16 @@ public:
 		mOwner = false; mReadOnly = false; mOnDemand = false;
 		mData = data;
 		mAllocatedSize = size;
-		mReadPos = mWritePos = 0;
-		mReadPosMarked = mWritePosMarked = 0;
+		if(Mode == BufferMode::plain)
+		{
+			mReadPos = mWritePos = 0;
+			mReadPosMarked = mWritePosMarked = 0;
+		}
+		else
+		{
+			mReadPos = mWritePos = 0;
+			mReadPosMarked = mWritePosMarked = 0;
+		}
 	}
 
 	/**
@@ -319,8 +344,16 @@ public:
 		mOwner = false; mReadOnly = true; mOnDemand = false;
 		mData = (byte*)data;
 		mAllocatedSize = size;
-		mReadPos = mWritePos = 0;
-		mReadPosMarked = mWritePosMarked = 0;
+		if(Mode == BufferMode::plain)
+		{
+			mReadPos = mWritePos = 0;
+			mReadPosMarked = mWritePosMarked = 0;
+		}
+		else
+		{
+			mReadPos = mWritePos = 0;
+			mReadPosMarked = mWritePosMarked = 0;
+		}
 	}
 
 	/**
@@ -793,9 +826,9 @@ public:
 			std::size_t size;
 			if(wpos() < rpos())
 			{
-				std::size_t size_to_end = allocatedSize() - rpos();
+				std::size_t size_to_end = mAllocatedSize - rpos();
 				std::size_t size_from_begin = wpos();
-				size = size_to_end + size_from_begin;
+				size = size_to_end + size_from_begin - 1;
 				if(LIKELY(size > 0))
 				{
 					byte* temporary = new byte[size];
@@ -846,7 +879,14 @@ public:
 	 */
 	inline std::size_t allocatedSize() const
 	{
-		return mAllocatedSize;
+		if(Mode == BufferMode::plain)
+		{
+			return mAllocatedSize;
+		}
+		else
+		{
+			return mAllocatedSize - 1;
+		}
 	}
 
 	/**
@@ -878,13 +918,13 @@ public:
 		}
 		else
 		{
-			if(wpos() < rpos())
+			if(wpos() <= rpos())
 			{
-				return wpos() + allocatedSize() - rpos();
+				return wpos() + mAllocatedSize - rpos() - 1;
 			}
 			else
 			{
-				return wpos() - rpos();
+				return wpos() - rpos() - 1;
 			}
 		}
 	}
@@ -955,9 +995,12 @@ public:
 		}
 		else
 		{
+			if(bytes > dataSize())
+				throw std::length_error("out of data buffer");
+
 			mReadPos += bytes;
-			if(mReadPos >= allocatedSize())
-				mReadPos -= allocatedSize();
+			if(mReadPos >= mAllocatedSize)
+				mReadPos -= mAllocatedSize;
 		}
 	}
 
@@ -976,9 +1019,12 @@ public:
 		}
 		else
 		{
+			if(bytes > freeSize())
+				throw std::length_error("out of free buffer");
+
 			mWritePos += bytes;
-			if(mWritePos >= allocatedSize())
-				mWritePos -= allocatedSize();
+			if(mWritePos >= mAllocatedSize)
+				mWritePos -= mAllocatedSize;
 		}
 	}
 
@@ -998,7 +1044,7 @@ public:
 		else
 		{
 			if(mReadPos < bytes)
-				mReadPos = allocatedSize() - (bytes - mReadPos);
+				mReadPos = mAllocatedSize - (bytes - mReadPos);
 			else
 				mReadPos -= bytes;
 		}
@@ -1020,10 +1066,15 @@ public:
 		else
 		{
 			if(mWritePos < bytes)
-				mWritePos = allocatedSize() - (bytes - mWritePos);
+				mWritePos = mAllocatedSize - (bytes - mWritePos);
 			else
 				mWritePos -= bytes;
 		}
+	}
+
+	inline byte* ptr(std::size_t s) const
+	{
+		return (byte*)mData + s;
 	}
 
 	inline byte* baseptr() const
@@ -1452,7 +1503,7 @@ public:
 	{
 		uint32 length; readDirect(length);
 
-		BOOST_ASSERT(value.freeSize() >= length);
+		BOOST_ASSERT(value->freeSize() >= length);
 		BOOST_ASSERT(dataSize() >= length);
 
 		value->append(*this, length);
@@ -1933,18 +1984,40 @@ public:
 	{
 		BOOST_ASSERT(!mReadOnly);
 
-		if(!mOnDemand)
+		if(Mode == BufferMode::plain)
 		{
-			BOOST_ASSERT(allocatedSize() >= wpos() + sizeof(T));
-		}
-		else if(allocatedSize() < wpos() + sizeof(T))
-		{
-			std::size_t s = wpos() + sizeof(T);
-			resize(round_up_to_nearest_power_of_two(s));
-		}
+			std::size_t current_wpos = wpos();
 
-		setDirect(t, wpos());
-		wskip(sizeof(T));
+			if(!mOnDemand)
+			{
+				BOOST_ASSERT(allocatedSize() >= wpos() + sizeof(T));
+			}
+			else if(allocatedSize() < wpos() + sizeof(T))
+			{
+				std::size_t s = current_wpos + sizeof(T);
+				resize(round_up_to_nearest_power_of_two(s));
+			}
+
+			setDirect(t, wpos());
+			wskip(sizeof(T));
+		}
+		else
+		{
+			std::size_t current_size = dataSize();
+
+			if(!mOnDemand)
+			{
+				BOOST_ASSERT(allocatedSize() >= current_size + sizeof(T));
+			}
+			else if(allocatedSize() < current_size + sizeof(T))
+			{
+				std::size_t s = current_size + sizeof(T);
+				resize(round_up_to_nearest_power_of_two(s));
+			}
+
+			setDirect(t, wpos());
+			wskip(sizeof(T));
+		}
 	}
 
 	/**
@@ -1957,18 +2030,40 @@ public:
 	{
 		BOOST_ASSERT(!mReadOnly);
 
-		if(!mOnDemand)
+		if(Mode == BufferMode::plain)
 		{
-			BOOST_ASSERT(allocatedSize() >= wpos() + size);
-		}
-		else if(allocatedSize() < wpos() + size)
-		{
-			std::size_t s = wpos() + size;
-			resize(round_up_to_nearest_power_of_two(s));
-		}
+			std::size_t current_wpos = wpos();
 
-		setArray(source, wpos(), size);
-		wskip(size);
+			if(!mOnDemand)
+			{
+				BOOST_ASSERT(allocatedSize() >= current_wpos + size);
+			}
+			else if(allocatedSize() < current_wpos + size)
+			{
+				std::size_t s = current_wpos + size;
+				resize(round_up_to_nearest_power_of_two(s));
+			}
+
+			setArray(source, current_wpos, size);
+			wskip(size);
+		}
+		else
+		{
+			std::size_t current_size = dataSize();
+
+			if(!mOnDemand)
+			{
+				BOOST_ASSERT(allocatedSize() >= current_size + size);
+			}
+			else if(allocatedSize() < current_size + size)
+			{
+				std::size_t s = current_size + size;
+				resize(round_up_to_nearest_power_of_two(s));
+			}
+
+			setArray(source, wpos(), size);
+			wskip(size);
+		}
 	}
 
 	/**
@@ -1989,9 +2084,9 @@ public:
 		else
 		{
 			// if we just cross the boundary
-			if(position + sizeof(T) > allocatedSize())
+			if(position + sizeof(T) > mAllocatedSize)
 			{
-				std::size_t size_to_end = allocatedSize() - position;
+				std::size_t size_to_end = mAllocatedSize - position;
 				::memcpy(((byte*)&t), mData + position, size_to_end);
 				::memcpy(((byte*)&t) + size_to_end, mData, sizeof(T) - size_to_end);
 			}
@@ -2023,9 +2118,9 @@ public:
 		else
 		{
 			// if we just cross the boundary
-			if(position + size > allocatedSize())
+			if(position + size > mAllocatedSize)
 			{
-				std::size_t size_to_end = allocatedSize() - position;
+				std::size_t size_to_end = mAllocatedSize - position;
 				::memcpy(dest, mData + position, size_to_end);
 				::memcpy(dest + size_to_end, mData, size - size_to_end);
 			}
@@ -2054,9 +2149,10 @@ public:
 		else
 		{
 			// if we just cross the boundary
-			if(position + sizeof(T) > allocatedSize())
+			if(position + sizeof(T) > mAllocatedSize)
 			{
-				std::size_t size_to_end = allocatedSize() - position;
+				// TODO use for-loop instead of memcpy
+				std::size_t size_to_end = mAllocatedSize - position;
 				::memcpy(mData + position, ((byte*)&t), size_to_end);
 				::memcpy(mData, ((byte*)&t) + size_to_end, sizeof(T) - size_to_end);
 			}
@@ -2088,9 +2184,9 @@ public:
 		else
 		{
 			// if we just cross the boundary
-			if(position + size > allocatedSize())
+			if(position + size > mAllocatedSize)
 			{
-				std::size_t size_to_end = allocatedSize() - position;
+				std::size_t size_to_end = mAllocatedSize - position;
 				::memcpy(mData + position, source, size_to_end);
 				::memcpy(mData, source + size_to_end, size - size_to_end);
 			}
