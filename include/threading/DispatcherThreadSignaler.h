@@ -33,7 +33,7 @@ class DispatcherThreadSignaler
 {
 public:
 	DispatcherThreadSignaler() : mWaitSignal(sizeof (uint64) * 8 - 1)
-	{ }
+	{ mBitmap = 0; }
 
 	~DispatcherThreadSignaler()
 	{ }
@@ -60,7 +60,15 @@ public:
 	}
 
 	uint64 check()
+	{ return mBitmap; }
+
+	uint64 reset()
 	{ return atomic::bitmap_xchg(mBitmap, 0); }
+
+	void bitZeroSet(uint32 bit)
+	{
+		atomic::bitmap_btsr(mBitmap, bit, bit);
+	}
 
 private:
 	Semaphore mSemaphore;

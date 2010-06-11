@@ -403,7 +403,7 @@ public:
         if (w == f)
             return true;
 
-        if(c.compare_and_swap(w, f) != w)
+        if(c.compare_and_swap(f, w) != w)
         {
         	c = f;
             w = f;
@@ -416,10 +416,10 @@ public:
 
     inline bool check_read ()
     {
-        if (&queue.front () != r)
+        if ((&queue.front () != r) && r)
              return true;
 
-        r = c.compare_and_swap(&queue.front(), NULL);
+        r = c.compare_and_swap(NULL, &queue.front());
 
         if (&queue.front () == r || !r)
             return false;

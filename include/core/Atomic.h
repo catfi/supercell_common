@@ -129,7 +129,7 @@ inline bool b_cas_ptr(void* volatile* pdst, void* pval, void* pcmp)
 #endif
 }
 
-inline bool bitmap_btsr(uint64 bitmap, int index_to_set, int index_to_reset)
+inline bool bitmap_btsr(uint64& bitmap, int index_to_set, int index_to_reset)
 {
 	uint64 bitmap_old;
 #if defined(__GNUC__)
@@ -158,7 +158,7 @@ inline bool bitmap_btsr(uint64 bitmap, int index_to_set, int index_to_reset)
 #endif
 }
 
-inline uint64 bitmap_xchg(uint64 bitmap, uint64 bitmap_new)
+inline uint64 bitmap_xchg(uint64& bitmap, uint64 bitmap_new)
 {
 	uint64 bitmap_old;
 #if defined(__GNUC__)
@@ -178,7 +178,7 @@ inline uint64 bitmap_xchg(uint64 bitmap, uint64 bitmap_new)
 // itez => "if-zero-then-else" atomic operation
 // if the value is zero, then it's substituted by valueThen, otherwise by valueElse
 // and return the original value
-inline uint64 bitmap_izte(uint64 bitmap, uint64 bitmap_then, uint64 bitmap_else)
+inline uint64 bitmap_izte(uint64& bitmap, uint64 bitmap_then, uint64 bitmap_else)
 {
 	uint64 bitmap_old;
 #if defined(__GNUC__)

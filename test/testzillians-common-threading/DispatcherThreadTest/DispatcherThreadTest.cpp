@@ -34,6 +34,8 @@
 
 using namespace zillians;
 using namespace zillians::threading;
+using std::cout;
+using std::endl;
 
 log4cxx::LoggerPtr mLogger(log4cxx::Logger::getLogger("DispatcherThreadTest"));
 
@@ -54,6 +56,7 @@ void writer_thread(shared_ptr<DispatcherThreadContext<Message> > dt, uint32 dest
 
 	for(int i=0;i<ITERATIONS;++i)
 	{
+//		cout << "writer iteration: " << i << endl;
 		m.count = i;
 		dest->write(m);
 	}
@@ -61,12 +64,22 @@ void writer_thread(shared_ptr<DispatcherThreadContext<Message> > dt, uint32 dest
 
 void reader_thread(shared_ptr<DispatcherThreadContext<Message> > dt, uint32 source)
 {
+	Message m[ITERATIONS];
+	uint32  s[ITERATIONS];
+	uint32 k = 0;
+	uint32 n = ITERATIONS;
 	for(int i=0;i<ITERATIONS;++i)
 	{
-		Message m;
-		while(!dt->read(source, m)) { }
+//		cout << "reader iteration: " << i << endl;
 
-		BOOST_ASSERT(m.count == i);
+		while(dt->read(&s[0], &m[0], n)) { }
+	}
+
+	for(int j=0;j<n;++j)
+	{
+		BOOST_ASSERT(m[j].count == k);
+		BOOST_ASSERT(s[j] == source);
+		++k;
 	}
 }
 
@@ -87,7 +100,7 @@ void writer_reader_thread(shared_ptr<DispatcherThreadContext<Message> > dt, std:
 		for(uint32 i=0;i<ITERATIONS;++i)
 		{
 			uint32 source;
-			while(!dt->read(source, m));
+			while(dt->read(source, m));
 
 			BOOST_ASSERT(m.count == 1);
 		}
@@ -98,7 +111,7 @@ int main (int argc, char** argv)
 {
 	log4cxx::BasicConfigurator::configure();
 
-	Dispatcher<Message> dispatcher(64);
+	Dispatcher<Message> dispatcher(63);
 
 	if(true)
 	{
@@ -114,6 +127,7 @@ int main (int argc, char** argv)
 
 	for(int i=0;i<10;++i)
 	{
+		cout << "iteration: " << i+1 << " of 10" << endl;
 		std::vector<uint32> destinations;
 		std::vector<shared_ptr<DispatcherThreadContext<Message> > > dts;
 		for(int i=0;i<READER_WRITER_THREAD_COUNT;++i)
@@ -123,9 +137,7 @@ int main (int argc, char** argv)
 			dts.push_back(dt);
 		}
 
-//		boost::thread** wr_threads = new boost::thread[READER_WRITER_THREAD_COUNT];
-		boost::thread** wr_threads;
-		*wr_threads = new boost::thread[READER_WRITER_THREAD_COUNT];
+		boost::thread** wr_threads = new boost::thread*[READER_WRITER_THREAD_COUNT];
 
 		for(int i=0;i<READER_WRITER_THREAD_COUNT;++i)
 		{
