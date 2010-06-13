@@ -89,19 +89,20 @@ public:
 			{
 				if(signals & uint64 (1) << i)
 				{
-					mSignaler.bitZeroSet(i);
 					for(; n < count; ++n)
 					{
 						if(!mDispatcher->read(i, mId, &message[n]))
+						{
+							mSignaler.bitReset(i);
 							break;
+						}
 
 						if(source)
 							source[n] = i;
 					}
 				}
-//				mSignaler.reset();
 			}
-			BOOST_ASSERT(n > 0);
+			count = n;
 		}
 
 		return n > 0;

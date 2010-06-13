@@ -110,12 +110,11 @@ public:
 	virtual void write(uint32 source, uint32 destination, const Message& message, bool incomplete)
 	{
 		ContextPipe* pipes = mPipes[source * mMaxThreadContextCount + destination];
-//		pipes->write(message, incomplete);
-		pipes->write(message, true);
+		pipes->write(message, incomplete);
 
 		if(!incomplete)
 		{
-//			pipes->flush();
+			pipes->flush();
 			mSignalers[destination]->signal(source);
 		}
 	}

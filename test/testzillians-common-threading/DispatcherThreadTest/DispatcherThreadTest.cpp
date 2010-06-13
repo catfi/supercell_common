@@ -62,24 +62,30 @@ void writer_thread(shared_ptr<DispatcherThreadContext<Message> > dt, uint32 dest
 	}
 }
 
-void reader_thread(shared_ptr<DispatcherThreadContext<Message> > dt, uint32 source)
+void reader_thread(shared_ptr<DispatcherThreadContext<Message> > dt, uint32 source, bool blocking)
 {
 	Message m[ITERATIONS];
 	uint32  s[ITERATIONS];
 	uint32 k = 0;
 	uint32 n = ITERATIONS;
-	for(int i=0;i<ITERATIONS;++i)
+	uint32 totalMsg = 0;
+	uint32 i = 0;
+	while(totalMsg < ITERATIONS)
 	{
 //		cout << "reader iteration: " << i << endl;
 
-		while(dt->read(&s[0], &m[0], n)) { }
-	}
-
-	for(int j=0;j<n;++j)
-	{
-		BOOST_ASSERT(m[j].count == k);
-		BOOST_ASSERT(s[j] == source);
-		++k;
+		n = ITERATIONS;
+		if(dt->read(s, m, n, blocking)) 
+		{
+			totalMsg += n;
+			for(int j = 0; j < n; ++j)
+			{
+				BOOST_ASSERT(m[j].count == k);
+				BOOST_ASSERT(s[j] == source);
+				++k;
+			}
+		}
+		++i;
 	}
 }
 
@@ -118,11 +124,27 @@ int main (int argc, char** argv)
 		shared_ptr<DispatcherThreadContext<Message> > reader_dt = dispatcher.createThreadContext();
 		shared_ptr<DispatcherThreadContext<Message> > writer_dt = dispatcher.createThreadContext();
 
-		boost::thread t0(boost::bind(reader_thread, reader_dt, writer_dt->getIdentity()));
+		boost::thread t0(boost::bind(reader_thread, reader_dt, writer_dt->getIdentity(), false));
 		boost::thread t1(boost::bind(writer_thread, writer_dt, reader_dt->getIdentity()));
 
 		t0.join();
 		t1.join();
+
+		cout << "non-blocking reading ok" << endl;
+	}
+	
+	if(true)
+	{
+		shared_ptr<DispatcherThreadContext<Message> > reader_dt = dispatcher.createThreadContext();
+		shared_ptr<DispatcherThreadContext<Message> > writer_dt = dispatcher.createThreadContext();
+
+		boost::thread t0(boost::bind(reader_thread, reader_dt, writer_dt->getIdentity(), true));
+		boost::thread t1(boost::bind(writer_thread, writer_dt, reader_dt->getIdentity()));
+
+		t0.join();
+		t1.join();
+
+		cout << "blocking reading ok" << endl;
 	}
 
 	for(int i=0;i<10;++i)

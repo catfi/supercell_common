@@ -33,7 +33,7 @@ class DispatcherThreadSignaler
 {
 public:
 	DispatcherThreadSignaler() : mWaitSignal(sizeof (uint64) * 8 - 1)
-	{ mBitmap = 0; }
+	{ mBitmap = uint64(1) << mWaitSignal; }
 
 	~DispatcherThreadSignaler()
 	{ }
@@ -48,12 +48,11 @@ public:
 	uint64 poll(uint32 id)
 	{
 		uint64 result = 0;
-		result = atomic::bitmap_izte(mBitmap, uint64(1) << mWaitSignal, 0);
+		result = mBitmap;
 
 		if(!result)
 		{
 			mSemaphore.wait();
-			result = atomic::bitmap_xchg(mBitmap, 0);
 		}
 
 		return result;
@@ -65,7 +64,7 @@ public:
 	uint64 reset()
 	{ return atomic::bitmap_xchg(mBitmap, 0); }
 
-	void bitZeroSet(uint32 bit)
+	void bitReset(uint32 bit)
 	{
 		atomic::bitmap_btsr(mBitmap, bit, bit);
 	}
