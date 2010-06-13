@@ -99,10 +99,14 @@ void ThreadReader(atomic::AtomicPipe<int, numElements>* pipe)
 	cout << "reader" << endl;
 
 	int ret;
-	for(int i = 0; i < numData; ++i)
+	int i = 0;
+	while(i < numData)
 	{
 		if(pipe->read(&ret))
+		{
 			BOOST_ASSERT(ret == i);
+			++i;
+		}
 	}
 }
 
@@ -114,7 +118,8 @@ void ThreadWriter(atomic::AtomicPipe<int, numElements>* pipe)
 
 	for(int i = 0; i < numData; ++i)
 	{
-		pipe->write(i, true);
+		pipe->write(i, false);
+		pipe->flush();
 	}
 }
 
