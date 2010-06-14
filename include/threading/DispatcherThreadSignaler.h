@@ -47,8 +47,9 @@ public:
 
 	uint64 poll(uint32 id)
 	{
-		uint64 result = 0;
-		result = mBitmap;
+		// TODO use ypollset style izte atomic op
+		uint64 result = atomic::bitmap_xchg(mBitmap, 0);
+		//result = mBitmap;
 
 		if(!result)
 		{
@@ -59,10 +60,10 @@ public:
 	}
 
 	uint64 check()
-	{ return mBitmap; }
-
-	uint64 reset()
 	{ return atomic::bitmap_xchg(mBitmap, 0); }
+
+	uint64 bitOr(uint64 bitmap)
+	{ return atomic::bitmap_or(mBitmap, bitmap); }
 
 	void bitReset(uint32 bit)
 	{

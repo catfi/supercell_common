@@ -209,6 +209,35 @@ inline uint64 bitmap_izte(uint64& bitmap, uint64 bitmap_then, uint64 bitmap_else
 	return bitmap_old;
 }
 
+inline bool bitmap_or(uint64& bitmap, uint64 bitmap_or)
+{
+	uint64 bitmap_old;
+#if defined(__GNUC__)
+	uint64 dummy;
+	__asm__ volatile (
+			"mov %0, %1\n\t"
+			"1:\n\t"
+			"mov %1, %2\n\t"
+			"or %3, %2\n\t"
+			"btr %4, %2\n\t"
+			"lock cmpxchg %2, %0\n\t"
+			"jnz 1b\n\t"
+			: "+m" (bitmap), "=&a" (bitmap_old), "=&r" (dummy)
+			: "r" (bitmap_or)
+			: "cc"
+			);
+	return bitmap_old;
+#elif defined(WIN32)
+	while(true)
+	{
+		bitmap_old = bitmap;
+		bitmap_new = (bitmap_old | bitmap_or);
+		if(_InterlockedCompareExchange((volatile LONG*)&bitmap, bitmap_new, bitmap_old) == (LONG)bitmap_old)
+			return bitmap_old;
+	}
+#endif
+}
+
 } }
 
 #endif /* ZILLIANS_ATOMIC_H_ */

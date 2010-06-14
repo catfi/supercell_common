@@ -93,7 +93,7 @@ public:
 					{
 						if(!mDispatcher->read(i, mId, &message[n]))
 						{
-							mSignaler.bitReset(i);
+							//mSignaler.bitReset(i);
 							break;
 						}
 
