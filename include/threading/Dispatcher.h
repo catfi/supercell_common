@@ -29,7 +29,7 @@
 #include "threading/DispatcherThreadContext.h"
 #include "threading/DispatcherNetwork.h"
 
-#define ZILLIANS_DISPATCHER_MAX_THREADS		64
+#define ZILLIANS_DISPATCHER_MAX_THREADS		63
 #define ZILLIANS_DISPATCHER_PIPE_CHUNK_SIZE	256
 
 namespace zillians { namespace threading {

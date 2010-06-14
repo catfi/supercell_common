@@ -93,7 +93,7 @@ public:
 					{
 						if(!mDispatcher->read(i, mId, &message[n]))
 						{
-							//mSignaler.bitReset(i);
+							signals = signals & ~(uint64(1) << i);
 							break;
 						}
 
@@ -103,6 +103,7 @@ public:
 				}
 			}
 			count = n;
+			mSignaler.bitOr(signals);
 		}
 
 		return n > 0;

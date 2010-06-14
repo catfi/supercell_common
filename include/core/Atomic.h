@@ -219,7 +219,6 @@ inline bool bitmap_or(uint64& bitmap, uint64 bitmap_or)
 			"1:\n\t"
 			"mov %1, %2\n\t"
 			"or %3, %2\n\t"
-			"btr %4, %2\n\t"
 			"lock cmpxchg %2, %0\n\t"
 			"jnz 1b\n\t"
 			: "+m" (bitmap), "=&a" (bitmap_old), "=&r" (dummy)

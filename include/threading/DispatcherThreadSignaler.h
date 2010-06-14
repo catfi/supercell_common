@@ -33,7 +33,7 @@ class DispatcherThreadSignaler
 {
 public:
 	DispatcherThreadSignaler() : mWaitSignal(sizeof (uint64) * 8 - 1)
-	{ mBitmap = uint64(1) << mWaitSignal; }
+	{ mBitmap = 0; }
 
 	~DispatcherThreadSignaler()
 	{ }
@@ -47,13 +47,12 @@ public:
 
 	uint64 poll(uint32 id)
 	{
-		// TODO use ypollset style izte atomic op
-		uint64 result = atomic::bitmap_xchg(mBitmap, 0);
-		//result = mBitmap;
+		uint64 result = atomic::bitmap_izte(mBitmap, uint64(1) << mWaitSignal, 0);
 
 		if(!result)
 		{
 			mSemaphore.wait();
+			result = atomic::bitmap_xchg (mBitmap, 0);
 		}
 
 		return result;
