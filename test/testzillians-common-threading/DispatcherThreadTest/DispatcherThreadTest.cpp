@@ -119,7 +119,7 @@ int main (int argc, char** argv)
 
 	Dispatcher<Message> dispatcher(63);
 
-	if(true)
+	for(int i=0;i<10;++i)
 	{
 		shared_ptr<DispatcherThreadContext<Message> > reader_dt = dispatcher.createThreadContext();
 		shared_ptr<DispatcherThreadContext<Message> > writer_dt = dispatcher.createThreadContext();
@@ -130,10 +130,10 @@ int main (int argc, char** argv)
 		t0.join();
 		t1.join();
 
-		cout << "non-blocking reading ok" << endl;
+		cout << "iteration: " << i+1 << " of 10, non-blocking reading ok" << endl;
 	}
 	
-	if(true)
+	for(int i=0;i<10;++i)
 	{
 		shared_ptr<DispatcherThreadContext<Message> > reader_dt = dispatcher.createThreadContext();
 		shared_ptr<DispatcherThreadContext<Message> > writer_dt = dispatcher.createThreadContext();
@@ -144,7 +144,7 @@ int main (int argc, char** argv)
 		t0.join();
 		t1.join();
 
-		cout << "blocking reading ok" << endl;
+		cout << "iteration: " << i+1 << " of 10, blocking reading ok" << endl;
 	}
 
 	for(int i=0;i<10;++i)
