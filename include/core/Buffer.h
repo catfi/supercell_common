@@ -892,6 +892,16 @@ public:
 		mWritePosMarked = mWritePos;
 	}
 
+	inline void markRead()
+	{
+		mReadPosMarked = mReadPos;
+	}
+
+	inline void markWrite()
+	{
+		mWritePosMarked = mWritePos;
+	}
+
 	/**
 	 * @brief Resets this buffer's position to the previously-marked position.
 	 * @note The default marked position is zero.
@@ -1004,6 +1014,46 @@ public:
 		}
 	}
 
+	/**
+	 * Get the current available data range vector
+	 *
+	 * This method is basically used in circular buffer scenario, in which we need to get the physical memory ranges for available data
+	 *
+	 * @return The current available data size
+	 */
+	inline std::size_t getDataRangesFromMark(std::vector<std::pair<byte*,std::size_t> >& ranges)
+	{
+		std::size_t current_wpos = mWritePosMarked;
+		std::size_t current_rpos = mReadPosMarked;
+
+		if(Mode == BufferMode::plain)
+		{
+			ranges.push_back(std::make_pair(mData + current_rpos, current_wpos - current_rpos));
+			return current_wpos - current_rpos;
+		}
+		else
+		{
+			if(current_wpos < current_rpos)
+			{
+				//return current_wpos + mAllocatedSize - current_rpos;
+				ranges.push_back(std::make_pair(mData + current_rpos, mAllocatedSize - current_rpos));
+				ranges.push_back(std::make_pair(mData, current_wpos));
+				return mAllocatedSize - current_rpos + current_wpos;
+			}
+			else
+			{
+				if(current_wpos != current_rpos)
+				{
+					ranges.push_back(std::make_pair(mData + current_rpos, current_wpos - current_rpos));
+					return current_wpos - current_rpos;
+				}
+				else
+				{
+					return 0;
+				}
+			}
+		}
+	}
 public:
 	/**
 	 * @brief Get the current read pointer position.
