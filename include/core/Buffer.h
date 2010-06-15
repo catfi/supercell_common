@@ -943,21 +943,63 @@ public:
 	 */
 	inline std::size_t dataSize() const
 	{
+		std::size_t current_wpos = wpos();	// get snapshot of wpos
+		std::size_t current_rpos = rpos();	// get snapshot of rpos
+
 		if(Mode == BufferMode::plain)
 		{
-			return wpos() - rpos();
+			return current_wpos - current_rpos;
 		}
 		else
 		{
-			std::size_t current_wpos = wpos();	// get snapshot of wpos
-			std::size_t current_rpos = rpos();	// get snapshot of rpos
 			if(current_wpos < current_rpos)
 			{
-				return current_wpos + mAllocatedSize - current_rpos;
+				return mAllocatedSize - current_rpos + current_wpos;
 			}
 			else
 			{
 				return current_wpos - current_rpos;
+			}
+		}
+	}
+
+	/**
+	 * Get the current available data range vector
+	 *
+	 * This method is basically used in circular buffer scenario, in which we need to get the physical memory ranges for available data
+	 *
+	 * @return The current available data size
+	 */
+	inline std::size_t getDataRanges(std::vector<std::pair<byte*,std::size_t> >& ranges)
+	{
+		std::size_t current_wpos = wpos();
+		std::size_t current_rpos = rpos();
+
+		if(Mode == BufferMode::plain)
+		{
+			ranges.push_back(std::make_pair(mData + current_rpos, current_wpos - current_rpos));
+			return current_wpos - current_rpos;
+		}
+		else
+		{
+			if(current_wpos < current_rpos)
+			{
+				//return current_wpos + mAllocatedSize - current_rpos;
+				ranges.push_back(std::make_pair(mData + current_rpos, mAllocatedSize - current_rpos));
+				ranges.push_back(std::make_pair(mData, current_wpos));
+				return mAllocatedSize - current_rpos + current_wpos;
+			}
+			else
+			{
+				if(current_wpos != current_rpos)
+				{
+					ranges.push_back(std::make_pair(mData + current_rpos, current_wpos - current_rpos));
+					return current_wpos - current_rpos;
+				}
+				else
+				{
+					return 0;
+				}
 			}
 		}
 	}
