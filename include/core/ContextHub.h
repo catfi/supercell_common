@@ -25,7 +25,7 @@
 
 #include "core/Common.h"
 #include "core/SharedPtr.h"
-
+#include <tr1/unordered_map>
 #include <tbb/atomic.h>
 
 /**
@@ -221,6 +221,11 @@ public:
 		refSharedContext<T>(name).reset();
 	}
 
+	inline std::size_t size()
+	{
+		return mSharedContextObjects.size();
+	}
+
 private:
 	/**
 	 * The magic trick to store and access context object by using static
@@ -244,6 +249,109 @@ private:
 	}
 
 	std::map< std::string, shared_ptr<void> > mSharedContextObjects;
+};
+
+/**
+ * HashedContextHub provides index to context pointer mapping.
+ *
+ * IndexedContextHub is an alternative version of ContexHub in which
+ * an key can be provided as the identifier of the context pointer.
+ * By default, the key is the name (typeid) of the given type object.
+ */
+template<ContextOwnership::type TransferOwnershipDefault = ContextOwnership::transfer, typename KeyType = uint32>
+class HashedContextHub
+{
+private:
+	struct NullDeleter
+	{
+	    void operator() (void const *) const
+	    { }
+	};
+
+public:
+	HashedContextHub()
+	{ }
+
+	virtual ~HashedContextHub()
+	{ }
+
+public:
+	/**
+	 * Save an object of type T into the universal storage.
+	 *
+	 * @note If the TransferOwnership template parameter is set, the ownership of the given object is transferred to this ContextHub instance.
+	 *
+	 * @param ctx The given object of type T
+	 */
+	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>
+	inline void set(T* ctx, const KeyType& key)
+	{
+		if(TransferOwnership == ContextOwnership::transfer)
+		{
+			refSharedContext<T>(key) = shared_ptr<T>(ctx);
+		}
+		else
+		{
+			refSharedContext<T>(key) = shared_ptr<T>(ctx, NullDeleter());
+		}
+	}
+
+	/**
+	 * Retrieve the object according to the given type T.
+	 *
+	 * @return The pointer to the stored object. Return null pointer if it's not set previously.
+	 */
+	template <typename T>
+	inline T* get(const KeyType& key)
+	{
+		return static_pointer_cast<T>(refSharedContext<T>(key)).get();
+	}
+
+	/**
+	 * Remove the previously stored object instance of type T.
+	 *
+	 * @note If the TransferOwnership template parameter is set, ContextHub will automatically destroy the object; otherwise
+	 */
+	template <typename T>
+	inline void reset(const KeyType& key)
+	{
+		refSharedContext<T>(key).reset();
+	}
+
+	inline std::size_t size()
+	{
+		return mSharedContextObjects.size();
+	}
+
+	template<typename F>
+	void foreach(F functor)
+	{
+		std::for_each(mSharedContextObjects.begin(), mSharedContextObjects.end(), functor);
+	}
+
+private:
+	/**
+	 * The magic trick to store and access context object by using static
+	 * initialization to identify the index of a specific type.
+	 *
+	 * @return The reference to the shared pointer
+	 */
+	template <typename T>
+	inline shared_ptr<void>& refSharedContext(const KeyType& name)
+	{
+		typename std::tr1::unordered_map<KeyType, shared_ptr<void> >::iterator it = mSharedContextObjects.find(name);
+		if(UNLIKELY(it == mSharedContextObjects.end()))
+		{
+			mSharedContextObjects[name] = shared_ptr<void>();
+			return mSharedContextObjects[name];
+		}
+		else
+		{
+			return it->second;
+		}
+	}
+
+	std::tr1::unordered_map<KeyType, shared_ptr<void> > mSharedContextObjects;
 };
 
 }

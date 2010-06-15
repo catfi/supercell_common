@@ -41,7 +41,7 @@ public:
 	typedef atomic::AtomicPipe<Message, ZILLIANS_DISPATCHER_PIPE_CHUNK_SIZE> ContextPipe;
 
 public:
-	Dispatcher(uint32 max_dispatcher_threads) : mMaxThreadContextCount(max_dispatcher_threads)
+	Dispatcher(uint32 max_dispatcher_threads = ZILLIANS_DISPATCHER_MAX_THREADS) : mMaxThreadContextCount(max_dispatcher_threads)
 	{
 		BOOST_ASSERT(max_dispatcher_threads <= ZILLIANS_DISPATCHER_MAX_THREADS);
 
