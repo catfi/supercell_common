@@ -67,9 +67,15 @@ public:
 		{
 			BOOST_ASSERT(!mAttachedFlags[i]);
 		}
-		delete [] mPipes;
-		delete [] mSignalers;
-		delete mAttachedFlags;
+
+		for(uint32 i = 0; i < mMaxThreadContextCount * mMaxThreadContextCount; ++i)
+		{
+			SAFE_DELETE(mPipes[i]);
+		}
+
+		SAFE_DELETE_ARRAY(mPipes);
+		SAFE_DELETE_ARRAY(mSignalers);
+		SAFE_DELETE_ARRAY(mAttachedFlags);
 	}
 
 public:

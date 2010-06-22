@@ -40,7 +40,7 @@ public:
 	DispatcherThreadContext(DispatcherNetwork<Message>* dispatcher, uint32 id, uint32 max_thread_id) : mId(id), mMaxThreadId(max_thread_id), mDispatcher(dispatcher)
 	{ }
 
-	~DispatcherThreadContext()
+	virtual ~DispatcherThreadContext()
 	{
 		mDispatcher->distroyThreadContext(mId);
 	}
