@@ -32,7 +32,7 @@
 #endif
 
 #define ITERATION_COUNT 1
-#define ELEMENT_COUNT 20000
+#define ELEMENT_COUNT 200000
 int main(int argc, char** argv)
 {
 	printf("ITERATION_COUNT = %d, ELEMENT_COUNT = %d\n", ITERATION_COUNT, ELEMENT_COUNT);

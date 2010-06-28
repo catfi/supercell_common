@@ -24,8 +24,6 @@ INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
 ADD_EXECUTABLE(ContainerPerformanceTest ContainerPerformanceTest.cpp)
 
 TARGET_LINK_LIBRARIES(ContainerPerformanceTest 
-    tbb 
-    boost_thread-gcc42-mt-1_36
-    stlport)
+    tbb) 
 
 ADD_TEST(ContainerPerformanceTest ${EXECUTABLE_OUTPUT_PATH}/ContainerPerformanceTest)
