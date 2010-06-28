@@ -19,7 +19,7 @@
 # Contact Information: info@zillians.com
 #
 
-#ADD_SUBDIRECTORY(ContainerPerformanceTest)
+ADD_SUBDIRECTORY(ContainerPerformanceTest)
 #ADD_SUBDIRECTORY(AllocatorPerformanceTest)
 #ADD_SUBDIRECTORY(GatewayReceivePerformanceTest)
 #ADD_SUBDIRECTORY(FunctorTest)

@@ -127,7 +127,7 @@ public:
 	
 public:
 	int iterations;
-	tbb::concurrent_queue<int> q;
+	tbb::concurrent_bounded_queue<int> q;
 	tbb::tick_count start, end;
 public:
 	void push_worker()
