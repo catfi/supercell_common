@@ -914,6 +914,21 @@ public:
 	}
 
 	/**
+	 * @brief Resets this buffer's write position to the previously-marked position.
+	 */
+	inline void resetWrite()
+	{
+		mWritePos = mWritePosMarked;
+	}
+
+	/**
+	 * @brief Resets this buffer's write position to the previously-marked position.
+	 */
+	inline void resetRead()
+	{
+		mReadPos = mReadPosMarked;
+	}
+	/**
 	 * @brief Get the allocated size (the internal data buffer size).
 	 *
 	 * @return The internal allocated buffer size.
