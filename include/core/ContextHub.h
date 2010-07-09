@@ -130,6 +130,7 @@ private:
 	inline std::vector< shared_ptr<void> >::reference refSharedContext()
 	{
 		static uint32 index = msContextIndexer++;
+		printf("this = %p, index = %d\n", this, index);
 		if(UNLIKELY(index >= mSharedContextObjects.size()))
 		{
 			while(index >= mSharedContextObjects.size())
@@ -239,7 +240,8 @@ private:
 		std::map< std::string, shared_ptr<void> >::iterator it = mSharedContextObjects.find(name);
 		if(UNLIKELY(it == mSharedContextObjects.end()))
 		{
-			mSharedContextObjects[name] = shared_ptr<void>();
+			//mSharedContextObjects[name] = shared_ptr<void>();
+			mSharedContextObjects.insert(std::make_pair(name, shared_ptr<void>()));
 			return mSharedContextObjects[name];
 		}
 		else
