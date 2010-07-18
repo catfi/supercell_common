@@ -96,7 +96,7 @@ ScalablePoolAllocator::ScalablePoolAllocator(byte* pMemory, size_t size, size_t*
 ScalablePoolAllocator::~ScalablePoolAllocator()
 {
 	//
-	delete[] mGlobalBins;
+	SAFE_DELETE_ARRAY(mGlobalBins);
 
 	//delete[] mBinSizes;// 20090302 nothing - mBinSizes now allocated on mPool
 
