@@ -72,6 +72,20 @@ public:
 		StringUtil::toupper(s.begin(), s.end(), locale_ref);
 		return s;
 	}
+
+	template<typename T>
+	static void itoa(T t, std::string& s)
+	{
+		unsigned char index;
+		for(int i = sizeof(T)-1; i >= 0; --i)
+		{
+			index = (t >> (i*8)) & 0xFF;
+			s.append(itoaAlphabet[index]);
+		}
+	}
+
+private:
+	static const char* itoaAlphabet [256];
 };
 
 /*
