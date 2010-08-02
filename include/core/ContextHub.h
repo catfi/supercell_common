@@ -130,7 +130,6 @@ private:
 	inline std::vector< shared_ptr<void> >::reference refSharedContext()
 	{
 		static uint32 index = msContextIndexer++;
-		printf("this = %p, index = %d\n", this, index);
 		if(UNLIKELY(index >= mSharedContextObjects.size()))
 		{
 			while(index >= mSharedContextObjects.size())
