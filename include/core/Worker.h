@@ -73,10 +73,13 @@ public:
 	{
 		mConditionSlots = new tbb::concurrent_bounded_queue<uint32>();
 		mConditions = new zillians::ConditionVariable<uint32>*[mConditionTableSize];
+		mCancellationFlags = new bool[mConditionTableSize];
+
 		for(uint32 i=0;i<mConditionTableSize;++i)
 		{
 			mConditionSlots->push(i);
 			mConditions[i] = new zillians::ConditionVariable<uint32>();
+			mCancellationFlags[i] = false;
 		}
 	}
 
@@ -93,6 +96,7 @@ public:
 			{
 				SAFE_DELETE(mConditions[i]);
 			}
+			SAFE_DELETE_ARRAY(mCancellationFlags);
 			SAFE_DELETE_ARRAY(mConditions);
 			SAFE_DELETE(mConditionSlots);
 		}
@@ -123,6 +127,7 @@ public:
 			void (Worker::*f)(uint32 /*key*/, boost::tuple<CompletionHandler> /*handler*/) = &Worker::wrap<CompletionHandler>;
 
 			uint32 key = 0; mConditionSlots->pop(key);
+			mCancellationFlags[key] = false;
 			mIoService.dispatch(boost::bind(f, this, key, boost::make_tuple(handler)));
 			uint32 dummy = 0; mConditions[key]->wait(dummy);
 		}
@@ -138,7 +143,7 @@ public:
 		void (Worker::*f)(uint32 /*key*/, boost::tuple<CompletionHandler> /*handler*/) = &Worker::wrap<CompletionHandler>;
 
 		uint32 key = 0; mConditionSlots->pop(key);
-
+		mCancellationFlags[key] = false;
 		mConditions[key]->reset();
 		mIoService.post(boost::bind(f, this, key, boost::make_tuple(handler)));
 		return key;
@@ -149,6 +154,24 @@ public:
 		uint32 dummy = 0;
 		mConditions[key]->wait(dummy);
 	}
+
+	bool timed_wait(int key, const boost::system_time& absolute)
+	{
+		uint32 dummy = 0;
+		return mConditions[key]->timed_wait(dummy, absolute);
+	}
+
+    template<typename DurationType>
+    bool timed_wait(int key, const DurationType& relative)
+    {
+    	uint32 dummy = 0;
+    	return mConditions[key]->timed_wait(dummy, relative);
+    }
+
+    void cancel(int key)
+    {
+    	mCancellationFlags[key] = true;
+    }
 
 	/**
 	 * @brief Post the given handler to job queue of the worker and return.
@@ -169,6 +192,7 @@ public:
 			void (Worker::*f)(uint32 /*key*/, boost::tuple<CompletionHandler> /*handler*/) = &Worker::wrap<CompletionHandler>;
 
 			uint32 key = 0; mConditionSlots->pop(key);
+			mCancellationFlags[key] = false;
 			mIoService.post(boost::bind(f, this, key, boost::make_tuple(handler)));
 			uint32 dummy = 0; mConditions[key]->wait(dummy);
 		}
@@ -206,7 +230,8 @@ public:
 		{
 			mTerminated = true;
 			mIoService.stop();
-			mThread.join();
+			if(mThread.joinable())
+				mThread.join();
 		}
 	}
 
@@ -224,9 +249,16 @@ protected:
 	template<typename CompletionHandler>
 	inline void wrap(uint32 key, boost::tuple<CompletionHandler> handler)
 	{
-		boost::get<0>(handler)();
-		mConditions[key]->signal(0);
-		mConditionSlots->push(key);
+		if(!mCancellationFlags[key])
+		{
+			boost::get<0>(handler)();
+			mConditions[key]->signal(0);
+			mConditionSlots->push(key);
+		}
+		else
+		{
+			mCancellationFlags[key] = false;
+		}
 	}
 
 protected:
@@ -237,6 +269,7 @@ protected:
 	boost::thread mThread;
 	tbb::concurrent_bounded_queue<uint32>* mConditionSlots;
 	zillians::ConditionVariable<uint32>** mConditions;
+	volatile bool* mCancellationFlags;
 };
 
 class WorkerGroup
