@@ -188,7 +188,7 @@ public:
 		mQueue.wait_and_pop(result);
 	}
 
-	void timed_wait(T& result, const boost::system_time& absolute)
+	bool timed_wait(T& result, const boost::system_time& absolute)
 	{
 		mQueue.timed_wait_and_pop(result, absolute);
 	}
