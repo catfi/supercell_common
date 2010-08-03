@@ -115,7 +115,7 @@ public:
 	 * asynchronous invocation, which is the default. True for synchronous
 	 * invocation.
 	 */
-	template<typename CompletionHandler>
+	template<typename CompletionHandler>//NOTE 20100728 Nothing - Tha name "CompletionHandler" sounds like it's a handler to be called after completion of the dispatched job, strange.
 	inline void dispatch(CompletionHandler handler, bool blocking = false)
 	{
 		if(blocking)
