@@ -26,17 +26,10 @@
 #include "core/Prerequisite.h"
 #include "core/Worker.h"
 
-//#define BUILD_WITH_JUSTTHREAD
-
-#ifdef BUILD_WITH_JUSTTHREAD
 // c++0x threading
 #include <thread>
 #include <future>
 #include <mutex>
-#else
-#include "core/Worker.h"
-#endif
-
 
 namespace zillians {
 
@@ -80,20 +73,11 @@ public:
 
 		if(mProgramCounter < (int32)mTransactions.size())
 		{
-#ifdef BUILD_WITH_JUSTTHREAD
 			mResult = std::async(boost::bind(&Transaction::run, this));
-#else
-			mResultKey = GlobalWorker::instance()->async(boost::bind(&Transaction::run, this));
-#endif
 
 			if(blocking)
 			{
-#ifdef BUILD_WITH_JUSTTHREAD
 				return mResult.get();
-#else
-				GlobalWorker::instance()->wait(mResultKey);
-				return true;
-#endif
 			}
 			else
 			{
@@ -187,11 +171,7 @@ private:
 protected:
 	std::vector< std::pair<ActionRoutine, RollbackRoutine> > mTransactions;
 	TransactionState& mTransactionState;
-#ifdef BUILD_WITH_JUSTTHREAD
 	std::future<bool> mResult;
-#else
-	int mResultKey;
-#endif
 	std::mutex mRunLock;
 	int32 mProgramCounter;
 };
