@@ -20,7 +20,11 @@
 #
 
 ADD_SUBDIRECTORY(libzillians-common-core)
-ADD_SUBDIRECTORY(libzillians-common-networking)
+
+IF(COROSYNC_FOUND)
+	ADD_SUBDIRECTORY(libzillians-common-networking)
+ENDIF(COROSYNC_FOUND)
+
 ADD_SUBDIRECTORY(libzillians-common-networking-tcp)
 
 IF(RDMA_FOUND)
