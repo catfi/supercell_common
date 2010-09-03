@@ -27,4 +27,4 @@ ADD_EXECUTABLE(GatewayReceivePerformanceTest GatewayReceivePerformanceTest.cpp)
 TARGET_LINK_LIBRARIES(GatewayReceivePerformanceTest 
     boost_thread tbb log4cxx)
 
-ADD_TEST(GatewayReceivePerformanceTest ${EXECUTABLE_OUTPUT_PATH}/GatewayReceivePerformanceTest)
+#ADD_TEST(GatewayReceivePerformanceTest ${EXECUTABLE_OUTPUT_PATH}/GatewayReceivePerformanceTest)

@@ -27,4 +27,4 @@ ADD_EXECUTABLE(FunctorTest FunctorTest.cpp)
 TARGET_LINK_LIBRARIES(FunctorTest 
     tbb log4cxx)
 
-ADD_TEST(FunctorTest ${EXECUTABLE_OUTPUT_PATH}/FunctorTest)
+#ADD_TEST(FunctorTest ${EXECUTABLE_OUTPUT_PATH}/FunctorTest)
