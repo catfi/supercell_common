@@ -28,4 +28,4 @@ TARGET_LINK_LIBRARIES(ConditionVarPerformanceTest
     ${JUSTTHREAD_LIBRARIES_STATIC}
     )
 
-ADD_TEST(ConditionVarPerformanceTest ${EXECUTABLE_OUTPUT_PATH}/ConditionVarPerformanceTest)
+#ADD_TEST(ConditionVarPerformanceTest ${EXECUTABLE_OUTPUT_PATH}/ConditionVarPerformanceTest)
