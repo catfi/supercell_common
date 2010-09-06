@@ -29,4 +29,4 @@ TARGET_LINK_LIBRARIES(AllocatorPerformanceTest
 #	boost-memory
 	)
 
-ADD_TEST(AllocatorPerformanceTest ${EXECUTABLE_OUTPUT_PATH}/AllocatorPerformanceTest)
+#ADD_TEST(AllocatorPerformanceTest ${EXECUTABLE_OUTPUT_PATH}/AllocatorPerformanceTest)
