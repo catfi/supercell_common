@@ -43,7 +43,7 @@ struct ContextOwnership
 	enum type
 	{
 		keep		= 0,
-		transfer	= 1
+		transfer	= 1,
 	};
 };
 
