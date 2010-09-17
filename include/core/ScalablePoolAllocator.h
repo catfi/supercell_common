@@ -237,6 +237,8 @@ public:// Statistics
 	struct AllocatorStat
 	{
 		bool StatAvailable;
+		tbb::atomic<size_t> AllocatedSize;
+
 		tbb::atomic<size_t> TotalAllocations;
 		tbb::atomic<size_t> TotalLargeAllocations;
 		tbb::atomic<size_t> TotalSmallAllocations;
@@ -275,11 +277,13 @@ public:
 #define STAT_ADD(v) (v)++;
 #define STAT_ADDV(v, x) (v)+=x;
 #define STAT_SUB(v) if(v == 0) { mStatistics.Underruns++; }; (v)--;
+#define STAT_SUBV(v, x) (v)-=x;
 #define STAT_RESET() resetAllocatorStat()
 #else// no statistics
 #define STAT_ADD(v)
 #define STAT_ADDV(v, x)
 #define STAT_SUB(v)
+#define STAT_SUBV(v, x)
 #define STAT_RESET()
 inline AllocatorStat getAllocatorStat() { AllocatorStat a; a.StatAvailable = false; return a; }
 #endif//ZILLIANS_SCALABLEALLOCATOR_STATISTICS

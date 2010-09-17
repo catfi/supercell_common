@@ -114,6 +114,8 @@ byte* ScalablePoolAllocator::allocate(size_t sz)//done
 		return allocateLarge(sz);
 	}
 
+	STAT_ADDV(mStatistics.AllocatedSize, sz);
+
 	STAT_ADD(mStatistics.TotalSmallAllocations);
 	STAT_ADD(mStatistics.ChunksInUse);
 
@@ -174,6 +176,7 @@ byte* ScalablePoolAllocator::allocate(size_t sz)//done
 	}
 
 	STAT_SUB(mStatistics.ChunksInUse);
+	STAT_SUBV(mStatistics.AllocatedSize, sz);
 	return NULL;// Out of memory
 }
 
@@ -234,6 +237,9 @@ byte* ScalablePoolAllocator::allocateLarge(size_t sz)
 {
 	tbb::spin_mutex::scoped_lock lock(mPoolLock);
 	STAT_ADD(mStatistics.TotalLargeAllocations);
+	STAT_ADDV(mStatistics.AllocatedSize, sz);
+	STAT_ADDV(mStatistics.AllocatedSize, sizeof(size_t));
+
 
 	LargeChunk* chunk = mLargeFreeList;
 	size_t* psz = NULL;
@@ -316,6 +322,8 @@ byte* ScalablePoolAllocator::allocateLarge(size_t sz)
 		// Out of memory!
 		mBumpPtr = mBumpPtr + sz + sizeof(size_t);
 		STAT_ADD(mStatistics.GarbageCollection);// TODO: Need some sort of garbage collection
+		STAT_SUBV(mStatistics.AllocatedSize, sizeof(size_t));
+		STAT_SUBV(mStatistics.AllocatedSize, sz);
 		return NULL;
 	}
 	psz = reinterpret_cast<size_t*>(mBumpPtr);
@@ -1045,6 +1053,7 @@ void ScalablePoolAllocator::BinTLSCleanUpFunction(Bin* bins)
 void ScalablePoolAllocator::resetAllocatorStat()
 {
 	mStatistics.StatAvailable = true;
+	mStatistics.AllocatedSize = 0;
 	mStatistics.TotalAllocations = 0;
 	mStatistics.TotalDeallocations = 0;
 	mStatistics.TotalSmallAllocations = 0;
