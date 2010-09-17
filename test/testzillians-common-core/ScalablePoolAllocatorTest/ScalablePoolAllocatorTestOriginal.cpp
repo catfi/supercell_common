@@ -36,8 +36,8 @@ using namespace log4cxx::helpers;
 using namespace zillians;
 //using zillians::ScalablePoolAllocator;
 
-const size_t TEST_SIZE = 1048576 * 1024;//100MB
-const size_t THREAD_COUNT = 1;
+const size_t TEST_SIZE = 1048576 * 1024;//1000MB
+const size_t THREAD_COUNT = 8;
 const size_t MINIMUM_OBJECT_SIZE = 8;
 const size_t MAXIMUM_OBJECT_SIZE = 16384;//8192;//20000;
 const size_t ALLOC_COUNT = 10000;

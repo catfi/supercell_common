@@ -180,6 +180,14 @@ byte* ScalablePoolAllocator::allocate(size_t sz)//done
 void ScalablePoolAllocator::deallocate(byte* mem)//done
 {
 	if(!mem) { return; }
+
+	if((mem < mPool)||(mem > mPoolEnd))
+	{
+		// NOTE: This should never ever happen, it's user's fault if this happens
+		LOG4CXX_ERROR(mLogger, "mem is not inside the pool. User's fault!");
+		assert(0);
+		return;
+	}
 	STAT_ADD(mStatistics.TotalDeallocations);
 
 	if(isLargeChunk(mem))
@@ -696,7 +704,7 @@ void ScalablePoolAllocator::returnPartialBlock(Bin* bin, Block* block)//done
 	size_t idx = getIndex(block->mChunkSize);
 	if( reinterpret_cast<uintptr_t>(block->mNextPrivatizable) == reinterpret_cast<uintptr_t>(bin) )
 	{
-		void* oldval;
+		void* oldval = NULL;
 		{//lock
 			tbb::spin_mutex::scoped_lock lock(mPublicFreeListLock);
 			if( (oldval = reinterpret_cast<void*>(block->mPublicFreeList)) == NULL)
@@ -848,6 +856,10 @@ void ScalablePoolAllocator::freePublicChunk(Block* block, FreeChunk* chunk)//don
 			tbb::spin_mutex::scoped_lock maillock(bin->mMailBoxLock);
 			block->mNextPrivatizable = bin->mMailBox;
 			bin->mMailBox = block;
+		}
+		else
+		{
+			// MALLOC_ASSERT( block->owner==0, ASSERT_TEXT );
 		}
 	}
 }
