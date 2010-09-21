@@ -114,8 +114,6 @@ byte* ScalablePoolAllocator::allocate(size_t sz)//done
 		return allocateLarge(sz);
 	}
 
-	STAT_ADDV(mStatistics.AllocatedSize, sz);
-
 	STAT_ADD(mStatistics.TotalSmallAllocations);
 	STAT_ADD(mStatistics.ChunksInUse);
 
@@ -176,7 +174,6 @@ byte* ScalablePoolAllocator::allocate(size_t sz)//done
 	}
 
 	STAT_SUB(mStatistics.ChunksInUse);
-	STAT_SUBV(mStatistics.AllocatedSize, sz);
 	return NULL;// Out of memory
 }
 
@@ -340,6 +337,9 @@ void ScalablePoolAllocator::deallocateLarge(byte* mem)
 	STAT_ADD(mStatistics.TotalLargeDeallocations);
 
 	size_t* psz = (reinterpret_cast<size_t*>(mem - sizeof(size_t)));
+	STAT_SUBV(mStatistics.AllocatedSize, *psz);
+	STAT_SUBV(mStatistics.AllocatedSize, sizeof(size_t));
+
 	if(mem == mBumpPtr + sizeof(size_t))// At front, move the bump pointer back
 	{
 		mBumpPtr = mBumpPtr + (*psz) + sizeof(size_t);
@@ -514,7 +514,12 @@ bool ScalablePoolAllocator::allocateBlocks()//done (mallocBigBlock)
 	Block* blk = reinterpret_cast<Block*>(mBlockAllocPtr);
 	mBlockAllocPtr += BIG_BLOCK_SIZE;
 
-	if(mBlockAllocPtr > mBumpPtr) { return false; }// Out of memory!
+	STAT_ADDV(mStatistics.AllocatedSize, BIG_BLOCK_SIZE);
+	if(mBlockAllocPtr > mBumpPtr)
+	{
+		STAT_SUBV(mStatistics.AllocatedSize, BIG_BLOCK_SIZE);
+		return false;// Out of memory!
+	}
 
 	blk->mBumpPtr = reinterpret_cast<FreeChunk*>( reinterpret_cast<uintptr_t>(blk) + BIG_BLOCK_SIZE );
 	mFreeBlockStack.push(reinterpret_cast<void**>(blk));
