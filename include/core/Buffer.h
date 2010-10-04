@@ -1443,18 +1443,6 @@ public:
 		readDirect(value);
 	}
 
-#ifdef __PLATFORM_WINDOWS__
-	/**
-	 * @brief Read a std::size_t (8 byte or 4 byte depend on the platform) variable.
-	 *
-	 * @param value The value to be read
-	 */
-	inline void readBuiltin(std::size_t& value)
-	{
-		readDirect(value);
-	}
-#endif
-
 	/**
 	 * @brief Read a boolean (treated as uint8) (1 byte) variable.
 	 *
@@ -1898,20 +1886,6 @@ public:
 	{
 		writeDirect(value);
 	}
-
-#ifdef __PLATFORM_WINDOWS__
-	/**
-	 * @brief Write a std::size_t (8 bytes or 4 byte depend on the platform) variable.
-	 *
-	 * @todo Consider cross-platform issue, because on Windows there're few 64bit installation.
-	 *
-	 * @param value The value to be written.
-	 */
-	inline void writeBuiltin(const std::size_t& value)
-	{
-		writeDirect(value);
-	}
-#endif
 
 	/**
 	 * @brief Write a boolean (treated as uint8) (1 bytes) variable.
