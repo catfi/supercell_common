@@ -27,8 +27,42 @@
 
 namespace zillians {
 
-extern uint32 round_up_to_nearest_power_of_two(uint32 v);
-extern uint64 round_up_to_nearest_power_of_two(uint64 v);
+template<typename T>
+struct round_up_to_nearest_power_of_two;
+
+template<>
+struct round_up_to_nearest_power_of_two<uint32>
+{
+	static uint32 apply(uint32 v)
+	{
+		v--;
+		v |= v >> 1;
+		v |= v >> 2;
+		v |= v >> 4;
+		v |= v >> 8;
+		v |= v >> 16;
+		v++;
+		return v;
+	}
+};
+
+template<>
+struct round_up_to_nearest_power_of_two<uint64>
+{
+	static uint64 apply(uint64 v)
+	{
+		v--;
+		v |= v >> 1;
+		v |= v >> 2;
+		v |= v >> 4;
+		v |= v >> 8;
+		v |= v >> 16;
+		v |= v >> 32;
+		v++;
+		return v;
+	}
+};
+
 
 }
 
