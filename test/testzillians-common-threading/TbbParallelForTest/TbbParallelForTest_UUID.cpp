@@ -224,21 +224,12 @@ static void test_query_tbb(uint32 UUIDCount, uint32 QueryCount, uint32 RepeatIte
 
     {
         // initialize timer
-        KernelApi::event_type StartEvent;
-        KernelApi::event_type StopEvent;
-        Api.event.create(&StartEvent);
-        Api.event.create(&StopEvent);
         tbb::tick_count StartTick = tbb::tick_count::now();
-        Api.event.record(StartEvent);
 
         for(int i = 0; i<RepeatIters; i++)
             tbb::parallel_for(tbb::blocked_range<int>(0, QueryCount), query_tbb_t());
 
         // finalize timer
-        Api.event.record(StopEvent);
-        Api.event.synchronize(StopEvent);
-        std::cout << "run time (reported by CUDA): " <<
-            Api.event.queryElapsed(StartEvent, StopEvent)/RepeatIters << " ms" << std::endl;
         tbb::tick_count StopTick = tbb::tick_count::now();
         std::cout << "run time (reported by TBB): " <<
             (StopTick-StartTick).seconds()*1000.0/RepeatIters << " ms" << std::endl;
@@ -273,21 +264,12 @@ static void test_query_rev_tbb(uint32 UUIDCount, uint32 QueryCount, uint32 Repea
 
     {
         // initialize timer
-        KernelApi::event_type StartEvent;
-        KernelApi::event_type StopEvent;
-        Api.event.create(&StartEvent);
-        Api.event.create(&StopEvent);
         tbb::tick_count StartTick = tbb::tick_count::now();
-        Api.event.record(StartEvent);
 
         for(int i = 0; i<RepeatIters; i++)
             tbb::parallel_for(tbb::blocked_range<int>(0, QueryCount), query_rev_tbb_t());
 
         // finalize timer
-        Api.event.record(StopEvent);
-        Api.event.synchronize(StopEvent);
-        std::cout << "run time (reported by CUDA): " <<
-            Api.event.queryElapsed(StartEvent, StopEvent)/RepeatIters << " ms" << std::endl;
         tbb::tick_count StopTick = tbb::tick_count::now();
         std::cout << "run time (reported by TBB): " <<
             (StopTick-StartTick).seconds()*1000.0/RepeatIters << " ms" << std::endl;
@@ -324,21 +306,12 @@ static void test_query_stl(uint32 UUIDCount, uint32 QueryCount, uint32 RepeatIte
 
     {
         // initialize timer
-        KernelApi::event_type StartEvent;
-        KernelApi::event_type StopEvent;
-        Api.event.create(&StartEvent);
-        Api.event.create(&StopEvent);
         tbb::tick_count StartTick = tbb::tick_count::now();
-        Api.event.record(StartEvent);
 
         for(int i = 0; i<RepeatIters; i++)
             tbb::parallel_for(tbb::blocked_range<int>(0, QueryCount), query_stl_t());
 
         // finalize timer
-        Api.event.record(StopEvent);
-        Api.event.synchronize(StopEvent);
-        std::cout << "run time (reported by CUDA): " <<
-            Api.event.queryElapsed(StartEvent, StopEvent)/RepeatIters << " ms" << std::endl;
         tbb::tick_count StopTick = tbb::tick_count::now();
         std::cout << "run time (reported by TBB): " <<
             (StopTick-StartTick).seconds()*1000.0/RepeatIters << " ms" << std::endl;
@@ -373,21 +346,12 @@ static void test_query_rev_stl(uint32 UUIDCount, uint32 QueryCount, uint32 Repea
 
     {
         // initialize timer
-        KernelApi::event_type StartEvent;
-        KernelApi::event_type StopEvent;
-        Api.event.create(&StartEvent);
-        Api.event.create(&StopEvent);
         tbb::tick_count StartTick = tbb::tick_count::now();
-        Api.event.record(StartEvent);
 
         for(int i = 0; i<RepeatIters; i++)
             tbb::parallel_for(tbb::blocked_range<int>(0, QueryCount), query_rev_stl_t());
 
         // finalize timer
-        Api.event.record(StopEvent);
-        Api.event.synchronize(StopEvent);
-        std::cout << "run time (reported by CUDA): " <<
-            Api.event.queryElapsed(StartEvent, StopEvent)/RepeatIters << " ms" << std::endl;
         tbb::tick_count StopTick = tbb::tick_count::now();
         std::cout << "run time (reported by TBB): " <<
             (StopTick-StartTick).seconds()*1000.0/RepeatIters << " ms" << std::endl;
@@ -424,21 +388,12 @@ static void test_query_gnu(uint32 UUIDCount, uint32 QueryCount, uint32 RepeatIte
 
     {
         // initialize timer
-        KernelApi::event_type StartEvent;
-        KernelApi::event_type StopEvent;
-        Api.event.create(&StartEvent);
-        Api.event.create(&StopEvent);
         tbb::tick_count StartTick = tbb::tick_count::now();
-        Api.event.record(StartEvent);
 
         for(int i = 0; i<RepeatIters; i++)
             tbb::parallel_for(tbb::blocked_range<int>(0, QueryCount), query_gnu_t());
 
         // finalize timer
-        Api.event.record(StopEvent);
-        Api.event.synchronize(StopEvent);
-        std::cout << "run time (reported by CUDA): " <<
-            Api.event.queryElapsed(StartEvent, StopEvent)/RepeatIters << " ms" << std::endl;
         tbb::tick_count StopTick = tbb::tick_count::now();
         std::cout << "run time (reported by TBB): " <<
             (StopTick-StartTick).seconds()*1000.0/RepeatIters << " ms" << std::endl;
@@ -473,21 +428,12 @@ static void test_query_rev_gnu(uint32 UUIDCount, uint32 QueryCount, uint32 Repea
 
     {
         // initialize timer
-        KernelApi::event_type StartEvent;
-        KernelApi::event_type StopEvent;
-        Api.event.create(&StartEvent);
-        Api.event.create(&StopEvent);
         tbb::tick_count StartTick = tbb::tick_count::now();
-        Api.event.record(StartEvent);
 
         for(int i = 0; i<RepeatIters; i++)
             tbb::parallel_for(tbb::blocked_range<int>(0, QueryCount), query_rev_gnu_t());
 
         // finalize timer
-        Api.event.record(StopEvent);
-        Api.event.synchronize(StopEvent);
-        std::cout << "run time (reported by CUDA): " <<
-            Api.event.queryElapsed(StartEvent, StopEvent)/RepeatIters << " ms" << std::endl;
         tbb::tick_count StopTick = tbb::tick_count::now();
         std::cout << "run time (reported by TBB): " <<
             (StopTick-StartTick).seconds()*1000.0/RepeatIters << " ms" << std::endl;
