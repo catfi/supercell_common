@@ -19,10 +19,16 @@
 # Contact Information: info@zillians.com
 #
 
-INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
+INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
+INCLUDE_DIRECTORIES(${PROJECT_FRAMEWORK_SOURCE_DIR}/include/)
 
 ADD_EXECUTABLE(TbbParallelForTest TbbParallelForTest.cpp) 
-
 TARGET_LINK_LIBRARIES(TbbParallelForTest
-    zillians-common-core 
+    zillians-common-core
+    )
+
+ADD_EXECUTABLE(TbbParallelForTest_UUID TbbParallelForTest_UUID.cpp) 
+TARGET_LINK_LIBRARIES(TbbParallelForTest_UUID
+    zillians-common-core
+    zillians-framework-vw-processors-fermi
     )
