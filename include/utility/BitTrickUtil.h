@@ -63,7 +63,6 @@ struct round_up_to_nearest_power_of_two<uint64>
 	}
 };
 
-
 }
 
 #endif /* ZILLIANS_BITTRICKUTIL_H_ */

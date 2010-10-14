@@ -90,6 +90,14 @@
 	#endif
 #endif
 
+#ifdef __GNUC__
+#define pure_function __attribute__((const))
+#else
+#define pure_function
+#endif
+
+#define restricted_pointer __restrict
+
 // Generic helper definitions for shared library support
 //#if defined _WIN32 || defined __CYGWIN__
 //	#define ZILLIANS_HELPER_DLL_IMPORT __declspec(dllimport)

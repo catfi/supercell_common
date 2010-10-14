@@ -333,7 +333,7 @@ inline typename Graph::vertex_descriptor vertex(
 
 ///////////////////////////////////////////////////////////////////////////
 template <class IndirectGraphTraits, class Graph>
-inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
+inline typename Graph::edge_descriptor add_edge(
 		const typename IndirectGraphTraits::edge_reference_type& re_,
 		const typename IndirectGraphTraits::vertex_reference_type ru_,
 		const typename IndirectGraphTraits::vertex_reference_type rv_,
@@ -361,7 +361,7 @@ inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
 }
 
 template <class IndirectGraphTraits, class Graph>
-inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
+inline typename Graph::edge_descriptor add_edge(
 		const typename IndirectGraphTraits::edge_reference_type& re_,
 		typename Graph::vertex_descriptor u_,
 		typename Graph::vertex_descriptor v_,
@@ -390,11 +390,11 @@ inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
 
 	prop_map[result.first] = re_;
 
-	return result;
+	return result.first;
 }
 
 template <class IndirectGraphTraits, class Graph>
-inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
+inline typename Graph::edge_descriptor add_edge(
 		const typename IndirectGraphTraits::edge_reference_type& re_,
 		const typename IndirectGraphTraits::vertex_reference_type ru_,
 		const typename IndirectGraphTraits::vertex_reference_type rv_,
@@ -416,7 +416,7 @@ inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
 }
 
 template <class IndirectGraphTraits, class Graph>
-inline std::pair<typename Graph::edge_descriptor, bool> add_edge(
+inline typename Graph::edge_descriptor add_edge(
 		const typename IndirectGraphTraits::edge_reference_type& re_,
 		typename Graph::vertex_descriptor u_,
 		typename Graph::vertex_descriptor v_,
@@ -709,7 +709,7 @@ inline typename Graph::edge_descriptor edge(
 }
 
 template <class IndirectGraphTraits, class Graph>
-inline std::pair<typename Graph::edge_descriptor, bool> edge(
+inline typename Graph::edge_descriptor edge(
 		const typename IndirectGraphTraits::vertex_reference_type& ru_,
 		const typename IndirectGraphTraits::vertex_reference_type& rv_,
 		const Graph& g_,
@@ -726,7 +726,13 @@ inline std::pair<typename Graph::edge_descriptor, bool> edge(
 		throw std::invalid_argument("invalid vertex reference value while finding edge");
 	}
 
-	return boost::edge(u, v, g_);
+	std::pair<typename Graph::edge_descriptor, bool> result = boost::edge(u, v, g_);
+	if(!result.second)
+	{
+		throw std::invalid_argument("edge does not exist");
+	}
+
+	return result.first;
 }
 
 }

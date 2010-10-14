@@ -66,6 +66,8 @@ BOOST_AUTO_TEST_CASE( IndirectMapTestCase1 )
 	BOOST_CHECK_NO_THROW(add_edge(1, 10, 20, g, mapping));
 	BOOST_CHECK_NO_THROW(add_edge(2, 20, 30, g, mapping));
 	BOOST_CHECK_NO_THROW(add_edge(3, 30, 40, g, mapping));
+	BOOST_CHECK_NO_THROW(add_edge(4, 20, 30, g, mapping)); // allow parallel edge for listS edge type as long as the edge identifier is unique
+	BOOST_REQUIRE_THROW(add_edge(2, 20, 30, g, mapping), std::invalid_argument); // the edge identifier is not unique, throw exception
 
 	VertexDescriptor vv = vertex(10, g, mapping);
 	property_map<Graph, vertex_name_t>::type name_map;
@@ -90,9 +92,9 @@ BOOST_AUTO_TEST_CASE( IndirectMapTestCase1 )
 	BOOST_CHECK_NO_THROW(remove_edge(3, g, mapping));
 
 	// remove edge by edge reference
-	std::pair<Graph::edge_descriptor, bool> result = edge(20, 30, g, mapping);
-	BOOST_CHECK(result.second == true);
-	BOOST_CHECK_NO_THROW(remove_edge(result.first, g, mapping));
+	Graph::edge_descriptor result;
+	BOOST_CHECK_NO_THROW(result = edge(20, 30, g, mapping););
+	BOOST_CHECK_NO_THROW(remove_edge(result, g, mapping));
 
 	BOOST_CHECK_NO_THROW(remove_vertex(10, g, mapping));
 	BOOST_CHECK_NO_THROW(remove_vertex(20, g, mapping));
@@ -399,6 +401,43 @@ BOOST_AUTO_TEST_CASE( IndirectMapTestCase7 )
 
 	// clear the graph
 	clear(g_new, mapping_new);
+}
+
+BOOST_AUTO_TEST_CASE( IndirectMapTestCase8 )
+{
+	using namespace boost;
+
+	typedef indirect_graph_traits<int,int> IndirectGraphTraits;
+
+	typedef property<vertex_name_t, std::string, IndirectGraphTraits::vertex_property > VertexProperty;
+	typedef property<edge_index_t, int, IndirectGraphTraits::edge_property > EdgeProperty;
+
+	// Note that when using indirect_graph_mapping with adjacency_list, the vertex/edge storage must be listS, otherwise the vertex/edge descriptor might not be consistent with the internal storage in indirect_graph_mapping after removing some vertex/edge.
+	// However, if you plan not to use edge reference but only vertex, it's OK to use vecS on edge storage while defining the adjacency_list
+	typedef adjacency_list<setS, setS, bidirectionalS, VertexProperty, EdgeProperty> Graph;
+	typedef graph_traits<Graph>::edge_descriptor EdgeDescriptor;
+	typedef graph_traits<Graph>::vertex_descriptor VertexDescriptor;
+
+	typedef indirect_graph_mapping<IndirectGraphTraits, VertexDescriptor, EdgeDescriptor> IndirectGraphMapping;
+
+	Graph g;
+	IndirectGraphMapping mapping;
+
+	BOOST_CHECK_NO_THROW(add_vertex(10, g, mapping));
+	BOOST_CHECK_NO_THROW(add_vertex(20, g, mapping));
+	BOOST_CHECK_NO_THROW(add_vertex(30, g, mapping));
+	BOOST_CHECK_NO_THROW(add_vertex(40, g, mapping));
+
+	BOOST_CHECK_NO_THROW(add_edge(1, 10, 20, g, mapping));
+	BOOST_CHECK_NO_THROW(add_edge(2, 20, 30, g, mapping));
+	BOOST_CHECK_NO_THROW(add_edge(3, 30, 40, g, mapping));
+
+	BOOST_REQUIRE_THROW(add_edge(1, 10, 20, g, mapping), std::invalid_argument);
+	BOOST_REQUIRE_THROW(add_edge(4, 10, 20, g, mapping), std::invalid_argument);
+
+	BOOST_REQUIRE_THROW(add_edge(2, 20, 30, g, mapping), std::invalid_argument);
+	BOOST_REQUIRE_THROW(add_edge(5, 20, 30, g, mapping), std::invalid_argument);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()
