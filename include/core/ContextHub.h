@@ -25,7 +25,15 @@
 
 #include "core/Common.h"
 #include "core/SharedPtr.h"
+#ifdef __PLATFORM_WINDOWS__
+#if (_MSC_VER >= 1500)
+#include <unordered_map>
+#else
+#error "Compiler does not support <unordered_map>"
+#endif
+#else
 #include <tr1/unordered_map>
+#endif
 #include <tbb/atomic.h>
 
 /**
