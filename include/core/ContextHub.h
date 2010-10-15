@@ -92,7 +92,7 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>
+	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>// NOTE 20101015 Nothing - Default template arguement in template function is a C++0x feature, not supported in C++03 standard.
 	inline void set(T* ctx)
 	{
 		if(TransferOwnership == ContextOwnership::transfer)
@@ -194,7 +194,7 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>
+	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>// NOTE 20101015 Nothing - Default template arguement in template function is a C++0x feature, not supported in C++03 standard.
 	inline void set(T* ctx, const std::string& name = typeid(T).name())
 	{
 		if(TransferOwnership == ContextOwnership::transfer)
@@ -292,7 +292,7 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>
+	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>// NOTE 20101015 Nothing - Default template arguement in template function is a C++0x feature, not supported in C++03 standard.
 	inline void set(T* ctx, const KeyType& key)
 	{
 		if(TransferOwnership == ContextOwnership::transfer)
