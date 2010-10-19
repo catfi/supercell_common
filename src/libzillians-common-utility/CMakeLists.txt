@@ -23,7 +23,8 @@ INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
 
 ADD_LIBRARY(zillians-common-utility
     utility/BitTrickUtil.cpp
+    utility/DemanglingUtil.cpp
 	utility/StringUtil.cpp
+    utility/utf8.cpp
 	utility/UUIDUtil.cpp
-	utility/DemanglingUtil.cpp
     )
