@@ -27,7 +27,9 @@
 
 namespace zillians {
 
+#if BUILD_WITH_LOG4CXX
 log4cxx::LoggerPtr ScalablePoolAllocator::mLogger(log4cxx::Logger::getLogger("zillians.common.core.ScalablePoolAllocator"));
+#endif
 
 ScalablePoolAllocator::ScalablePoolAllocator(byte* pMemory, size_t size, size_t* binSizes, size_t binCount)
 : BLOCK_SIZE(16384)// Default to 16K blocks
@@ -184,7 +186,9 @@ void ScalablePoolAllocator::deallocate(byte* mem)//done
 	if((mem < mPool)||(mem > mPoolEnd))
 	{
 		// NOTE: This should never ever happen, it's user's fault if this happens
+#if BUILD_WITH_LOG4CXX
 		LOG4CXX_ERROR(mLogger, "mem is not inside the pool. User's fault!");
+#endif
 		assert(0);
 		return;
 	}

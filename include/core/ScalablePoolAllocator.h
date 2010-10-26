@@ -231,8 +231,10 @@ private:// Thread local storage control
 	Block*			mTLSUsedBlocks;	///< Blocks used for TLS allocation (bootStrapBlockUsed)
 	Block*			mTLSAllocBlock;	///< Block used for next TLS allocation (bootStrapBlock)
 
+#if BUILD_WITH_LOG4CXX
 private:// Logging
 	static log4cxx::LoggerPtr mLogger;
+#endif
 public:// Statistics
 	struct AllocatorStat
 	{
