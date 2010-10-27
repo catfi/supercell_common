@@ -2130,7 +2130,7 @@ public:
 			else if(mAllocatedSize < wpos() + sizeof(T))
 			{
 				std::size_t s = current_wpos + sizeof(T);
-				resize(round_up_to_nearest_power_of_two<std::size_t>::apply(s));
+				resize(round_up_to_nearest_power_of_two<uint64>::apply(s));
 			}
 
 			setDirect(t, wpos());
@@ -2147,7 +2147,7 @@ public:
 			else if(mAllocatedSize < current_size + sizeof(T) + 1)
 			{
 				std::size_t s = current_size + sizeof(T);
-				resize(round_up_to_nearest_power_of_two<std::size_t>::apply(s) + 1);
+				resize(round_up_to_nearest_power_of_two<uint64>::apply(s) + 1);
 			}
 
 			setDirect(t, wpos());
@@ -2176,7 +2176,7 @@ public:
 			else if(mAllocatedSize < current_wpos + size)
 			{
 				std::size_t s = current_wpos + size;
-				resize(round_up_to_nearest_power_of_two<std::size_t>::apply(s));
+				resize(round_up_to_nearest_power_of_two<uint64>::apply(s));
 			}
 
 			setArray(source, current_wpos, size);
@@ -2193,7 +2193,7 @@ public:
 			else if(mAllocatedSize < current_size + size + 1)
 			{
 				std::size_t s = current_size + size;
-				resize(round_up_to_nearest_power_of_two<std::size_t>::apply(s) + 1);
+				resize(round_up_to_nearest_power_of_two<uint64>::apply(s) + 1);
 			}
 
 			setArray(source, wpos(), size);
