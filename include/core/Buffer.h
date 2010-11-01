@@ -560,13 +560,25 @@ public:
 	template <typename T>
 	inline static std::size_t probeSizeDispatch(const T &value, boost::mpl::true_ /* is_builtin_type */)
 	{
-		return probeSizeBuiltin(value);
+		probeSizeDispatchBuiltin(value, boost::mpl::bool_< is_buffer<T>::value >());
 	}
 
 	template <typename T>
 	inline static std::size_t probeSizeDispatch(const T &value, boost::mpl::false_ /* is_builtin_type */)
 	{
 		return probeSizeSerializable(value);
+	}
+
+	template<typename T>
+	inline static std::size_t probeSizeDispatchBuiltin(const T& value, boost::mpl::true_ /* is_buffer */)
+	{
+		return probeSizeBuiltin((const BufferBase*)&value);
+	}
+
+	template<typename T>
+	inline static std::size_t probeSizeDispatchBuiltin(const T& value, boost::mpl::false_ /* is_buffer */)
+	{
+		return probeSizeBuiltin(value);
 	}
 
 	/**
@@ -729,9 +741,9 @@ public:
 	 * @param value The const BufferBase reference to probe its actual data size.
 	 * @return The actual data size of the const BufferBase reference stored in the BufferBase object.
 	 */
-	inline static std::size_t probeSizeBuiltin(const BufferBase &value)
+	inline static std::size_t probeSizeBuiltin(const BufferBase* value)
 	{
-		return value.dataSize() + sizeof(uint32);
+		return value->dataSize() + sizeof(uint32);
 	}
 
 	/**
