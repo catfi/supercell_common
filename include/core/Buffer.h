@@ -560,7 +560,7 @@ public:
 	template <typename T>
 	inline static std::size_t probeSizeDispatch(const T &value, boost::mpl::true_ /* is_builtin_type */)
 	{
-		probeSizeDispatchBuiltin(value, boost::mpl::bool_< is_buffer<T>::value >());
+		return probeSizeDispatchBuiltin(value, boost::mpl::bool_< is_buffer<T>::value >());
 	}
 
 	template <typename T>
