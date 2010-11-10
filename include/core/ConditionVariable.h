@@ -190,7 +190,7 @@ public:
 
 	bool timed_wait(T& result, const boost::system_time& absolute)
 	{
-		mQueue.timed_wait_and_pop(result, absolute);
+		return mQueue.timed_wait_and_pop(result, absolute);
 	}
 
     template<typename DurationType>

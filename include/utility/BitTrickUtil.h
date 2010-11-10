@@ -27,6 +27,21 @@
 
 namespace zillians {
 
+/**
+ * Round-up helper function to calculate round-up value
+ * @param v the value to round-up
+ * @param m the multiple of rounding
+ * @return the rounded value (upward)
+ */
+template<typename Value, typename Multiple>
+inline static Value round_up_to_nearest_power(const Value& v, const Multiple& m)
+{
+	if(m == 0 || v % m == 0)
+		return v;
+	else
+		return (v / m + 1) * m;
+}
+
 template<typename T>
 struct round_up_to_nearest_power_of_two;
 

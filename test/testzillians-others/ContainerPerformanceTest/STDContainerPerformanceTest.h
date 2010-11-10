@@ -11,7 +11,7 @@ void test_std_map_insert_search_delete_in_same_order(int iterations)
 {
 	std::map<int,int> m;
 	tbb::tick_count start, end;
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -21,7 +21,7 @@ void test_std_map_insert_search_delete_in_same_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tinsertion takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -32,7 +32,7 @@ void test_std_map_insert_search_delete_in_same_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tsearch takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -49,7 +49,7 @@ void test_std_map_insert_search_delete_in_reverse_order(int iterations)
 {
 	std::map<int,int> m;
 	tbb::tick_count start, end;
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -59,7 +59,7 @@ void test_std_map_insert_search_delete_in_reverse_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tinsertion takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=iterations-1;i>=0;--i)
@@ -70,7 +70,7 @@ void test_std_map_insert_search_delete_in_reverse_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tsearch takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=iterations-1;i>=0;--i)
@@ -87,7 +87,7 @@ void test_gnucxx_hash_map_insert_search_delete_in_same_order(int iterations)
 {
 	__gnu_cxx::hash_map<int,int> m;
 	tbb::tick_count start, end;
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -97,7 +97,7 @@ void test_gnucxx_hash_map_insert_search_delete_in_same_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tinsertion takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -108,7 +108,7 @@ void test_gnucxx_hash_map_insert_search_delete_in_same_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tsearch takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -125,7 +125,7 @@ void test_gnucxx_hash_map_insert_search_delete_in_reverse_order(int iterations)
 {
 	__gnu_cxx::hash_map<int,int> m;
 	tbb::tick_count start, end;
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -135,7 +135,7 @@ void test_gnucxx_hash_map_insert_search_delete_in_reverse_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tinsertion takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=iterations-1;i>=0;--i)
@@ -146,7 +146,7 @@ void test_gnucxx_hash_map_insert_search_delete_in_reverse_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tsearch takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=iterations-1;i>=0;--i)
@@ -163,7 +163,7 @@ void test_gnucxx_hash_set_insert_search_delete_in_same_order(int iterations)
 {
 	__gnu_cxx::hash_set<int> m;
 	tbb::tick_count start, end;
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -173,7 +173,7 @@ void test_gnucxx_hash_set_insert_search_delete_in_same_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tinsertion takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -184,7 +184,7 @@ void test_gnucxx_hash_set_insert_search_delete_in_same_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tsearch takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -202,7 +202,7 @@ void test_gnucxx_hash_set_insert_search_delete_in_reverse_order(int iterations)
 {
 	__gnu_cxx::hash_set<int> m;
 	tbb::tick_count start, end;
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=0;i<iterations;++i)
@@ -212,7 +212,7 @@ void test_gnucxx_hash_set_insert_search_delete_in_reverse_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tinsertion takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=iterations-1;i>=0;--i)
@@ -223,7 +223,7 @@ void test_gnucxx_hash_set_insert_search_delete_in_reverse_order(int iterations)
 	}
 	end = tbb::tick_count::now();
 	printf("\tsearch takes %lf ms\n", (end - start).seconds()*1000.0);
-	
+
 	start = tbb::tick_count::now();
 	{
 		for(int i=iterations-1;i>=0;--i)
@@ -254,14 +254,14 @@ public:
 	{
 		iterations = _iterations;
 	}
-	test_std_queue(const test_std_queue &obj) 
-	{ 
+	test_std_queue(const test_std_queue &obj)
+	{
 		iterations = obj.iterations;
 	}
 	~test_std_queue()
 	{
 	}
-	
+
 public:
 	int iterations;
 	std::queue<int> q;
@@ -278,7 +278,7 @@ public:
 			q.push(i);
 		}
 	}
-	
+
 	void pop_worker()
 	{
 		int iter = iterations;
@@ -296,7 +296,7 @@ public:
 			}
 		}
 		end = tbb::tick_count::now();
-		printf("\tpush/pop takes %lf ms\n", (end - start).seconds()*1000.0);		
+		printf("\tpush/pop takes %lf ms\n", (end - start).seconds()*1000.0);
 	}
 };
 
@@ -343,6 +343,50 @@ void test_std_queue_push_pop_with_boost_mutex(int iterations)
 	tbb::tbb_thread pop_worker(boost::bind(&test_std_queue<boost::mutex>::pop_worker, &base));
 	push_worker.join();
 	pop_worker.join();
+}
+
+void test_std_priority_queue_push_pop(int iterations)
+{
+	std::priority_queue<int, std::vector<int>, std::greater<int>> q;
+	{
+		tbb::tick_count start = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+			q.push(rand());
+		}
+		tbb::tick_count end = tbb::tick_count::now();
+		printf("\tpush takes %lf ms\n", (end-start).seconds() * 1000.0);
+	}
+
+	{
+		tbb::tick_count start = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+			q.pop();
+		}
+		tbb::tick_count end = tbb::tick_count::now();
+		printf("\tpop takes %lf ms\n", (end-start).seconds() * 1000.0);
+	}
+
+	{
+		tbb::tick_count start = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+			q.push(rand());
+		}
+		tbb::tick_count end = tbb::tick_count::now();
+		printf("\tpush takes %lf ms\n", (end-start).seconds() * 1000.0);
+	}
+
+	{
+		tbb::tick_count start = tbb::tick_count::now();
+		for(int i=0;i<iterations;++i)
+		{
+			q.pop();
+		}
+		tbb::tick_count end = tbb::tick_count::now();
+		printf("\tpop takes %lf ms\n", (end-start).seconds() * 1000.0);
+	}
 }
 
 #endif /*STDCONTAINERPERFORMANCETEST_H_*/

@@ -51,6 +51,7 @@
 #include <boost/lambda/construct.hpp>
 #include <boost/lambda/exceptions.hpp>
 #include <boost/lambda/algorithm.hpp>
+#include <boost/lexical_cast.hpp>
 #endif
 
 #if BUILD_WITH_LOG4CXX
