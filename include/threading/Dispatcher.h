@@ -63,7 +63,7 @@ public:
 
 	~Dispatcher()
 	{
-		for(int i=0;i<mMaxThreadContextCount;++i)
+		for(uint32 i=0;i<mMaxThreadContextCount;++i)
 		{
 			BOOST_ASSERT(!mAttachedFlags[i]);
 		}

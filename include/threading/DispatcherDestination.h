@@ -56,7 +56,7 @@ public:
 
 	void write(const Message* message, uint32 count)
 	{
-		for(int i = 0; i < count - 1; ++i)
+		for(uint32 i = 0; i < count - 1; ++i)
 			mDispatcher->write(mSouceId, mDestinationId, message[i], true);
 		mDispatcher->write(mSouceId, mDestinationId, message[count-1], false);
 	}

@@ -85,7 +85,7 @@ public:
 
 		if(signals)
 		{
-			for(int i = 0; i < mMaxThreadId && n < count; ++i)
+			for(uint32 i = 0; i < mMaxThreadId && n < count; ++i)
 			{
 				if(signals & uint64 (1) << i)
 				{
@@ -110,10 +110,10 @@ public:
 	}
 
 private:
-	DispatcherThreadSignaler mSignaler;
-	DispatcherNetwork<Message>* mDispatcher;
 	uint32 mId;
 	uint32 mMaxThreadId;
+	DispatcherNetwork<Message>* mDispatcher;
+	DispatcherThreadSignaler mSignaler;
 };
 
 } }
