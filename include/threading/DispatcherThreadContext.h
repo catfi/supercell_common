@@ -87,7 +87,7 @@ public:
 		{
 			for(uint32 i = 0; i < mMaxThreadId && n < count; ++i)
 			{
-				if(signals & uint64 (1) << i)
+				if(signals & (uint64 (1) << i))
 				{
 					for(; n < count; ++n)
 					{

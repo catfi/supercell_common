@@ -79,15 +79,17 @@ public:
 	}
 
 public:
-	shared_ptr<DispatcherThreadContext<Message> > createThreadContext()
+	shared_ptr<DispatcherThreadContext<Message> > createThreadContext(int contextId = -1)
 	{
-		int contextId = -1;
-		for(uint32 i = 0; i < mMaxThreadContextCount; ++i)
+		if(contextId == -1)
 		{
-			if(!mAttachedFlags[i])
+			for(uint32 i = 0; i < mMaxThreadContextCount; ++i)
 			{
-				contextId = i;
-				break;
+				if(!mAttachedFlags[i])
+				{
+					contextId = i;
+					break;
+				}
 			}
 		}
 
@@ -96,6 +98,8 @@ public:
 			BOOST_ASSERT("out of thread context" && 0);
 		}
 
+		BOOST_ASSERT(mAttachedFlags[contextId] == false && "context already assigned");
+
 		mAttachedFlags[contextId] = true;
 		shared_ptr<DispatcherThreadContext<Message> > context = shared_ptr<DispatcherThreadContext<Message> >(new DispatcherThreadContext<Message>(this, contextId, mMaxThreadContextCount));
 
@@ -103,7 +107,7 @@ public:
 		mSignalers[contextId] = &context->getSignaler();
 
 		return context;
-	}
+	}	
 
 	virtual void distroyThreadContext(uint32 contextId)
 	{
