@@ -92,10 +92,22 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>// NOTE 20101015 Nothing - Default template arguement in template function is a C++0x feature, not supported in C++03 standard.
+	template <typename T, ContextOwnership::type TransferOwnership/* = TransferOwnershipDefault*/>// NOTE 20101015 Nothing - Default template argument in template function is a C++0x feature, not supported in C++03 standard.
 	inline void set(T* ctx)
 	{
 		if(TransferOwnership == ContextOwnership::transfer)
+		{
+			refSharedContext<T>() = shared_ptr<T>(ctx);
+		}
+		else
+		{
+			refSharedContext<T>() = shared_ptr<T>(ctx, NullDeleter());
+		}
+	}
+	template <typename T>
+	inline void set(T* ctx)
+	{
+		if(TransferOwnershipDefault == ContextOwnership::transfer)
 		{
 			refSharedContext<T>() = shared_ptr<T>(ctx);
 		}
@@ -194,10 +206,22 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>// NOTE 20101015 Nothing - Default template arguement in template function is a C++0x feature, not supported in C++03 standard.
+	template <typename T, ContextOwnership::type TransferOwnership/* = TransferOwnershipDefault*/>// NOTE 20101015 Nothing - Default template argument in template function is a C++0x feature, not supported in C++03 standard.
 	inline void set(T* ctx, const std::string& name = typeid(T).name())
 	{
 		if(TransferOwnership == ContextOwnership::transfer)
+		{
+			refSharedContext<T>(name) = shared_ptr<T>(ctx);
+		}
+		else
+		{
+			refSharedContext<T>(name) = shared_ptr<T>(ctx, NullDeleter());
+		}
+	}
+	template <typename T>
+	inline void set(T* ctx, const std::string& name = typeid(T).name())
+	{
+		if(TransferOwnershipDefault == ContextOwnership::transfer)
 		{
 			refSharedContext<T>(name) = shared_ptr<T>(ctx);
 		}
@@ -292,10 +316,22 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>// NOTE 20101015 Nothing - Default template arguement in template function is a C++0x feature, not supported in C++03 standard.
+	template <typename T, ContextOwnership::type TransferOwnership/* = TransferOwnershipDefault*/>// NOTE 20101015 Nothing - Default template argument in template function is a C++0x feature, not supported in C++03 standard.
 	inline void set(T* ctx, const KeyType& key)
 	{
 		if(TransferOwnership == ContextOwnership::transfer)
+		{
+			refSharedContext<T>(key) = shared_ptr<T>(ctx);
+		}
+		else
+		{
+			refSharedContext<T>(key) = shared_ptr<T>(ctx, NullDeleter());
+		}
+	}
+	template <typename T>
+	inline void set(T* ctx, const KeyType& key)
+	{
+		if(TransferOwnershipDefault == ContextOwnership::transfer)
 		{
 			refSharedContext<T>(key) = shared_ptr<T>(ctx);
 		}
