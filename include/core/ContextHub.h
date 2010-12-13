@@ -26,15 +26,18 @@
 #include "core/Common.h"
 #include "core/SharedPtr.h"
 #ifdef __PLATFORM_WINDOWS__
+#include <tbb/atomic.h>
 #if (_MSC_VER >= 1500)
 #include <unordered_map>
 #else
 #error "Compiler does not support <unordered_map>"
 #endif
+
 #else
+#include <cstdatomic>
 #include <tr1/unordered_map>
 #endif
-#include <tbb/atomic.h>
+
 
 /**
  * By allowing arbitrary context placement for different ContextHub instance,
@@ -164,13 +167,25 @@ private:
 
 	std::vector< shared_ptr<void> > mSharedContextObjects;
 #if ZILLIANS_SERVICEHUB_ALLOW_ARBITRARY_CONTEXT_PLACEMENT_FOR_DIFFERENT_INSTANCE
+#ifdef __PLATFORM_WINDOWS__
 	tbb::atomic<uint32> msContextIndexer;
 #else
+	std::atomic<uint32> msContextIndexer;
+#endif
+#else
+#ifdef __PLATFORM_WINDOWS__
 	static tbb::atomic<uint32> msContextIndexer;
+#else
+	static std::atomic<uint32> msContextIndexer;
+#endif
 #endif
 };
 
+#ifdef __PLATFORM_WINDOWS__
 template<ContextOwnership::type TransferOwnershipDefault> tbb::atomic<uint32> ContextHub<TransferOwnershipDefault>::msContextIndexer;
+#else
+template<ContextOwnership::type TransferOwnershipDefault> std::atomic<uint32> ContextHub<TransferOwnershipDefault>::msContextIndexer;
+#endif
 
 
 /**
