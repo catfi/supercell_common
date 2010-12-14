@@ -45,8 +45,22 @@ ScalablePoolAllocator::ScalablePoolAllocator(byte* pMemory, size_t size, size_t*
 , mThreadID(ThreadIDTLSCleanUpFunction)
 , mBins(BinTLSCleanUpFunction)
 {
-	// Only use memory aligned part
+	// check minimum buffer size
+	if(size < BLOCK_SIZE * 17)
+		throw std::length_error("ScalablePoolAllocator needs at least BLOCK_SIZE * 17 bytes");
+
 	memset(pMemory, 0, size);
+
+	// Store mGlobalBins in our heap. (NOTE 20101230 Nothing: This is needed before we cannot delete it prior to deletion of ScalablePoolAllocator
+	mGlobalBins = (Stack*)pMemory;//new Stack[BIN_COUNT];
+	for(int i = 0; i < BIN_COUNT; ++i)
+	{
+		mGlobalBins[i] = Stack();
+	}
+	pMemory += BIN_COUNT * sizeof(Stack);
+
+	// Set pool end-points
+	// Only use memory aligned part
 	mPool = reinterpret_cast<byte*>( alignUp(reinterpret_cast<uintptr_t>(pMemory), BLOCK_SIZE) );
 	mPoolEnd = pMemory + size;
 
@@ -89,7 +103,6 @@ ScalablePoolAllocator::ScalablePoolAllocator(byte* pMemory, size_t size, size_t*
 		mBinSizes[24] = 2560;	mBinSizes[25] = 3072;	mBinSizes[26] = 3584;	mBinSizes[27] = 4096;
 		mBinSizes[28] = 5120;	mBinSizes[29] = 6144;	mBinSizes[30] = 7168;	mBinSizes[31] = 8192;
 	}
-	mGlobalBins = new Stack[BIN_COUNT];
 
 	STAT_RESET();
 
@@ -98,7 +111,7 @@ ScalablePoolAllocator::ScalablePoolAllocator(byte* pMemory, size_t size, size_t*
 ScalablePoolAllocator::~ScalablePoolAllocator()
 {
 	//
-	SAFE_DELETE_ARRAY(mGlobalBins);
+	//SAFE_DELETE_ARRAY(mGlobalBins);
 
 	//delete[] mBinSizes;// 20090302 nothing - mBinSizes now allocated on mPool
 

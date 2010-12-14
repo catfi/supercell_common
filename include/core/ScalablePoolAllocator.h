@@ -209,11 +209,6 @@ private:// Pool variables
 
 	LargeChunk* mLargeFreeList;	///< Freelist of large chunks, in ascending size order
 
-private:// Bins
-	typedef std::pair<size_t, size_t> SizePair;
-	size_t *mBinSizes;
-
-	Stack* mGlobalBins;	///< Contains all blocks returned from threads (globalSizedBins)
 
 
 private:// Thread local storage control
@@ -221,15 +216,22 @@ private:// Thread local storage control
 	static void BinTLSCleanUpFunction(Bin* bins);
 
 	ThreadID	getThreadID();
-	boost::thread_specific_ptr<ThreadID>	mThreadID;///< TLS storing current thread's ID
 	tbb::atomic<ThreadID> mThreadCount;
 
 	Bin* getBin(size_t sz);
-	boost::thread_specific_ptr<Bin>			mBins;///< TLS storing sized bins
 	tbb::spin_mutex	mTLSAllocationLock;	///< Lock used for alloc/dealloc of TLS(bins)
 	FreeChunk*		mTLSChunkList;	///< Chunks freed and used for next TLS allocation (bootStrapObjectList)
 	Block*			mTLSUsedBlocks;	///< Blocks used for TLS allocation (bootStrapBlockUsed)
 	Block*			mTLSAllocBlock;	///< Block used for next TLS allocation (bootStrapBlock)
+
+	boost::thread_specific_ptr<ThreadID>	mThreadID;///< TLS storing current thread's ID
+	boost::thread_specific_ptr<Bin>			mBins;///< TLS storing sized bins
+
+private:// Bins
+	typedef std::pair<size_t, size_t> SizePair;
+	size_t *mBinSizes;
+
+	Stack* mGlobalBins;	///< Contains all blocks returned from threads (globalSizedBins)
 
 #if BUILD_WITH_LOG4CXX
 private:// Logging
