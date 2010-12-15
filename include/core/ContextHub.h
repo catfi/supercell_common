@@ -26,15 +26,18 @@
 #include "core/Common.h"
 #include "core/SharedPtr.h"
 #ifdef __PLATFORM_WINDOWS__
+#include <tbb/atomic.h>
 #if (_MSC_VER >= 1500)
 #include <unordered_map>
 #else
 #error "Compiler does not support <unordered_map>"
 #endif
+
 #else
+#include <cstdatomic>
 #include <tr1/unordered_map>
 #endif
-#include <tbb/atomic.h>
+
 
 /**
  * By allowing arbitrary context placement for different ContextHub instance,
@@ -92,10 +95,22 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>// NOTE 20101015 Nothing - Default template arguement in template function is a C++0x feature, not supported in C++03 standard.
+	template <typename T, ContextOwnership::type TransferOwnership/* = TransferOwnershipDefault*/>// NOTE 20101015 Nothing - Default template argument in template function is a C++0x feature, not supported in C++03 standard.
 	inline void set(T* ctx)
 	{
 		if(TransferOwnership == ContextOwnership::transfer)
+		{
+			refSharedContext<T>() = shared_ptr<T>(ctx);
+		}
+		else
+		{
+			refSharedContext<T>() = shared_ptr<T>(ctx, NullDeleter());
+		}
+	}
+	template <typename T>
+	inline void set(T* ctx)
+	{
+		if(TransferOwnershipDefault == ContextOwnership::transfer)
 		{
 			refSharedContext<T>() = shared_ptr<T>(ctx);
 		}
@@ -152,13 +167,25 @@ private:
 
 	std::vector< shared_ptr<void> > mSharedContextObjects;
 #if ZILLIANS_SERVICEHUB_ALLOW_ARBITRARY_CONTEXT_PLACEMENT_FOR_DIFFERENT_INSTANCE
+#ifdef __PLATFORM_WINDOWS__
 	tbb::atomic<uint32> msContextIndexer;
 #else
+	std::atomic<uint32> msContextIndexer;
+#endif
+#else
+#ifdef __PLATFORM_WINDOWS__
 	static tbb::atomic<uint32> msContextIndexer;
+#else
+	static std::atomic<uint32> msContextIndexer;
+#endif
 #endif
 };
 
+#ifdef __PLATFORM_WINDOWS__
 template<ContextOwnership::type TransferOwnershipDefault> tbb::atomic<uint32> ContextHub<TransferOwnershipDefault>::msContextIndexer;
+#else
+template<ContextOwnership::type TransferOwnershipDefault> std::atomic<uint32> ContextHub<TransferOwnershipDefault>::msContextIndexer;
+#endif
 
 
 /**
@@ -194,10 +221,22 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>// NOTE 20101015 Nothing - Default template arguement in template function is a C++0x feature, not supported in C++03 standard.
+	template <typename T, ContextOwnership::type TransferOwnership/* = TransferOwnershipDefault*/>// NOTE 20101015 Nothing - Default template argument in template function is a C++0x feature, not supported in C++03 standard.
 	inline void set(T* ctx, const std::string& name = typeid(T).name())
 	{
 		if(TransferOwnership == ContextOwnership::transfer)
+		{
+			refSharedContext<T>(name) = shared_ptr<T>(ctx);
+		}
+		else
+		{
+			refSharedContext<T>(name) = shared_ptr<T>(ctx, NullDeleter());
+		}
+	}
+	template <typename T>
+	inline void set(T* ctx, const std::string& name = typeid(T).name())
+	{
+		if(TransferOwnershipDefault == ContextOwnership::transfer)
 		{
 			refSharedContext<T>(name) = shared_ptr<T>(ctx);
 		}
@@ -292,10 +331,22 @@ public:
 	 *
 	 * @param ctx The given object of type T
 	 */
-	template <typename T, ContextOwnership::type TransferOwnership = TransferOwnershipDefault>// NOTE 20101015 Nothing - Default template arguement in template function is a C++0x feature, not supported in C++03 standard.
+	template <typename T, ContextOwnership::type TransferOwnership/* = TransferOwnershipDefault*/>// NOTE 20101015 Nothing - Default template argument in template function is a C++0x feature, not supported in C++03 standard.
 	inline void set(T* ctx, const KeyType& key)
 	{
 		if(TransferOwnership == ContextOwnership::transfer)
+		{
+			refSharedContext<T>(key) = shared_ptr<T>(ctx);
+		}
+		else
+		{
+			refSharedContext<T>(key) = shared_ptr<T>(ctx, NullDeleter());
+		}
+	}
+	template <typename T>
+	inline void set(T* ctx, const KeyType& key)
+	{
+		if(TransferOwnershipDefault == ContextOwnership::transfer)
 		{
 			refSharedContext<T>(key) = shared_ptr<T>(ctx);
 		}
