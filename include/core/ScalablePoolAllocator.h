@@ -29,7 +29,7 @@
 #include "tbb/spin_mutex.h"// for synchronization
 #include "tbb/atomic.h"
 #include "boost/thread.hpp"
-
+#include "log4cxx/logger.h"
 
 #define ZILLIANS_SCALABLEALLOCATOR_STATISTICS ///< Enable statistics for debugging purposes.
 
