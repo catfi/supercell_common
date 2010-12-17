@@ -21,6 +21,7 @@
 #define ZILLIANS_SHAREDPTR_H_
 
 #include "core/Common.h"
+#include <hash_set>
 
 #if defined _WIN32
 	#include <boost/shared_ptr.hpp>
@@ -86,5 +87,37 @@ inline bool operator != (const shared_ptr<T> &a, const T* b)
 {
     return (a.get() != b);
 }
+
+
+#ifdef __PLATFORM_LINUX__
+namespace __gnu_cxx
+{
+	template<typename T>
+	struct hash<shared_ptr<T> >
+	{
+		size_t operator()(const shared_ptr<T>& __x) const
+		{
+			return reinterpret_cast<size_t>(__x.get());
+		}
+	};
+}
+#else
+namespace stdext
+{
+	template<typename T>
+	struct hash_compare<shared_ptr<T> >
+	{
+		size_t operator()(const shared_ptr<T>& __x) const
+		{
+			return reinterpret_cast<size_t>(__x.get());
+		}
+
+		bool operator()(const shared_ptr<T>& v1, const shared_ptr<T>& v2) const
+		{
+			return (v1 == v2) ? true : false;
+		}
+	};
+}
+#endif
 
 #endif/*ZILLIANS_SHAREDPTR_H_*/
