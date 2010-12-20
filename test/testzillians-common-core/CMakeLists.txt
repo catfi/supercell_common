@@ -19,7 +19,6 @@
 # Contact Information: info@zillians.com
 #
 
-#ADD_SUBDIRECTORY(BufferManagerTest)
 IF(JUSTTHREAD_FOUND)
     ADD_SUBDIRECTORY(AdvancedThreadingTest)
     ADD_SUBDIRECTORY(TransactionTest)
@@ -27,14 +26,10 @@ ENDIF()
 
 ADD_SUBDIRECTORY(BufferTest)
 ADD_SUBDIRECTORY(ScalablePoolAllocatorTest)
-#ADD_SUBDIRECTORY(CallbackTest)
-#ADD_SUBDIRECTORY(MemoryStorageTest)
-#ADD_SUBDIRECTORY(ObjectPoolAndSharedCountTest)
 ADD_SUBDIRECTORY(BiMapTest)
 IF(JUSTTHREAD_FOUND)
 	ADD_SUBDIRECTORY(ConditionVarPerformanceTest)
 ENDIF(JUSTTHREAD_FOUND)
-#ADD_SUBDIRECTORY(MapTest)
 ADD_SUBDIRECTORY(WorkerTest)
 ADD_SUBDIRECTORY(ContextHubTest)
 #ADD_SUBDIRECTORY(FragmentFreeAllocatorTest)
