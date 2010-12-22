@@ -26,4 +26,4 @@ ADD_EXECUTABLE(ContainerPerformanceTest ContainerPerformanceTest.cpp)
 TARGET_LINK_LIBRARIES(ContainerPerformanceTest 
     tbb) 
 
-#ADD_TEST(ContainerPerformanceTest ${EXECUTABLE_OUTPUT_PATH}/ContainerPerformanceTest)
+zillians_add_simple_test(TARGET ContainerPerformanceTest)

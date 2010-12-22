@@ -26,3 +26,5 @@ ADD_EXECUTABLE(DispatcherThreadTest DispatcherThreadTest.cpp)
 TARGET_LINK_LIBRARIES(DispatcherThreadTest
     zillians-common-core 
     )
+
+zillians_add_simple_test(TARGET DispatcherThreadTest)

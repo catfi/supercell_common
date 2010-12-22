@@ -28,4 +28,4 @@ TARGET_LINK_LIBRARIES(TemplateTricksTest
     zillians-common-utility
     )
 
-ADD_TEST(TemplateTricksTest ${EXECUTABLE_OUTPUT_PATH}/TemplateTricksTest)
+zillians_add_simple_test(TARGET TemplateTricksTest)

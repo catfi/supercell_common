@@ -27,4 +27,4 @@ TARGET_LINK_LIBRARIES(MemoryCopyPerformanceTest
     zillians-common-core
     )
 
-#ADD_TEST(MemoryCopyPerformanceTest ${EXECUTABLE_OUTPUT_PATH}/MemoryCopyPerformanceTest)
+zillians_add_simple_test(TARGET MemoryCopyPerformanceTest)

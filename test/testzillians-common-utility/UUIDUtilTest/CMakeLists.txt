@@ -19,13 +19,15 @@
 # Contact Information: info@zillians.com
 #
 
-INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
+include_directories(${zillians-common_SOURCE_DIR}/include/)
 
-ADD_EXECUTABLE(UUIDUtilTest UUIDUtilTest.cpp)
+add_executable(UUIDUtilTest UUIDUtilTest.cpp)
 
-TARGET_LINK_LIBRARIES(UUIDUtilTest 
+target_link_libraries(UUIDUtilTest 
     zillians-common-core
     zillians-common-utility
     )
 
-ADD_TEST(UUIDUtilTest ${EXECUTABLE_OUTPUT_PATH}/UUIDUtilTest)
+zillians_add_simple_test(TARGET UUIDUtilTest)
+#zillians_add_compare_output_test(UUIDUtilTest ${CMAKE_CURRENT_SOURCE_DIR}/expected_output.txt)
+#zillians_add_regex_match_output_test(UUIDUtilTest "*.Error" "MATCH_FOR_FAILURE")

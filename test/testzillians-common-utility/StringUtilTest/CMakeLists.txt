@@ -28,4 +28,4 @@ TARGET_LINK_LIBRARIES(StringUtilTest
     zillians-common-utility
     )
 
-ADD_TEST(StringUtilTest ${EXECUTABLE_OUTPUT_PATH}/StringUtilTest)
+zillians_add_simple_test(TARGET StringUtilTest)

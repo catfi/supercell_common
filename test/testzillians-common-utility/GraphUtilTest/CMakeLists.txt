@@ -28,4 +28,4 @@ TARGET_LINK_LIBRARIES(GraphUtilTest
     zillians-common-utility
     )
 
-ADD_TEST(GraphUtilTest ${EXECUTABLE_OUTPUT_PATH}/GraphUtilTest)
+zillians_add_simple_test(TARGET GraphUtilTest)
