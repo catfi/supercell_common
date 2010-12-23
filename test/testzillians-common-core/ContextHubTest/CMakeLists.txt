@@ -26,4 +26,5 @@ ADD_EXECUTABLE(ContextHubTest ContextHubTest.cpp)
 TARGET_LINK_LIBRARIES(ContextHubTest 
     zillians-common-core)
 
-ADD_TEST(ContextHubTest ${EXECUTABLE_OUTPUT_PATH}/ContextHubTest)
+zillians_add_simple_test(TARGET ContextHubTest)
+

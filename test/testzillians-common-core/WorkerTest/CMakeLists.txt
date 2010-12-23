@@ -26,4 +26,4 @@ ADD_EXECUTABLE(WorkerTest WorkerTest.cpp)
 TARGET_LINK_LIBRARIES(WorkerTest 
     zillians-common-core)
 
-ADD_TEST(WorkerTest ${EXECUTABLE_OUTPUT_PATH}/WorkerTest)
+zillians_add_simple_test(TARGET WorkerTest)

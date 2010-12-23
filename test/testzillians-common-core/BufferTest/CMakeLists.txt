@@ -26,4 +26,4 @@ ADD_EXECUTABLE(BufferTest BufferTest.cpp)
 TARGET_LINK_LIBRARIES(BufferTest 
     zillians-common-core)
 
-ADD_TEST(BufferTest ${EXECUTABLE_OUTPUT_PATH}/BufferTest)
+zillians_add_simple_test(TARGET BufferTest)

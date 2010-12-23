@@ -26,4 +26,5 @@ ADD_EXECUTABLE(ObjectPoolTest ObjectPoolTest)
 TARGET_LINK_LIBRARIES(ObjectPoolTest 
     zillians-common-core)
 
-ADD_TEST(ObjectPoolTest ${EXECUTABLE_OUTPUT_PATH}/ObjectPoolTest)
+zillians_add_simple_test(TARGET ObjectPoolTest)
+

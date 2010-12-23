@@ -27,4 +27,4 @@ TARGET_LINK_LIBRARIES(TransactionTest
     zillians-common-core
     ${JUSTTHREAD_LIBRARIES_STATIC})
 
-ADD_TEST(TransactionTest ${EXECUTABLE_OUTPUT_PATH}/TransactionTest)
+zillians_add_simple_test(TARGET TransactionTest)

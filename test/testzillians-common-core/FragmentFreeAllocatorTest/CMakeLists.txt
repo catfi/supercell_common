@@ -26,4 +26,5 @@ ADD_EXECUTABLE(FragmentFreeAllocatorTest FragmentFreeAllocatorTest.cpp)
 TARGET_LINK_LIBRARIES(FragmentFreeAllocatorTest 
     zillians-common-core)
 
-ADD_TEST(FragmentFreeAllocatorTest ${EXECUTABLE_OUTPUT_PATH}/FragmentFreeAllocatorTest)
+zillians_add_simple_test(TARGET FragmentFreeAllocatorTest)
+

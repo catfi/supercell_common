@@ -28,4 +28,4 @@ TARGET_LINK_LIBRARIES(ScalablePoolAllocatorTest
     zillians-common-networking
     )
 
-ADD_TEST(ScalablePoolAllocatorTest ${EXECUTABLE_OUTPUT_PATH}/ScalablePoolAllocatorTest)
+zillians_add_simple_test(TARGET ScalablePoolAllocatorTest)

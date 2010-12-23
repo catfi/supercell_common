@@ -26,4 +26,4 @@ ADD_EXECUTABLE(SharePtrCopyTest SharePtrCopyTest.cpp)
 TARGET_LINK_LIBRARIES(SharePtrCopyTest
     zillians-common-core)
 
-ADD_TEST(SharePtrCopyTest ${EXECUTABLE_OUTPUT_PATH}/SharePtrCopyTest)
+zillians_add_simple_test(TARGET SharePtrCopyTest)
