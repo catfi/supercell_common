@@ -1064,7 +1064,8 @@ public:
 			{
 				//return current_wpos + mAllocatedSize - current_rpos;
 				ranges.push_back(std::make_pair(mData + current_rpos, mAllocatedSize - current_rpos));
-				ranges.push_back(std::make_pair(mData, current_wpos));
+				if(current_wpos != 0 )
+					ranges.push_back(std::make_pair(mData, current_wpos));
 				return mAllocatedSize - current_rpos + current_wpos;
 			}
 			else
