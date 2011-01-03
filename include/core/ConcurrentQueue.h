@@ -71,6 +71,18 @@ public:
         return mQueue.empty();
     }
 
+    bool try_peek(T& value)
+    {
+        boost::mutex::scoped_lock lock(mMutex);
+        if(mQueue.empty())
+        {
+            return false;
+        }
+
+        value = mQueue.front();
+        return true;
+    }
+
     bool try_pop(T& value)
     {
         boost::mutex::scoped_lock lock(mMutex);
