@@ -89,4 +89,31 @@
       , HAS_MEMBER_FUNCTION_ACCESS \
     )
 
+template <typename T, int N> T* beginof (T (&a)[N]) { return a; }
+template <typename T, int N> T* endof (T (&a)[N])   { return a + N; }
+
+#include <vector>
+template <typename T, typename Alloc> typename std::vector<T, Alloc>::iterator beginof (std::vector<T, Alloc>& v) { return v.begin(); }
+template <typename T, typename Alloc> typename std::vector<T, Alloc>::iterator endof (std::vector<T, Alloc>& v)   { return v.end(); }
+
+template <typename T, typename Alloc> typename std::vector<T, Alloc>::const_iterator beginof (const std::vector<T, Alloc>& v) { return v.begin(); }
+template <typename T, typename Alloc> typename std::vector<T, Alloc>::const_iterator endof (const std::vector<T, Alloc>& v)   { return v.end(); }
+
+#include <list>
+template <typename T, typename Alloc> typename std::list<T, Alloc>::iterator beginof (std::list<T, Alloc>& v) { return v.begin(); }
+template <typename T, typename Alloc> typename std::list<T, Alloc>::iterator endof (std::list<T, Alloc>& v)   { return v.end(); }
+
+template <typename T, typename Alloc> typename std::list<T, Alloc>::const_iterator beginof (const std::list<T, Alloc>& v) { return v.begin(); }
+template <typename T, typename Alloc> typename std::list<T, Alloc>::const_iterator endof (const std::list<T, Alloc>& v)   { return v.end(); }
+
+#include <map>
+template <typename Key, typename T, typename Compare, typename Alloc> typename std::map<Key, T, Compare, Alloc>::iterator beginof (std::map<Key, T, Compare, Alloc>& m) { return m.begin(); }
+template <typename Key, typename T, typename Compare, typename Alloc> typename std::map<Key, T, Compare, Alloc>::iterator endof (std::map<Key, T, Compare, Alloc>& m)   { return m.end(); }
+
+template <typename Key, typename T, typename Compare, typename Alloc> typename std::map<Key, T, Compare, Alloc>::const_iterator beginof (const std::map<Key, T, Compare, Alloc>& m) { return m.begin(); }
+template <typename Key, typename T, typename Compare, typename Alloc> typename std::map<Key, T, Compare, Alloc>::const_iterator endof (const std::map<Key, T, Compare, Alloc>& m)   { return m.end(); }
+
+#define foreach(i, c) \
+   for(decltype(beginof(c)) i = beginof(c); i != endof(c); ++i)
+
 #endif /* ZILLIANS_TEMPLATETRICKS_H_ */

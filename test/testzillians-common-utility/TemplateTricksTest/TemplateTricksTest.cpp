@@ -33,14 +33,87 @@ using namespace zillians;
 
 BOOST_AUTO_TEST_SUITE( TemplateTricksTestSuite )
 
-HAS_MEMBER_FUNCTION(f, (void, (char)))
+//HAS_MEMBER_FUNCTION(f, (void, (char)))
 
-BOOST_AUTO_TEST_CASE( TemplateTricksTestCase1 )
+//BOOST_AUTO_TEST_CASE( TemplateTricksTestCase1 )
+//{
+//	struct dummy_t
+//	{
+//		void f() { }
+//	};
+//}
+
+BOOST_AUTO_TEST_CASE( TemplateTricksTestCase2 )
 {
-	struct dummy_t
+	int xs[] = { 1, 2, 3 };
+	int sum = 0;
+	foreach(x, xs)
+		sum += *x;
+	BOOST_CHECK(sum == 6);
+}
+
+struct value_t { char const* name; int value; } values[] =
+{
+    { "foo", 1 },
+    { "bar", 2 },
+    { "dumb", 3 }
+};
+
+BOOST_AUTO_TEST_CASE( TemplateTricksTestCase3 )
+{
+	int sum = 0;
+	foreach(value, values)
 	{
-		void f() { }
-	};
+		sum += value->value;
+	}
+
+	BOOST_CHECK(sum == 6);
+}
+
+BOOST_AUTO_TEST_CASE( TemplateTricksTestCase4 )
+{
+	std::vector<int> vec;
+	vec.push_back(1);
+	vec.push_back(2);
+	vec.push_back(3);
+	int sum = 0;
+
+	foreach(v, vec)
+		sum += *v;
+	BOOST_CHECK(sum == 6);
+}
+
+BOOST_AUTO_TEST_CASE( TemplateTricksTestCase5 )
+{
+	std::list<int> vec;
+	vec.push_back(1);
+	vec.push_back(2);
+	vec.push_back(3);
+	int sum = 0;
+
+	foreach(v, vec)
+		sum += *v;
+	BOOST_CHECK(sum == 6);
+}
+
+BOOST_AUTO_TEST_CASE( TemplateTricksTestCase6 )
+{
+	std::map<int, int> map;
+	map[1] = 1;
+	map[2] = 2;
+	map[3] = 3;
+
+	int sum_first = 0;
+	int sum_second = 0;
+
+	foreach(m, map)
+	{
+		sum_first += m->first;
+		sum_second += m->second;
+	}
+
+	BOOST_CHECK(sum_first == 6);
+	BOOST_CHECK(sum_second == 6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
