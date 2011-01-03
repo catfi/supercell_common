@@ -414,5 +414,13 @@ private:
 	std::tr1::unordered_map<KeyType, shared_ptr<void> > mSharedContextObjects;
 };
 
+template <typename Trait, typename T, T DefaultValue>
+struct SimpleContextTrait
+{
+	SimpleContextTrait(const T& _value = DefaultValue) : value(_value)
+	{ }
+	T value;
+};
+
 }
 #endif/*ZILLIANS_CONTEXTHUB_H_*/

@@ -235,18 +235,10 @@ BOOST_AUTO_TEST_CASE( ContextHubTestCase4 )
 	BOOST_CHECK(dtor_counter == 12);
 }
 
-template <typename Trait, typename T, T DefaultValue>
-struct ContextTrait
-{
-	ContextTrait(const T& _value = DefaultValue) : value(_value)
-	{ }
-	T value;
-};
-
-typedef ContextTrait<struct traits1, bool, true> context_traits1;
-typedef ContextTrait<struct traits2, bool, true> context_traits2;
-typedef ContextTrait<struct traits3, bool, true> context_traits3;
-typedef ContextTrait<struct traits4, bool, true> context_traits4;
+typedef SimpleContextTrait<struct traits1, bool, true> context_traits1;
+typedef SimpleContextTrait<struct traits2, bool, true> context_traits2;
+typedef SimpleContextTrait<struct traits3, bool, true> context_traits3;
+typedef SimpleContextTrait<struct traits4, bool, true> context_traits4;
 
 BOOST_AUTO_TEST_CASE( ContextHubTestCase5 )
 {
