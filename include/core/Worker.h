@@ -52,13 +52,14 @@ namespace zillians {
 class Worker
 {
 	friend class WorkerGroup;
-	Worker(zillians::ConditionVariable<uint32>** conditions, tbb::concurrent_bounded_queue<uint32>* slots) :
+	Worker(zillians::ConditionVariable<uint32>** conditions, tbb::concurrent_bounded_queue<uint32>* slots, volatile bool* flags) :
 		mTerminated(false),
 		mConditionTableOwner(false),
 		mThread(boost::bind(&Worker::run, this))
 	{
 		mConditionSlots = slots;
 		mConditions = conditions;
+		mCancellationFlags = flags;
 	}
 
 public:
@@ -301,10 +302,13 @@ public:
 		mConditionTableSize = workers * maxConcurrentCalls;
 		mConditionSlots = new tbb::concurrent_bounded_queue<uint32>();
 		mConditions = new zillians::ConditionVariable<uint32>*[mConditionTableSize];
+		mCancellationFlags = new bool[mConditionTableSize];
+
 		for(uint32 i=0;i<mConditionTableSize;++i)
 		{
 			mConditionSlots->push(i);
 			mConditions[i] = new zillians::ConditionVariable<uint32>();
+			mCancellationFlags[i] = false;
 		}
 
 		// create all workers with shared condition variables and slots
@@ -312,7 +316,7 @@ public:
 		mWorkers = new Worker*[workers];
 		for(std::size_t i=0;i<workers;++i)
 		{
-			mWorkers[i] = new Worker(mConditions, mConditionSlots);
+			mWorkers[i] = new Worker(mConditions, mConditionSlots, mCancellationFlags);
 
 			// spawn default threads on each worker
 			// (note that there's one thread associated with the worker by default, that's why we minus one here)
@@ -431,6 +435,7 @@ protected:
 	uint32 mConditionTableSize;
 	tbb::concurrent_bounded_queue<uint32>* mConditionSlots;
 	zillians::ConditionVariable<uint32>** mConditions;
+	volatile bool* mCancellationFlags;
 };
 
 /**

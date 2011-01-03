@@ -235,4 +235,31 @@ BOOST_AUTO_TEST_CASE( ContextHubTestCase4 )
 	BOOST_CHECK(dtor_counter == 12);
 }
 
+template <typename Trait, typename T, T DefaultValue>
+struct ContextTrait
+{
+	ContextTrait(const T& _value = DefaultValue) : value(_value)
+	{ }
+	T value;
+};
+
+typedef ContextTrait<struct traits1, bool, true> context_traits1;
+typedef ContextTrait<struct traits2, bool, true> context_traits2;
+typedef ContextTrait<struct traits3, bool, true> context_traits3;
+typedef ContextTrait<struct traits4, bool, true> context_traits4;
+
+BOOST_AUTO_TEST_CASE( ContextHubTestCase5 )
+{
+	ContextHub<ContextOwnership::transfer> hub;
+	hub.set<context_traits1>(new context_traits1(true));
+	hub.set<context_traits2>(new context_traits2(false));
+	hub.set<context_traits3>(new context_traits3(true));
+	hub.set<context_traits4>(new context_traits4(false));
+
+	BOOST_CHECK(hub.get<context_traits1>()->value == true);
+	BOOST_CHECK(hub.get<context_traits2>()->value == false);
+	BOOST_CHECK(hub.get<context_traits3>()->value == true);
+	BOOST_CHECK(hub.get<context_traits4>()->value == false);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

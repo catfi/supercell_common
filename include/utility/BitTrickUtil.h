@@ -36,7 +36,7 @@ namespace zillians {
 template<typename Value, typename Multiple>
 inline static Value round_up_to_nearest_power(const Value& v, const Multiple& m)
 {
-	if(m == 0 || v % m == 0)
+	if(v == 0 || m == 0 || v % m == 0)
 		return v;
 	else
 		return (v / m + 1) * m;

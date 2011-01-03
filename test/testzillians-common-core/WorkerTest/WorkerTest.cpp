@@ -78,32 +78,32 @@ BOOST_AUTO_TEST_CASE( WorkerTestCase3 )
 	}
 	BOOST_CHECK(counter == 5000);
 }
-
-BOOST_AUTO_TEST_CASE( WorkerTestCase6 )
-{
-	if(!GlobalWorker::instance())
-		new GlobalWorker();
-
-	int counter = 0;
-	for(int i=0;i<5000;++i)
-	{
-		int key = GlobalWorker::instance()->async(boost::bind(increment, &counter));
-		GlobalWorker::instance()->wait(key);
-		BOOST_CHECK(counter == i+1);
-	}
-}
-
-BOOST_AUTO_TEST_CASE( WorkerTestCase7 )
-{
-	WorkerGroup group(2, 2, WorkerGroup::load_balancing_t::round_robin, 10);
-
-	int counter = 0;
-	for(int i=0;i<5000;++i)
-	{
-		int key = group.async(boost::bind(increment, &counter));
-		group.wait(key);
-		BOOST_CHECK(counter == i+1);
-	}
-}
+//
+//BOOST_AUTO_TEST_CASE( WorkerTestCase6 )
+//{
+//	if(!GlobalWorker::instance())
+//		new GlobalWorker();
+//
+//	int counter = 0;
+//	for(int i=0;i<5000;++i)
+//	{
+//		int key = GlobalWorker::instance()->async(boost::bind(increment, &counter));
+//		GlobalWorker::instance()->wait(key);
+//		BOOST_CHECK(counter == i+1);
+//	}
+//}
+//
+//BOOST_AUTO_TEST_CASE( WorkerTestCase7 )
+//{
+//	WorkerGroup group(2, 2, WorkerGroup::load_balancing_t::round_robin, 10);
+//
+//	int counter = 0;
+//	for(int i=0;i<5000;++i)
+//	{
+//		int key = group.async(boost::bind(increment, &counter));
+//		group.wait(key);
+//		BOOST_CHECK(counter == i+1);
+//	}
+//}
 
 BOOST_AUTO_TEST_SUITE_END()
