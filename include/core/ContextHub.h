@@ -25,8 +25,9 @@
 
 #include "core/Common.h"
 #include "core/SharedPtr.h"
+#include "core/Atomic.h"
+
 #ifdef __PLATFORM_WINDOWS__
-#include <tbb/atomic.h>
 #if (_MSC_VER >= 1500)
 #include <unordered_map>
 #else
@@ -34,7 +35,6 @@
 #endif
 
 #else
-#include <cstdatomic>
 #include <tr1/unordered_map>
 #endif
 
@@ -152,7 +152,7 @@ private:
 	template <typename T>
 	inline std::vector< shared_ptr<void> >::reference refSharedContext()
 	{
-		static uint32 index = msContextIndexer++;
+		static uint32 index = atomic::add<uint32>(&msContextIndexer, 1);
 		if(UNLIKELY(index >= mSharedContextObjects.size()))
 		{
 			while(index >= mSharedContextObjects.size())
@@ -167,24 +167,15 @@ private:
 
 	std::vector< shared_ptr<void> > mSharedContextObjects;
 #if ZILLIANS_SERVICEHUB_ALLOW_ARBITRARY_CONTEXT_PLACEMENT_FOR_DIFFERENT_INSTANCE
-#ifdef __PLATFORM_WINDOWS__
-	tbb::atomic<uint32> msContextIndexer;
+	uint32 msContextIndexer;
 #else
-	std::atomic<uint32> msContextIndexer;
-#endif
-#else
-#ifdef __PLATFORM_WINDOWS__
-	static tbb::atomic<uint32> msContextIndexer;
-#else
-	static std::atomic<uint32> msContextIndexer;
-#endif
+	static uint32 msContextIndexer;
 #endif
 };
 
-#ifdef __PLATFORM_WINDOWS__
-template<ContextOwnership::type TransferOwnershipDefault> tbb::atomic<uint32> ContextHub<TransferOwnershipDefault>::msContextIndexer;
+#if ZILLIANS_SERVICEHUB_ALLOW_ARBITRARY_CONTEXT_PLACEMENT_FOR_DIFFERENT_INSTANCE
 #else
-template<ContextOwnership::type TransferOwnershipDefault> std::atomic<uint32> ContextHub<TransferOwnershipDefault>::msContextIndexer;
+template<ContextOwnership::type TransferOwnershipDefault> uint32 ContextHub<TransferOwnershipDefault>::msContextIndexer;
 #endif
 
 
