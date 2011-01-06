@@ -62,7 +62,7 @@ ScalablePoolAllocator::ScalablePoolAllocator(byte* pMemory, size_t size, size_t*
 	// Set pool end-points
 	// Only use memory aligned part
 	mPool = reinterpret_cast<byte*>( alignUp(reinterpret_cast<uintptr_t>(pMemory), BLOCK_SIZE) );
-	mPoolEnd = pMemory + size;
+	mPoolEnd = pMemory + size - BIN_COUNT * sizeof(Stack);
 
 	// Create TLS variables
 	// 20090302 nothing - They are now created on heap
