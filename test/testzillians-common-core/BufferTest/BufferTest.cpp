@@ -763,6 +763,27 @@ BOOST_AUTO_TEST_CASE( SerializableBufferTest )
 	double output_data_c; BOOST_REQUIRE_NO_THROW(output["test_key_c"] >> output_data_c); BOOST_CHECK(input_data_c == output_data_c);
 }
 
+BOOST_AUTO_TEST_CASE( SerializableCircularBufferTest )
+{
+	std::map<std::string, CircularBuffer> input;
+	std::map<std::string, CircularBuffer> output;
+	CircularBuffer a(32); int input_data_a = 1234; BOOST_REQUIRE_NO_THROW(a << input_data_a);
+	CircularBuffer b(32); float input_data_b = 23145.0f; BOOST_REQUIRE_NO_THROW(b << input_data_b);
+	CircularBuffer c(32); double input_data_c = 65655.0; BOOST_REQUIRE_NO_THROW(c << input_data_c);
+	input.insert(std::make_pair("test_key_a", a));
+	input.insert(std::make_pair("test_key_b", b));
+	input.insert(std::make_pair("test_key_c", c));
+
+
+	CircularBuffer t(256);
+	BOOST_REQUIRE_NO_THROW(t << input);
+	BOOST_REQUIRE_NO_THROW(t >> output);
+
+	int output_data_a; BOOST_REQUIRE_NO_THROW(output["test_key_a"] >> output_data_a); BOOST_CHECK(input_data_a == output_data_a);
+	float output_data_b; BOOST_REQUIRE_NO_THROW(output["test_key_b"] >> output_data_b); BOOST_CHECK(input_data_b == output_data_b);
+	double output_data_c; BOOST_REQUIRE_NO_THROW(output["test_key_c"] >> output_data_c); BOOST_CHECK(input_data_c == output_data_c);
+}
+
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 BOOST_AUTO_TEST_CASE( BufferMoveSemanticsTest )
 {
