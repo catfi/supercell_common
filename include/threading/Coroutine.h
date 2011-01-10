@@ -20,66 +20,75 @@
  * @date Jan 10, 2011 sdk - Initial version created.
  */
 
-#ifndef COROUTINE_H_
-#define COROUTINE_H_
+/**
+ * This code is copied from Chris Knohlohff who is the author of boost asio.
+ * Basically he implements stackless coroutine on top of asio. This can be very useful
+ * for implementing application with lots asynchronous operations.
+ *
+ * We modify the naming convention and the macro name to meet our coding standard.
+ *
+ * @ref http://blog.think-async.com/2009/07/wife-says-i-cant-believe-it-works.html
+ * @ref http://blog.think-async.com/2009/08/composed-operations-coroutines-and-code.html
+ * @ref http://blog.think-async.com/2009/08/secret-sauce-revealed.html
+ */
+
+#ifndef ZILLIANS_COROUTINE_H_
+#define ZILLIANS_COROUTINE_H_
 
 #include <boost/asio.hpp>
 #include <boost/asio/error.hpp>
 
 namespace zillians {
 
-class coroutine
+class Coroutine
 {
 public:
-	coroutine() :
-		value_(0)
-	{
-	}
+	Coroutine() : mInternalCoroutineState(0)
+	{ }
 private:
-	friend class coroutine_ref;
-	int value_;
+	friend class CoroutineRef;
+	int mInternalCoroutineState;
 };
 
-class coroutine_ref
+class CoroutineRef
 {
 public:
-	coroutine_ref(coroutine& c) :
-		value_(c.value_)
+	CoroutineRef(Coroutine& c) :
+		mInternalCoroutineState(c.mInternalCoroutineState)
 	{
 	}
-	coroutine_ref(coroutine* c) :
-		value_(c->value_)
+	CoroutineRef(Coroutine* c) :
+		mInternalCoroutineState(c->mInternalCoroutineState)
 	{
 	}
 	operator int() const
 	{
-		return value_;
+		return mInternalCoroutineState;
 	}
-	int operator=(int v)
+	int operator= (int state)
 	{
-		return value_ = v;
+		return mInternalCoroutineState = state;
 	}
 private:
-	int& value_;
+	int& mInternalCoroutineState;
 };
 
-#define coro_reenter(c) \
-  switch (coroutine_ref _coro_value = c)
+#define CoroutineReenter(c) \
+  switch (CoroutineRef _coro_value = c)
 
-#define coro_entry \
+#define CoroutineEntry \
   extern void you_forgot_to_add_the_entry_label(); \
   bail_out_of_coroutine: break; \
   case 0
 
-#define coro_yield \
+#define CoroutineYield \
   if ((_coro_value = __LINE__) == 0) \
   { \
     case __LINE__: ; \
     (void)&you_forgot_to_add_the_entry_label; \
   } \
   else \
-    for (bool _coro_bool = false;; \
-         _coro_bool = !_coro_bool) \
+    for (bool _coro_bool = false;; _coro_bool = !_coro_bool) \
       if (_coro_bool) \
         goto bail_out_of_coroutine; \
       else
