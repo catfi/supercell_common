@@ -118,6 +118,7 @@ struct Session : public Coroutine
 		socket_(socket), buffer_(new std::vector<char>(1024))
 	{ }
 
+
 	void operator()(error_code ec = error_code(), size_t n = 0)
 	{
 		if (!ec)
@@ -133,6 +134,12 @@ struct Session : public Coroutine
 			}
 		}
 	}
+
+//private:
+//	Session(const Session& session) //: socket_(session.socket_), buffer_(session.buffer_)
+//	{
+//		printf("this = %p, session = %p, copyed!\n", this, &session);
+//	}
 };
 
 struct Server : public Coroutine

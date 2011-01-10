@@ -21,4 +21,5 @@
 
 ADD_SUBDIRECTORY(DispatcherThreadTest)
 ADD_SUBDIRECTORY(TbbParallelForTest)
-ADD_SUBDIRECTORY(CoroutineTest)
+ADD_SUBDIRECTORY(CoroutineBasicTest)
+ADD_SUBDIRECTORY(CoroutineEchoServerTest)

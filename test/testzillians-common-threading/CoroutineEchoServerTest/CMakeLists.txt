@@ -21,9 +21,9 @@
 
 INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
 
-ADD_EXECUTABLE(CoroutineTest CoroutineTest.cpp) 
+ADD_EXECUTABLE(CoroutineEchoServerTest CoroutineEchoServerTest.cpp) 
 
-TARGET_LINK_LIBRARIES(CoroutineTest
+TARGET_LINK_LIBRARIES(CoroutineEchoServerTest
     zillians-common-core 
     )
 

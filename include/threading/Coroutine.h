@@ -69,7 +69,7 @@ public:
 	{
 		return mInternalCoroutineState = state;
 	}
-private:
+protected:
 	int& mInternalCoroutineState;
 };
 
