@@ -27,8 +27,8 @@
 
 namespace zillians {
 
-std::string SimpleAsciiEnc(std::string Data, std::string Key);
-std::string SimpleAsciiDec(std::string Data, std::string Key);
+std::string EncryptAsciiBasic(std::string Data, std::string Key);
+std::string DecryptAsciiBasic(std::string Data, std::string Key);
 
 }
 
