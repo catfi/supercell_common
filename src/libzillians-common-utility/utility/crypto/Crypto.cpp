@@ -48,14 +48,14 @@ static char _decode_char(char data_char, char key_char)
 
 namespace zillians {
 
-std::string EncryptAsciiBasic(std::string Data, std::string Key)
+std::string EncryptStringBasic(std::string Data, std::string Key)
 {
 	std::string EncryptedData;
 	for(int i = 0; i<Data.length(); i++)
 		EncryptedData.append(1, _encode_char(Data.c_str()[i], Key.c_str()[i%Key.length()]));
 	return EncryptedData;
 }
-std::string DecryptAsciiBasic(std::string Data, std::string Key)
+std::string DecryptStringBasic(std::string Data, std::string Key)
 {
 	std::string DecryptedData;
 	for(int i = 0; i<Data.length(); i++)
