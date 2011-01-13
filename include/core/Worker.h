@@ -236,6 +236,10 @@ public:
 		}
 	}
 
+public:
+	boost::asio::io_service& getIoService()
+	{ return mIoService; }
+
 protected:
 	/**
 	 * @brief Wrap the given handler with synchronous acknowledgment.
