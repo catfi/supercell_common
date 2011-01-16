@@ -374,11 +374,11 @@ public:
 		return mSharedContextObjects.size();
 	}
 
-	template<typename F>
-	void foreach(F functor)
-	{
-		std::for_each(mSharedContextObjects.begin(), mSharedContextObjects.end(), functor);
-	}
+//	template<typename F>
+//	void foreach(F functor)
+//	{
+//		std::for_each(mSharedContextObjects.begin(), mSharedContextObjects.end(), functor);
+//	}
 
 private:
 	/**
