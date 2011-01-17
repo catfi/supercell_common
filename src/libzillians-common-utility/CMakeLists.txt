@@ -22,6 +22,7 @@
 INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
 
 ADD_LIBRARY(zillians-common-utility
+    utility/crypto/base64.cpp
     utility/crypto/Crypto.cpp
 	utility/BitTrickUtil.cpp
 	utility/DemanglingUtil.cpp
