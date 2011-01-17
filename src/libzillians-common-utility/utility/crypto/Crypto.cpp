@@ -22,6 +22,7 @@
 
 #include "utility/crypto/Crypto.h"
 #include "utility/crypto/base64.h"
+#include "utility/crypto/machine_info.h"
 #include <ctype.h>
 #include <iostream>
 
@@ -67,6 +68,10 @@ std::string Crypto_t::decryptStringBasic(std::string Data, std::string Key, bool
 	for(int i = 0; i<Data.length(); i++)
 		DecryptedData.append(1, _decode_char_rolling_offset(Data.c_str()[i], Key.c_str()[i%Key.length()]));
 	return DecryptedData;
+}
+std::string Crypto_t::genHardwareIdent()
+{
+	return GetMacAddress();
 }
 
 }
