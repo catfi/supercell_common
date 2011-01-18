@@ -20,19 +20,14 @@
  * @date May 19, 2010 sdk - Initial version created.
  */
 
-#ifndef ZILLIANS_CRYPTO_H_
-#define ZILLIANS_CRYPTO_H_
+#ifndef ZILLIANS_MACHINE_INFO_H_
+#define ZILLIANS_MACHINE_INFO_H_
 
 #include <string>
 
 namespace zillians {
 
-struct Crypto_t
-{
-	static std::string encryptStringBasic(std::string Data, std::string Key, bool PostBase64Encode = true);
-	static std::string decryptStringBasic(std::string Data, std::string Key, bool PreBase64Decode = true);
-	static std::string genHardwareIdentKey();
-};
+std::string GetMacAddress();
 
 }
 

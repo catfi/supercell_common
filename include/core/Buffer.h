@@ -176,7 +176,12 @@ class BufferBase
 	{
 		//enum { value = boost::is_same<T, BufferBase >::value };
 		//enum { value = boost::is_base_and_derived<typename boost::remove_const<T>::type, BufferBase<Mode> >::value };
-		enum { value = boost::is_base_and_derived<BufferBase<Mode,Concurrency>, T>::value };
+		enum { value =
+				boost::is_base_and_derived<BufferBase<BufferMode::plain,BufferConcurrency::none>, T>::value ||
+				boost::is_base_and_derived<BufferBase<BufferMode::plain,BufferConcurrency::spsc>, T>::value ||
+				boost::is_base_and_derived<BufferBase<BufferMode::circular,BufferConcurrency::none>, T>::value ||
+				boost::is_base_and_derived<BufferBase<BufferMode::circular,BufferConcurrency::spsc>, T>::value
+		};
 	};
 
 	/**
@@ -1301,7 +1306,7 @@ public:
 	template <typename T>
 	inline void readDispatchBuiltin(T& value, boost::mpl::true_ /*is_buffer*/)
 	{
-		readBuiltin(&value);
+		readBuiltin(value);
 	}
 
 	template <typename T>
@@ -1662,13 +1667,14 @@ public:
 	 *
 	 * @param value The BufferBase variable to be read.
 	 */
-	inline void readBuiltin(BufferBase* value)
+	template<BufferMode::type M, BufferConcurrency::type C>
+	inline void readBuiltin(BufferBase<M, C>& value)
 	{
 		uint32 length; readDirect(length);
 
 		BOOST_ASSERT(dataSize() >= length);
 
-		value->append(*this, length);
+		value.append(*this, length);
 	}
 
 	/**
@@ -1744,7 +1750,7 @@ public:
 	template <typename T>
 	inline void writeDispatchBuiltin(const T& value, boost::mpl::true_ /*is_buffer*/)
 	{
-		writeBuiltin((BufferBase*)&value);
+		writeBuiltin(value);
 	}
 
 	template <typename T>
@@ -2086,14 +2092,15 @@ public:
 	 *
 	 * @param value Another BufferBase object to be written.
 	 */
-	inline void writeBuiltin(const BufferBase* value)
+	template<BufferMode::type M, BufferConcurrency::type C>
+	inline void writeBuiltin(const BufferBase<M,C>& value)
 	{
-		uint32 length = value->dataSize();
+		uint32 length = value.dataSize();
 		writeDirect(length);
 
-		BOOST_ASSERT(value->dataSize() >= length);
+		BOOST_ASSERT(value.dataSize() >= length);
 
-		BufferBase* non_const_value = const_cast<BufferBase*>(value);
+		BufferBase<M,C>* non_const_value = const_cast<BufferBase<M,C>*>(&value);
 		append(*non_const_value, length);
 	}
 
@@ -2367,7 +2374,8 @@ public:
 	 * @param source The buffer object to be read.
 	 * @param size The specific data size to append.
 	 */
-	inline void append(BufferBase &source, std::size_t size)
+	template<BufferMode::type M, BufferConcurrency::type C>
+	inline void append(BufferBase<M, C> &source, std::size_t size)
 	{
 		BOOST_ASSERT(size <= source.dataSize());
 		writeArray(source.rptr(), size);

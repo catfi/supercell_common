@@ -20,20 +20,43 @@
  * @date May 19, 2010 sdk - Initial version created.
  */
 
-#ifndef ZILLIANS_CRYPTO_H_
-#define ZILLIANS_CRYPTO_H_
-
+#include "utility/crypto/machine_info.h"
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <linux/if.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <string.h>
 #include <string>
+
+static std::string _rtrim_char(const std::string &s, char c)
+{
+    std::string s2 = s;
+    while(!s2.empty() && s2[s2.length()-1] == c)
+        s2.erase(s2.length()-1);
+    return s2;
+}
 
 namespace zillians {
 
-struct Crypto_t
+std::string GetMacAddress()
 {
-	static std::string encryptStringBasic(std::string Data, std::string Key, bool PostBase64Encode = true);
-	static std::string decryptStringBasic(std::string Data, std::string Key, bool PreBase64Decode = true);
-	static std::string genHardwareIdentKey();
-};
-
+	struct ifreq s;
+	int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+	strcpy(s.ifr_name, "eth0");
+	if(0 == ioctl(fd, SIOCGIFHWADDR, &s))
+	{
+		std::string result;
+		for(int i = 0; i<6; ++i)
+		{
+			char buf[20];
+			sprintf(buf, "%02x ", static_cast<unsigned char>(s.ifr_addr.sa_data[i]));
+			result.append(buf);
+		}
+		result = _rtrim_char(result, ' ');
+		return result;
+	}
+	return "";
 }
 
-#endif
+}

@@ -21,9 +21,12 @@
  */
 
 #include "utility/crypto/Crypto.h"
+#include "utility/crypto/base64.h"
+#include "utility/crypto/machine_info.h"
 #include <ctype.h>
+#include <iostream>
 
-static char _encode_char(char data_char, char key_char)
+static char _encode_char_rolling_offset(char data_char, char key_char)
 {
 	if(!isalpha(data_char) || !isalpha(key_char))
 		return data_char;
@@ -34,7 +37,7 @@ static char _encode_char(char data_char, char key_char)
 		return 'a'+((data_char-'a')+(tolower(key_char)-'a'))%range_size;
 	return 'A';
 }
-static char _decode_char(char data_char, char key_char)
+static char _decode_char_rolling_offset(char data_char, char key_char)
 {
 	if(!isalpha(data_char) || !isalpha(key_char))
 		return data_char;
@@ -48,19 +51,27 @@ static char _decode_char(char data_char, char key_char)
 
 namespace zillians {
 
-std::string EncryptStringBasic(std::string Data, std::string Key)
+std::string Crypto_t::encryptStringBasic(std::string Data, std::string Key, bool PostBase64Encode)
 {
 	std::string EncryptedData;
 	for(int i = 0; i<Data.length(); i++)
-		EncryptedData.append(1, _encode_char(Data.c_str()[i], Key.c_str()[i%Key.length()]));
+		EncryptedData.append(1, _encode_char_rolling_offset(Data.c_str()[i], Key.c_str()[i%Key.length()]));
+	if(PostBase64Encode)
+		return base64_encode(reinterpret_cast<const unsigned char*>(EncryptedData.c_str()), EncryptedData.length());
 	return EncryptedData;
 }
-std::string DecryptStringBasic(std::string Data, std::string Key)
+std::string Crypto_t::decryptStringBasic(std::string Data, std::string Key, bool PreBase64Decode)
 {
+	if(PreBase64Decode)
+		Data = base64_decode(Data);
 	std::string DecryptedData;
 	for(int i = 0; i<Data.length(); i++)
-		DecryptedData.append(1, _decode_char(Data.c_str()[i], Key.c_str()[i%Key.length()]));
+		DecryptedData.append(1, _decode_char_rolling_offset(Data.c_str()[i], Key.c_str()[i%Key.length()]));
 	return DecryptedData;
+}
+std::string Crypto_t::genHardwareIdentKey()
+{
+	return GetMacAddress();
 }
 
 }
