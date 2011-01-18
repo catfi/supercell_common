@@ -89,9 +89,31 @@
       , HAS_MEMBER_FUNCTION_ACCESS \
     )
 
+/* foreach support for non-container type, the indexer iterates through 0 ~ (A-1) */
+zillians::int8 beginof(zillians::int8 a) { return 0; }
+zillians::int8 endof(zillians::int8 a) { return a-1; }
+zillians::uint8 beginof(zillians::uint8 a) { return 0; }
+zillians::uint8 endof(zillians::uint8 a) { return a-1; }
+
+zillians::int16 beginof(zillians::int16 a) { return 0; }
+zillians::int16 endof(zillians::int16 a) { return a-1; }
+zillians::uint16 beginof(zillians::uint16 a) { return 0; }
+zillians::uint16 endof(zillians::uint16 a) { return a-1; }
+
+zillians::int32 beginof(zillians::int32 a) { return 0; }
+zillians::int32 endof(zillians::int32 a) { return a-1; }
+zillians::uint32 beginof(zillians::uint32 a) { return 0; }
+zillians::uint32 endof(zillians::uint32 a) { return a-1; }
+
+zillians::int64 beginof(zillians::int64 a) { return 0; }
+zillians::int64 endof(zillians::int64 a) { return a-1; }
+zillians::uint64 beginof(zillians::uint64 a) { return 0; }
+zillians::uint64 endof(zillians::uint64 a) { return a-1; }
+
 template <typename T, int N> T* beginof (T (&a)[N]) { return a; }
 template <typename T, int N> T* endof (T (&a)[N])   { return a + N; }
 
+// foreach support for std::vector
 #include <vector>
 template <typename T, typename Alloc> typename std::vector<T, Alloc>::iterator beginof (std::vector<T, Alloc>& v) { return v.begin(); }
 template <typename T, typename Alloc> typename std::vector<T, Alloc>::iterator endof (std::vector<T, Alloc>& v)   { return v.end(); }
@@ -99,6 +121,7 @@ template <typename T, typename Alloc> typename std::vector<T, Alloc>::iterator e
 template <typename T, typename Alloc> typename std::vector<T, Alloc>::const_iterator beginof (const std::vector<T, Alloc>& v) { return v.begin(); }
 template <typename T, typename Alloc> typename std::vector<T, Alloc>::const_iterator endof (const std::vector<T, Alloc>& v)   { return v.end(); }
 
+// foreach support for std::list
 #include <list>
 template <typename T, typename Alloc> typename std::list<T, Alloc>::iterator beginof (std::list<T, Alloc>& v) { return v.begin(); }
 template <typename T, typename Alloc> typename std::list<T, Alloc>::iterator endof (std::list<T, Alloc>& v)   { return v.end(); }
@@ -106,12 +129,53 @@ template <typename T, typename Alloc> typename std::list<T, Alloc>::iterator end
 template <typename T, typename Alloc> typename std::list<T, Alloc>::const_iterator beginof (const std::list<T, Alloc>& v) { return v.begin(); }
 template <typename T, typename Alloc> typename std::list<T, Alloc>::const_iterator endof (const std::list<T, Alloc>& v)   { return v.end(); }
 
+// foreach support for std::map
 #include <map>
 template <typename Key, typename T, typename Compare, typename Alloc> typename std::map<Key, T, Compare, Alloc>::iterator beginof (std::map<Key, T, Compare, Alloc>& m) { return m.begin(); }
 template <typename Key, typename T, typename Compare, typename Alloc> typename std::map<Key, T, Compare, Alloc>::iterator endof (std::map<Key, T, Compare, Alloc>& m)   { return m.end(); }
 
 template <typename Key, typename T, typename Compare, typename Alloc> typename std::map<Key, T, Compare, Alloc>::const_iterator beginof (const std::map<Key, T, Compare, Alloc>& m) { return m.begin(); }
 template <typename Key, typename T, typename Compare, typename Alloc> typename std::map<Key, T, Compare, Alloc>::const_iterator endof (const std::map<Key, T, Compare, Alloc>& m)   { return m.end(); }
+
+// foreach support for std::tr1::unordered_set
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#include <unordered_set>
+template <typename Value, typename Hash, typename Pred, typename Alloc> typename std::unordered_set<Value, Hash, Pred, Alloc>::iterator beginof (std::unordered_set<Value, Hash, Pred, Alloc>& m) { return m.begin(); }
+template <typename Value, typename Hash, typename Pred, typename Alloc> typename std::unordered_set<Value, Hash, Pred, Alloc>::iterator endof (std::unordered_set<Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+
+template <typename Value, typename Hash, typename Pred, typename Alloc> typename std::unordered_set<Value, Hash, Pred, Alloc>::const_iterator beginof (const std::unordered_set<Value, Hash, Pred, Alloc>& m) { return m.begin(); }
+template <typename Value, typename Hash, typename Pred, typename Alloc> typename std::unordered_set<Value, Hash, Pred, Alloc>::const_iterator endof (const std::unordered_set<Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+
+#include <unordered_map>
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> typename std::unordered_map<Key, Value, Hash, Pred, Alloc>::iterator beginof (std::unordered_map<Key, Value, Hash, Pred, Alloc>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> typename std::unordered_map<Key, Value, Hash, Pred, Alloc>::iterator endof (std::unordered_map<Key, Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> typename std::unordered_map<Key, Value, Hash, Pred, Alloc>::const_iterator beginof (const std::unordered_map<Key, Value, Hash, Pred, Alloc>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> typename std::unordered_map<Key, Value, Hash, Pred, Alloc>::const_iterator endof (const std::unordered_map<Key, Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+#else
+#include <tr1/unordered_set>
+template <typename Value, typename Hash, typename Pred, typename Alloc> typename std::tr1::unordered_set<Value, Hash, Pred, Alloc>::iterator beginof (std::tr1::unordered_set<Value, Hash, Pred, Alloc>& m) { return m.begin(); }
+template <typename Value, typename Hash, typename Pred, typename Alloc> typename std::tr1::unordered_set<Value, Hash, Pred, Alloc>::iterator endof (std::tr1::unordered_set<Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+
+template <typename Value, typename Hash, typename Pred, typename Alloc> typename std::tr1::unordered_set<Value, Hash, Pred, Alloc>::const_iterator beginof (const std::tr1::unordered_set<Value, Hash, Pred, Alloc>& m) { return m.begin(); }
+template <typename Value, typename Hash, typename Pred, typename Alloc> typename std::tr1::unordered_set<Value, Hash, Pred, Alloc>::const_iterator endof (const std::tr1::unordered_set<Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+
+// foreach support for std::tr1::unordered_map
+#include <tr1/unordered_map>
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> typename std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>::iterator beginof (std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> typename std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>::iterator endof (std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> typename std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>::const_iterator beginof (const std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> typename std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>::const_iterator endof (const std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+#endif
+
+// foreach support for __gnu_cxx::hash_map
+#include <ext/hash_map>
+template <typename Key, typename Value, typename Hash> typename __gnu_cxx::hash_map<Key, Value, Hash>::iterator beginof (__gnu_cxx::hash_map<Key, Value, Hash>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash> typename __gnu_cxx::hash_map<Key, Value, Hash>::iterator endof (__gnu_cxx::hash_map<Key, Value, Hash>& m)   { return m.end(); }
+
+template <typename Key, typename Value, typename Hash> typename __gnu_cxx::hash_map<Key, Value, Hash>::const_iterator beginof (const __gnu_cxx::hash_map<Key, Value, Hash>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash> typename __gnu_cxx::hash_map<Key, Value, Hash>::const_iterator endof (const __gnu_cxx::hash_map<Key, Value, Hash>& m)   { return m.end(); }
 
 #define foreach(i, c) \
    for(decltype(beginof(c)) i = beginof(c); i != endof(c); ++i)
