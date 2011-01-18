@@ -69,7 +69,7 @@ std::string Crypto_t::decryptStringBasic(std::string Data, std::string Key, bool
 		DecryptedData.append(1, _decode_char_rolling_offset(Data.c_str()[i], Key.c_str()[i%Key.length()]));
 	return DecryptedData;
 }
-std::string Crypto_t::genHardwareIdent()
+std::string Crypto_t::genHardwareIdentKey()
 {
 	return GetMacAddress();
 }

@@ -31,7 +31,7 @@ struct Crypto_t
 {
 	static std::string encryptStringBasic(std::string Data, std::string Key, bool PostBase64Encode = true);
 	static std::string decryptStringBasic(std::string Data, std::string Key, bool PreBase64Decode = true);
-	static std::string genHardwareIdent();
+	static std::string genHardwareIdentKey();
 };
 
 }
