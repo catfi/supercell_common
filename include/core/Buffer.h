@@ -137,6 +137,10 @@ struct BufferObjectPoolStrategy
 	};
 };
 
+template<bool ShadowRead, bool ShadowWrite>
+struct BufferRef
+{ };
+
 namespace {
 
 template<BufferConcurrency::type Concurrency>
