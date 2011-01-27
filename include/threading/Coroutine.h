@@ -45,6 +45,15 @@ class Coroutine
 public:
 	Coroutine() : mInternalCoroutineState(0)
 	{ }
+
+public:
+	/**
+	 * reset the coroutine state to initial value (so the coroutine state is re-initialized for new asynchronous transaction)
+	 *
+	 * @note CAUTION!! DANGEROUS!! ZAC ONLY!! Unless you understand coroutine completely, DO NOT TRY IT without supervision!
+	 */
+	void reset() { mInternalCoroutineState = 0; }
+
 private:
 	friend class CoroutineRef;
 	int mInternalCoroutineState;
@@ -69,6 +78,15 @@ public:
 	{
 		return mInternalCoroutineState = state;
 	}
+
+public:
+	/**
+	 * reset the coroutine state to initial value (so the coroutine state is re-initialized for new asynchronous transaction)
+	 *
+	 * @note CAUTION!! DANGEROUS!! ZAC ONLY!! Unless you understand coroutine completely, DO NOT TRY IT without supervision!
+	 */
+	void reset() { mInternalCoroutineState = 0; }
+
 protected:
 	int& mInternalCoroutineState;
 };
