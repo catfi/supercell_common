@@ -91,24 +91,24 @@
 
 /* foreach support for non-container type, the indexer iterates through 0 ~ (A-1) */
 static inline zillians::int8 beginof(zillians::int8 a) { return 0; }
-static inline zillians::int8 endof(zillians::int8 a) { return a-1; }
+static inline zillians::int8 endof(zillians::int8 a) { return a; }
 static inline zillians::uint8 beginof(zillians::uint8 a) { return 0; }
-static inline zillians::uint8 endof(zillians::uint8 a) { return a-1; }
+static inline zillians::uint8 endof(zillians::uint8 a) { return a; }
 
 static inline zillians::int16 beginof(zillians::int16 a) { return 0; }
-static inline zillians::int16 endof(zillians::int16 a) { return a-1; }
+static inline zillians::int16 endof(zillians::int16 a) { return a; }
 static inline zillians::uint16 beginof(zillians::uint16 a) { return 0; }
-static inline zillians::uint16 endof(zillians::uint16 a) { return a-1; }
+static inline zillians::uint16 endof(zillians::uint16 a) { return a; }
 
 static inline zillians::int32 beginof(zillians::int32 a) { return 0; }
-static inline zillians::int32 endof(zillians::int32 a) { return a-1; }
+static inline zillians::int32 endof(zillians::int32 a) { return a; }
 static inline zillians::uint32 beginof(zillians::uint32 a) { return 0; }
-static inline zillians::uint32 endof(zillians::uint32 a) { return a-1; }
+static inline zillians::uint32 endof(zillians::uint32 a) { return a; }
 
 static inline zillians::int64 beginof(zillians::int64 a) { return 0; }
-static inline zillians::int64 endof(zillians::int64 a) { return a-1; }
+static inline zillians::int64 endof(zillians::int64 a) { return a; }
 static inline zillians::uint64 beginof(zillians::uint64 a) { return 0; }
-static inline zillians::uint64 endof(zillians::uint64 a) { return a-1; }
+static inline zillians::uint64 endof(zillians::uint64 a) { return a; }
 
 template <typename T, int N> static inline T* beginof (T (&a)[N]) { return a; }
 template <typename T, int N> static inline T* endof (T (&a)[N])   { return a + N; }
