@@ -41,6 +41,8 @@ public:
 	static std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters, bool allowEmptyTokenString = false);
 	static std::vector<std::wstring> tokenize(const std::wstring& str, const std::wstring& delimiters, bool allowEmptyTokenString = false);
 
+	static void substitute(std::string &s, const std::string &to_search, const std::string &to_replace);
+
 	template<typename ForwardIterator> inline static ForwardIterator tolower(ForwardIterator first, ForwardIterator last, const std::locale& locale_ref = std::locale())
 	{
 //		using namespace boost;

@@ -51,6 +51,16 @@ StringUtil::StringUtil()
 StringUtil::~StringUtil()
 { }
 
+void StringUtil::substitute(std::string &s, const std::string &to_search, const std::string &to_replace)
+{
+    std::string::size_type p = 0;
+    while ((p = s.find(to_search, p)) != std::string::npos)
+    {
+        s.replace(p, to_search.size(), to_replace);
+        p++;
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////
 std::vector<std::string> StringUtil::tokenize(const std::string& str, const std::string& delimiters, bool allowEmptyTokenString)
 {
