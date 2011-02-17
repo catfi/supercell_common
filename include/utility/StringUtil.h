@@ -86,6 +86,129 @@ public:
 		}
 	}
 
+	static std::string wstrToUtf8(const std::wstring& wstr)
+	{
+		std::string ret("");
+		wchar_t wc = 0;
+		for(std::size_t i = 0; i < wstr.size(); ++i)
+		{
+			wc = wstr[i];
+			if(wc < 0x80)
+			{
+				ret += (char)wc;
+			}
+			else if(wc < 0x800)
+			{
+				ret += (0xc0 | (wc >> 6));	// 110xxxxx
+				ret += (0x80 | (wc & 0x3f));	// 10xxxxxx
+			}
+			else if(wc < 0x10000)
+			{
+				ret += (0xe0 | (wc >> 12));			// 1110xxxx
+				ret += (0x80 | ((wc >> 6) & 0x3f));	// 10xxxxxx
+				ret += (0x80 | (wc & 0x3f));		// 10xxxxxx
+			}
+#if !defined(WIN32)// Following codeprints does not exist in UCS-2
+			else if(wc < 0x20000)
+			{
+				ret += (0xf0 | (wc >> 18));			// 11110xxx
+				ret += (0x80 | ((wc >> 12) & 0x3f));// 10xxxxxx
+				ret += (0x80 | ((wc >> 6) & 0x3f));	// 10xxxxxx
+				ret += (0x80 | (wc & 0x3f));		// 10xxxxxx
+			}
+			else if(wc < 0x4000000)
+			{
+				ret += (0xf8 | (wc >> 24));			// 111110xx
+				ret += (0x80 | ((wc >> 18) & 0x3f));// 10xxxxxx
+				ret += (0x80 | ((wc >> 12) & 0x3f));// 10xxxxxx
+				ret += (0x80 | ((wc >> 6) & 0x3f));	// 10xxxxxx
+				ret += (0x80 | (wc & 0x3f));		// 10xxxxxx
+			}
+			else if(wc < 0x8000000)
+			{
+				ret += (0xfc | (wc >> 30));			// 1111110x
+				ret += (0x80 | ((wc >> 24) & 0x3f));// 10xxxxxx
+				ret += (0x80 | ((wc >> 18) & 0x3f));// 10xxxxxx
+				ret += (0x80 | ((wc >> 12) & 0x3f));// 10xxxxxx
+				ret += (0x80 | ((wc >> 6) & 0x3f));	// 10xxxxxx
+				ret += (0x80 | (wc & 0x3f));		// 10xxxxxx
+			}
+#endif
+		}
+		return ret;
+	}//wstrToUtf8()
+
+	
+	static std::wstring utf8ToWstr(const std::string& str)
+	{
+		std::wstring ret(L"");
+		wchar_t wc = 0;
+		int tailing = 0;
+		for(std::size_t i = 0; i < str.size(); ++i)
+		{
+			if(tailing > 0)
+			{
+				wc = ((wc << 6) | ((wchar_t)(str[i] & 0x3f)));
+				--tailing;
+				if(tailing == 0) { ret += wc; wc = 0; }
+			}
+			else if((str[i] & 0x80) == 0x80)// control byte
+			{
+				if((str[i] & 0xe0) == 0xc)// 0x80 - 0x7FF unicode  2bytes 110xxxxx 10xxxxxx
+				{
+					tailing = 1;
+					wc = ((wchar_t)str[i]) & 0x1f;
+				}
+				else if((str[i] & 0xf0) == 0xe0)// 0x800 - 0xFFFF unicode  3bytes 1110xxxx 10xxxxxx 10xxxxxx
+				{
+					tailing = 2;
+					wc = ((wchar_t)str[i]) & 0x0f;
+				}
+				else if((str[i] & 0xf8) == 0xf0)// 0x10000 - 0x1FFFF unicode  4bytes 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+				{
+#if !defined(WIN32)
+					tailing = 3;
+					wc = ((wchar_t)str[i]) & 0x07;
+#else
+					i += 3;
+					ret += L'?';// Cannot display codeprints outside UCS-2
+					wc = 0;
+#endif
+				}
+				else if((str[i] & 0xfc) == 0xf8)// 0x20000 - 0x3FFFFFF unicode  5bytes 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+				{
+#if !defined(WIN32)
+					tailing = 4;
+					wc = ((wchar_t)str[i]) & 0x3;
+#else
+					i += 4;
+					ret += L'?';// Cannot display codeprints outside UCS-2
+					wc = 0;
+#endif
+				}
+				else if((str[i] & 0xfe) == 0xfd)// 0x4000000 - 0x7FFFFFF unicode  6bytes 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+				{
+#if !defined(WIN32)
+					tailing = 5;
+					wc = ((wchar_t)str[i]) & 0x1f;
+#else
+					i += 5;
+					ret += L'?';// Cannot display codeprints outside UCS-2
+					wc = 0;
+#endif
+				}
+			}
+			else
+			{
+				tailing = 0;
+				ret += (wchar_t)str[i];
+			}
+		}
+		return ret;
+
+	}//utf8ToWstr()
+
+	
 private:
 	static const char* itoaAlphabet [256];
 };
