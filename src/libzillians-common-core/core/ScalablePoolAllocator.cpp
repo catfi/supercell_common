@@ -133,6 +133,10 @@ byte* ScalablePoolAllocator::allocate(size_t sz)//done
 	STAT_ADD(mStatistics.ChunksInUse);
 
 	Bin* bin = getBin(sz);
+	if(bin == NULL)//Out of memory
+	{
+		return NULL;
+	}
 	byte* ret = NULL;
 	Block* block = bin->getActiveBlock();
 
@@ -471,6 +475,10 @@ ScalablePoolAllocator::Bin* ScalablePoolAllocator::getBin(size_t sz)//done
 	if(bins == NULL)// First time used, create bins
 	{
 		bins = allocateTLS(TLS_SIZE);
+		if(bins == NULL)//Out of memory
+		{
+			return NULL;
+		}
 		uintptr_t* sa = reinterpret_cast<uintptr_t*>(bins);
 		*sa = reinterpret_cast<uintptr_t>(this);
 		bins = bins + 1;
@@ -497,6 +505,10 @@ ScalablePoolAllocator::Bin* ScalablePoolAllocator::allocateTLS(size_t sz)// done
 			if( !mTLSAllocBlock )
 			{
 				mTLSAllocBlock = getEmptyBlock(sz);
+			}
+			if( mTLSAllocBlock == NULL )//Out of memory
+			{
+				return NULL;
 			}
 			ret = reinterpret_cast<Bin*>(mTLSAllocBlock->mBumpPtr);
 			mTLSAllocBlock->mBumpPtr = reinterpret_cast<FreeChunk*>( reinterpret_cast<uintptr_t>(mTLSAllocBlock->mBumpPtr) - mTLSAllocBlock->mChunkSize );

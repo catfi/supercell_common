@@ -185,7 +185,13 @@ private:// Utility methods
 		return (ptr) & ~(alignTo - 1);
 	}
 
-	inline bool isInvalid(uintptr_t ptr) { return ptr == INVALID; };
+
+	/**
+	 * Check if pointer is invalid
+	 *
+	 * @return True if pointer is INVALID or NULL
+	 */
+	inline bool isInvalid(uintptr_t ptr) { return (INVALID | ptr) == INVALID; };
 
 	/**
 	 * @brief Check if pointer is valid
