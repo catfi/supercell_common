@@ -89,7 +89,7 @@ public:
 	static std::wstring toWStr_ascii(std::string s)
 	{
 		wchar_t *wBuf = new wchar_t[s.length()+1];
-		for(int i = 0; i<s.length(); i++)
+		for(size_t i = 0; i<s.length(); i++)
 			wBuf[i] = static_cast<wchar_t>(s[i]);
 		std::wstring Ret(wBuf);
 		delete wBuf;
@@ -99,7 +99,7 @@ public:
 	static std::string ws2s_ascii(std::wstring s)
 	{
 		char *buf = new char[s.length()+1];
-		for(int i = 0; i<s.length(); i++)
+		for(size_t i = 0; i<s.length(); i++)
 			buf[i] = static_cast<char>(s[i]);
 		std::string Ret(buf);
 		delete buf;
