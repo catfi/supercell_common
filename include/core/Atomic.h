@@ -27,6 +27,7 @@
 
 #if defined(WIN32)
 #include <intrin.h>
+#include <windows.h>
 #pragma intrinsic(_InterlockedIncrement)
 #pragma intrinsic(_InterlockedDecrement)
 #pragma intrinsic(_InterlockedExchangeAdd)
