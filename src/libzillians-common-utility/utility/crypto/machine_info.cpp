@@ -21,6 +21,7 @@
  */
 
 #include "utility/crypto/machine_info.h"
+#include <core/Platform.h>
 #ifdef __PLATFORM_LINUX__
 	#include <sys/socket.h>
 	#include <sys/ioctl.h>
@@ -62,6 +63,7 @@ std::string GetMacAddress()
 
 #ifdef __PLATFORM_WINDOWS__
 	// NOTE: not supported
+	return "";
 #endif
 }
 
