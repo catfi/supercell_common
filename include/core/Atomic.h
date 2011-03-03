@@ -107,7 +107,7 @@ inline void* cas_ptr(void* volatile* pdst, void* pval, void* pcmp)
 			reinterpret_cast<ptrdiff_t> (pcmp),
 			reinterpret_cast<ptrdiff_t> (pval)));
 #elif defined(WIN32)
-	return reinterpret_cast<void*>(__InterlockedCompareExchange(
+	return reinterpret_cast<void*>(_InterlockedCompareExchange(
 					reinterpret_cast<volatile long *>(pdst),
 					reinterpret_cast<long>(pval),
 					reinterpret_cast<long>(pcmp)));
@@ -122,7 +122,7 @@ inline bool b_cas_ptr(void* volatile* pdst, void* pval, void* pcmp)
 			reinterpret_cast<ptrdiff_t> (pcmp),
 			reinterpret_cast<ptrdiff_t> (pval));
 #elif defined(WIN32)
-	return __InterlockedCompareExchange(
+	return _InterlockedCompareExchange(
 			reinterpret_cast<volatile long *>(pdst),
 			reinterpret_cast<long>(pval),
 			reinterpret_cast<long>(pcmp)) == reinterpret_cast<long>(pcmp);
@@ -198,6 +198,7 @@ inline uint64 bitmap_izte(uint64& bitmap, uint64 bitmap_then, uint64 bitmap_else
 			: "cc"
 			);
 #elif defined(WIN32)
+	uint64 bitmap_new;
 	while(true)
 	{
 		bitmap_old = bitmap;
