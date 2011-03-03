@@ -17,7 +17,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * @date May 19, 2010 sdk - Initial version created.
+ * @date May 19, 2010 jerry - Initial version created.
  */
 
 #include "utility/crypto/machine_info.h"
@@ -47,20 +47,22 @@ std::string GetMacAddress()
 	struct ifreq s;
 	int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 	strcpy(s.ifr_name, "eth0");
-	if(0 == ioctl(fd, SIOCGIFHWADDR, &s))
+	if(0 != ioctl(fd, SIOCGIFHWADDR, &s))
+		return "";
+	std::string result;
+	for(int i = 0; i<6; ++i)
 	{
-		std::string result;
-		for(int i = 0; i<6; ++i)
-		{
-			char buf[20];
-			sprintf(buf, "%02x ", static_cast<unsigned char>(s.ifr_addr.sa_data[i]));
-			result.append(buf);
-		}
-		result = _rtrim_char(result, ' ');
-		return result;
+		char buf[20];
+		sprintf(buf, "%02x ", static_cast<unsigned char>(s.ifr_addr.sa_data[i]));
+		result.append(buf);
 	}
+	result = _rtrim_char(result, ' ');
+	return result;
 #endif
-	return "";
+
+#ifdef __PLATFORM_WINDOWS__
+	// NOTE: not supported
+#endif
 }
 
 }
