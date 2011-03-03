@@ -21,10 +21,12 @@
  */
 
 #include "utility/crypto/machine_info.h"
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <linux/if.h>
-#include <netdb.h>
+#ifdef __PLATFORM_LINUX__
+	#include <sys/socket.h>
+	#include <sys/ioctl.h>
+	#include <linux/if.h>
+	#include <netdb.h>
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <string>
@@ -41,6 +43,7 @@ namespace zillians {
 
 std::string GetMacAddress()
 {
+#ifdef __PLATFORM_LINUX__
 	struct ifreq s;
 	int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 	strcpy(s.ifr_name, "eth0");
@@ -56,6 +59,7 @@ std::string GetMacAddress()
 		result = _rtrim_char(result, ' ');
 		return result;
 	}
+#endif
 	return "";
 }
 
