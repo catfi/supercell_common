@@ -29,6 +29,7 @@
 
 #if defined _WIN32 || defined __WIN32__
 #define __PLATFORM_WINDOWS__
+#include <winsock2.h>// This is to prevent inclusion of winsock.h in some third party libraries, which would cause duplicated definitions
 #else
 #define __PLATFORM_LINUX__
 #endif

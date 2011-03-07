@@ -19,7 +19,10 @@
 # Contact Information: info@zillians.com
 #
 
-INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
+INCLUDE_DIRECTORIES(
+	${PROJECT_COMMON_SOURCE_DIR}/include/
+	${TBB_INCLUDE_DIR}/
+)
 
 ADD_LIBRARY(zillians-common-core
 	core/ScalablePoolAllocator.cpp
