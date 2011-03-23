@@ -20,16 +20,14 @@
  * @date May 2, 2009 sdk - Initial version created.
  */
 
-#ifndef ZILLIANS_TIMEUTIL_H_
-#define ZILLIANS_TIMEUTIL_H_
-
+#include "utility/TimerUtil.h"
 #include <stdint.h>
 #include <time.h>
 #include <sys/timeb.h>
 
 namespace zillians {
 
-uint64_t clock_get_time_ms()
+uint64_t TimerUtil::clock_get_time_ms()
 {
 	timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
@@ -38,5 +36,3 @@ uint64_t clock_get_time_ms()
 }
 
 }
-
-#endif

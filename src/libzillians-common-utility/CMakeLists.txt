@@ -28,5 +28,6 @@ ADD_LIBRARY(zillians-common-utility
 	utility/BitTrickUtil.cpp
 	utility/DemanglingUtil.cpp
 	utility/StringUtil.cpp
+    utility/TimerUtil.cpp
 	utility/UUIDUtil.cpp
     )
