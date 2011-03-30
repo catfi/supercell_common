@@ -17,19 +17,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * @date Mar 17, 2010 sdk - Initial version created.
+ * @date Mar 30, 2011 sdk - Initial version created.
  */
 
-#include "core/ConcurrentQueue.h"
+#include "core/Logger.h"
 
 namespace zillians {
 
-ConcurrentQueue::ConcurrentQueue()
-{
+namespace {
+log4cxx::LoggerPtr gLogger(log4cxx::Logger::getLogger("Global"));
 }
 
-ConcurrentQueue::~ConcurrentQueue()
+log4cxx::LoggerPtr GlobalLogger()
 {
+	return gLogger;
 }
 
 }

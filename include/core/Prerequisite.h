@@ -28,6 +28,7 @@
 #include "core/ObjectPool.h"
 #include "core/SharedPtr.h"
 #include "core/Buffer.h"
+#include "core/Logger.h"
 
 #if BUILD_WITH_BOOST
 #include <boost/assert.hpp>
@@ -52,11 +53,6 @@
 #include <boost/lambda/exceptions.hpp>
 #include <boost/lambda/algorithm.hpp>
 #include <boost/lexical_cast.hpp>
-#endif
-
-#if BUILD_WITH_LOG4CXX
-#include <log4cxx/logger.h>
-#include <log4cxx/basicconfigurator.h>
 #endif
 
 #endif/*ZILLIANS_PREREQUISITE_H_*/

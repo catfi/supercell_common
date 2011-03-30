@@ -17,22 +17,23 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * @date Mar 17, 2010 sdk - Initial version created.
+ * @date Mar 30, 2011 sdk - Initial version created.
  */
 
-#include "core/ConcurrentPipe.h"
+#ifndef ZILLIANS_LOGGER_H_
+#define ZILLIANS_LOGGER_H_
+
+#ifdef BUILD_WITH_LOG4CXX
+
+#include <log4cxx/logger.h>
+#include <log4cxx/basicconfigurator.h>
 
 namespace zillians {
 
-ConcurrentPipe::ConcurrentPipe()
-{
-	// TODO Auto-generated constructor stub
+log4cxx::LoggerPtr GlobalLogger();
 
 }
 
-ConcurrentPipe::~ConcurrentPipe()
-{
-	// TODO Auto-generated destructor stub
-}
+#endif
 
-}
+#endif /* ZILLIANS_LOGGER_H_ */

@@ -25,6 +25,7 @@ INCLUDE_DIRECTORIES(
 )
 
 ADD_LIBRARY(zillians-common-core
+    core/Logger.cpp
 	core/ScalablePoolAllocator.cpp
 	core/FragmentFreeAllocator.cpp
     )
