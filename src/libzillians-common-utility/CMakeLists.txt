@@ -30,4 +30,5 @@ ADD_LIBRARY(zillians-common-utility
 	utility/StringUtil.cpp
     utility/TimerUtil.cpp
 	utility/UUIDUtil.cpp
+	utility/DependencySolver.cpp
     )
