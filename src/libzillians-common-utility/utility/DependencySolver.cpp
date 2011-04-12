@@ -42,7 +42,7 @@ DependencySolver::~DependencySolver()
 bool DependencySolver::addNode(const std::string& id)
 {
 	// add given node to the dependency graph
-	LOG4CXX_INFO(mLogger, "add node " << id);
+	//LOG4CXX_DEBUG(mLogger, "add node " << id);
 	try
 	{
 		VertexDescriptor vd;
@@ -59,7 +59,7 @@ bool DependencySolver::addNode(const std::string& id)
 bool DependencySolver::addDependency(const std::string& id, const std::string& require_id)
 {
 	// add dependency between the given nodes
-	LOG4CXX_INFO(mLogger, "add dependency " << id << " " << require_id);
+	//LOG4CXX_DEBUG(mLogger, "add dependency " << id << " " << require_id);
 	try
 	{
 		static int increment_number = 0;
@@ -71,14 +71,14 @@ bool DependencySolver::addDependency(const std::string& id, const std::string& r
 		LOG4CXX_ERROR(mLogger, "fail to add dependency: " << ia.what());
 		return false;
 	}
-	LOG4CXX_INFO(mLogger, "successfully add dependency " << id << " " << require_id);
+	//LOG4CXX_DEBUG(mLogger, "successfully add dependency " << id << " " << require_id);
 	return true;
 }
 
 bool DependencySolver::removeNode(const std::string& id)
 {
 	// remove given node from the dependency graph
-	LOG4CXX_INFO(mLogger, "remove node " << id);
+	//LOG4CXX_DEBUG(mLogger, "remove node " << id);
 	try
 	{
 		clear_vertex(id, mDependencyGraph, mMapping);
@@ -95,7 +95,7 @@ bool DependencySolver::removeNode(const std::string& id)
 bool DependencySolver::removeDependency(const std::string& id, const std::string& require_id)
 {
 	// remove dependency between the given nodes
-	LOG4CXX_INFO(mLogger, "remove dependency " << id << " " << require_id);
+	//LOG4CXX_DEBUG(mLogger, "remove dependency " << id << " " << require_id);
 	try
 	{
 		remove_edge(id, require_id, mDependencyGraph, mMapping);
@@ -122,17 +122,31 @@ bool DependencySolver::isNodeExist(const std::string& id)
 	return true;
 }
 
+bool DependencySolver::isDependencyExist(const std::string& id, const std::string& require_id)
+{
+	// return if the node with specified id exist in the graph
+	try
+	{
+		edge(id, require_id, mDependencyGraph, mMapping);
+	}
+	catch(std::invalid_argument& ia)
+	{
+		return false;
+	}
+	return true;
+}
+
 void DependencySolver::clear()
 {
 	// clear the dependency graph, remove all nodes and dependencies
-	LOG4CXX_INFO(mLogger, "clear dependency graph");
+	//LOG4CXX_DEBUG(mLogger, "clear dependency graph");
 	zillians::clear(mDependencyGraph, mMapping);
 }
 
 bool DependencySolver::compileTopologicalOrder(std::list<std::string>& result)
 {
 	// compile the complete list to load node (by topological sort)
-	LOG4CXX_INFO(mLogger, "compile topological ordering");
+	//LOG4CXX_DEBUG(mLogger, "compile topological ordering");
 	std::list<VertexDescriptor> make_order;
 	try
 	{
@@ -164,7 +178,7 @@ bool DependencySolver::compileTopologicalOrder(std::list<std::string>& result)
 bool DependencySolver::compileReversedTopologicalOrder(std::list<std::string>& result)
 {
 	// compile the complete list to unload node (by reversed topological sort)
-	LOG4CXX_INFO(mLogger, "compile node unload order");
+	//LOG4CXX_DEBUG(mLogger, "compile node unload order");
 	std::list<VertexDescriptor> make_order;
 	try
 	{
@@ -197,7 +211,7 @@ bool DependencySolver::compileRequireNodes(/*IN*/ const std::string& id, /*OUT*/
 {
 	// find the list of node required by the given node
 	// sorted by load order, exclude the given node
-	LOG4CXX_INFO(mLogger, "compile require node of " << id);
+	//LOG4CXX_DEBUG(mLogger, "compile require node of " << id);
 	vertex_iter vi, vi_end;
 	for(boost::tie(vi, vi_end) = vertices(mDependencyGraph); vi != vi_end; ++vi)
 	{
@@ -236,7 +250,7 @@ bool DependencySolver::compileDependentNodes(/*IN*/ const std::string& id, /*OUT
 {
 	// find the list of nodes which depend on the given node
 	// sorted by unload order, exclude the given node
-	LOG4CXX_INFO(mLogger, "compile dependent nodes of " << id);
+	//LOG4CXX_DEBUG(mLogger, "compile dependent nodes of " << id);
 	vertex_iter vi, vi_end;
 	for(boost::tie(vi, vi_end) = vertices(mDependencyGraph); vi != vi_end; ++vi)
 	{

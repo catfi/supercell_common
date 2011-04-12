@@ -66,6 +66,7 @@ public:
 	bool removeNode(const std::string& id);
 	bool removeDependency(const std::string& id, const std::string& require_id);
 	bool isNodeExist(const std::string& id);
+	bool isDependencyExist(const std::string& id, const std::string& require_id);
 	void clear();
 
 public:
