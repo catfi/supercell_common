@@ -20,8 +20,8 @@
  * @date Apr 13, 2011 sdk - Initial version created.
  */
 
-#ifndef ATOMICBOUNDEDQUEUE_H_
-#define ATOMICBOUNDEDQUEUE_H_
+#ifndef ZILLIANS_ATOMICBOUNDEDQUEUE_H_
+#define ZILLIANS_ATOMICBOUNDEDQUEUE_H_
 
 #include "core/Common.h"
 #include "core/JustThread.h"
@@ -119,8 +119,8 @@ private:
     cacheline_pad_t             pad3;
 
     AtomicBoundedQueue(AtomicBoundedQueue const&);
-    void operator = (AtomicBoundedQueue const&);
+    void operator= (AtomicBoundedQueue const&);
 };
 
 }
-#endif /* ATOMICBOUNDEDQUEUE_H_ */
+#endif /* ZILLIANS_ATOMICBOUNDEDQUEUE_H_ */
