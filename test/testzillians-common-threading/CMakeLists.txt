@@ -24,4 +24,7 @@ ADD_SUBDIRECTORY(TbbParallelForTest)
 ADD_SUBDIRECTORY(CoroutineBasicTest)
 ADD_SUBDIRECTORY(CoroutineAdvanceTest)
 ADD_SUBDIRECTORY(CoroutineEchoServerTest)
-ADD_SUBDIRECTORY(AtomicBoundedQueueTest)
+
+IF(JUSTTHREAD_FOUND)
+    ADD_SUBDIRECTORY(AtomicBoundedQueueTest)
+ENDIF()
