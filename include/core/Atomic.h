@@ -130,6 +130,24 @@ inline bool b_cas_ptr(void* volatile* pdst, void* pval, void* pcmp)
 #endif
 }
 
+template<typename T>
+inline T exchange(T& val, T val_new)
+{
+	T val_old;
+#if defined(__GNUC__)
+	val_old = val_new;
+	__asm__ volatile (
+			"lock; xchg %0, %1"
+			: "=r" (val_old)
+			: "m" (val), "0" (val_old)
+			: "memory"
+			);
+#elif defined(WIN32)
+	val_old = _InterlockedExchange((volatile T*)&val, val_new);
+#endif
+	return val_old;
+}
+
 inline bool bitmap_btsr(uint64& bitmap, int index_to_set, int index_to_reset)
 {
 	uint64 bitmap_old;

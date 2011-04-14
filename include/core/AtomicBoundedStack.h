@@ -28,6 +28,8 @@
 
 namespace zillians {
 
+#if 0
+
 template<typename T>
 class AtomicBoundedStack
 {
@@ -75,25 +77,33 @@ public:
     bool pop(T& data)
     {
         cell_t* cell;
-        size_t pos = top_pos.load(std::memory_order_relaxed);
-        for (;;)
+//        size_t pos = top_pos.load(std::memory_order_relaxed) - 1;
+        size_t pos;
+        for(;;)
         {
-            cell = &buffer[pos & buffer_mask];
+        	pos = top_pos.load(std::memory_order_relaxed);
+        	if(pos == 0) return false;
+
+            cell = &buffer[(pos-1) & buffer_mask];
             size_t seq = cell->sequence.load(std::memory_order_acquire);
-            intptr_t dif = (intptr_t)seq - (intptr_t)(pos + 1);
+            intptr_t dif = (intptr_t)seq - (intptr_t)(pos);
             if (dif == 0)
             {
-                if (top_pos.compare_exchange_weak(pos, pos - 1, std::memory_order_relaxed))
+                if(top_pos.compare_exchange_weak(pos, pos - 1, std::memory_order_relaxed))
                     break;
             }
             else if (dif < 0)
-                return false;
-            else
-                pos = top_pos.load(std::memory_order_relaxed);
+            {
+//            	pos = top_pos.load(std::memory_order_relaxed);
+//            	if(pos == 0)
+            		return false;
+            }
+//            else
+//                pos = top_pos.load(std::memory_order_relaxed) - 1;
         }
 
         data = cell->data;
-        cell->sequence.store(pos + buffer_mask + 1, std::memory_order_release);
+        cell->sequence.store(pos - 1, std::memory_order_release);
 
         return true;
     }
@@ -117,6 +127,8 @@ private:
     AtomicBoundedStack(AtomicBoundedStack const&);
     void operator= (AtomicBoundedStack const&);
 };
+
+#endif
 
 }
 #endif /* ZILLIANS_ATOMICBOUNDEDSTACK_H_ */

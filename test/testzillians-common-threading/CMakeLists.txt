@@ -27,4 +27,5 @@ ADD_SUBDIRECTORY(CoroutineEchoServerTest)
 
 IF(JUSTTHREAD_FOUND)
     ADD_SUBDIRECTORY(AtomicBoundedQueueTest)
+    #ADD_SUBDIRECTORY(AtomicBoundedStackTest)
 ENDIF()
