@@ -539,6 +539,10 @@ public:
 #endif
 
 public:
+	void isMutable() { return !mReadOnly; }
+	void setMutable(bool m = true) { mReadOnly = !m; }
+
+public:
 	/**
 	 * @brief Probe the actual data size of a given type.
 	 *
