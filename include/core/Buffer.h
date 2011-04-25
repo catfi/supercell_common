@@ -2575,6 +2575,11 @@ public:
 		BufferBase<Mode,Concurrency>::operator=(std::move(x));
 	}
 #endif
+
+	void setMutable()
+	{
+		// NOTE: fix-me! -- i am broken because someone forgot to check-in code
+	}
 };
 
 template<BufferMode::type Mode, BufferConcurrency::type Concurrency>
