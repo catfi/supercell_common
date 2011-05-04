@@ -51,14 +51,17 @@ StringUtil::StringUtil()
 StringUtil::~StringUtil()
 { }
 
-void StringUtil::substitute(std::string &s, const std::string &to_search, const std::string &to_replace)
+bool StringUtil::substitute(std::string &s, const std::string &to_search, const std::string &to_replace)
 {
+	bool replace_found = false;
     std::string::size_type p = 0;
     while ((p = s.find(to_search, p)) != std::string::npos)
     {
         s.replace(p, to_search.size(), to_replace);
         p++;
+        replace_found = true;
     }
+    return replace_found;
 }
 
 //////////////////////////////////////////////////////////////////////////
