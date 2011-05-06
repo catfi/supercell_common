@@ -68,6 +68,21 @@ struct null_deleter
 	{ }
 };
 
+template<typename T>
+struct reference_holder
+{
+	reference_holder(const shared_ptr<T>& obj) : ref(obj) { }
+	void operator()(void const*) const
+	{ }
+	const shared_ptr<T> ref;
+};
+
+template<typename A, typename B>
+shared_ptr<B> reinterpret_pointer_cast(const shared_ptr<A>& obj)
+{
+	return shared_ptr<B>((B*)obj.get(), reference_holder<A>(obj));
+}
+
 }
 
 /**
