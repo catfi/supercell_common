@@ -167,6 +167,7 @@ inline bool bitmap_btsr(uint64& bitmap, int index_to_set, int index_to_reset)
 			);
 	return (bool) (bitmap_old & (uint64(1) << index_to_reset));
 #elif defined(WIN32)
+	uint64 bitmap_new;
 	while(true)
 	{
 		bitmap_old = bitmap;
@@ -247,6 +248,7 @@ inline bool bitmap_or(uint64& bitmap, uint64 bitmap_or)
 			);
 	return bitmap_old;
 #elif defined(WIN32)
+	uint64 bitmap_new;
 	while(true)
 	{
 		bitmap_old = bitmap;
