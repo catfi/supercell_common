@@ -24,7 +24,7 @@ INCLUDE_DIRECTORIES(
 	${TBB_INCLUDE_DIR}/
 )
 
-IF(BUILD_WITH_TBB)
+IF(ENABLE_FEATURE_TBB)
     ADD_LIBRARY(zillians-common-core
         core/Logger.cpp
     	core/ScalablePoolAllocator.cpp
