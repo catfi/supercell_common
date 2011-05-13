@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <sys/timeb.h>
+#include <sys/time.h>
 
 namespace zillians {
 
@@ -34,5 +35,28 @@ uint64_t TimerUtil::clock_get_time_ms()
 	uint64_t time_mu_s = static_cast<uint64_t>(ts.tv_sec)*1000000LL+static_cast<uint64_t>(ts.tv_nsec)/1000LL;
 	return time_mu_s/1000;
 }
+
+uint64_t TimerUtil::clock_get_time_us()
+{
+	timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+	uint64_t time_nu_s = static_cast<uint64_t>(ts.tv_sec)*1000000LL+static_cast<uint64_t>(ts.tv_nsec)/1000LL;
+	return time_nu_s;
+}
+
+//uint64_t TimerUtil::clock_get_time_ns()
+//{
+//	timespec ts;
+//	clock_gettime(CLOCK_REALTIME, &ts);
+//	uint64_t time_mu_s = static_cast<uint64_t>(ts.tv_sec)*1000000000LL+static_cast<uint64_t>(ts.tv_nsec);
+//	return time_mu_s;
+//}
+
+//uint64_t TimerUtil::getTimeStamp()
+//{
+//	struct timeval tv;
+//	gettimeofday(&tv, NULL);
+//	return static_cast<long long>(1000000)*static_cast<long long>(tv.tv_sec) + static_cast<long long>(tv.tv_usec);
+//}
 
 }

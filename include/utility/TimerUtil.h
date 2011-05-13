@@ -31,6 +31,9 @@ class TimerUtil
 {
 public:
 	static uint64_t clock_get_time_ms();
+	static uint64_t clock_get_time_us();
+//	static uint64_t clock_get_time_ns();
+//	static uint64_t getTimeStamp();
 };
 
 }
