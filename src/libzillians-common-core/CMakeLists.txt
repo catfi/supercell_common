@@ -24,11 +24,18 @@ INCLUDE_DIRECTORIES(
 	${TBB_INCLUDE_DIR}/
 )
 
-ADD_LIBRARY(zillians-common-core
-    core/Logger.cpp
-	core/ScalablePoolAllocator.cpp
-	core/FragmentFreeAllocator.cpp
-    )
+IF(ENABLE_FEATURE_TBB)
+    ADD_LIBRARY(zillians-common-core
+        core/Logger.cpp
+    	core/ScalablePoolAllocator.cpp
+    	core/FragmentFreeAllocator.cpp
+        )
+ELSE()
+    ADD_LIBRARY(zillians-common-core
+        core/Logger.cpp
+    	core/FragmentFreeAllocator.cpp
+        )
+ENDIF()
     
 TARGET_LINK_LIBRARIES(zillians-common-core
     zillians-common-utility

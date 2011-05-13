@@ -21,7 +21,11 @@
 #define ZILLIANS_OBJECTPOOL_H_
 
 #include "core/Common.h"
+#if BUILD_WITH_TBB
 #include <tbb/concurrent_queue.h>
+#else
+#include "core/ConcurrentQueue.h"
+#endif
 
 #define ZILLIANS_OBJPOOL_PREFERABLE_POOL_SIZE     0
 #define ZILLIANS_OBJPOOL_ENABLE_OBJ_POOL_COUNTER  0
@@ -192,7 +196,11 @@ protected:
 #if ZILLIANS_OBJPOOL_ENABLE_OBJ_POOL_COUNTER
 		tbb::atomic<long> allocationCount;
 #endif
+#if BUILD_WITH_TBB
 		tbb::concurrent_bounded_queue<void*> allocations;
+#else
+		ConcurrentQueue<void*> allocations;
+#endif
 	};
 	static AutoPoolImpl mPool;
 };
