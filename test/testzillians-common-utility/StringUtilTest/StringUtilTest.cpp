@@ -400,7 +400,7 @@ BOOST_AUTO_TEST_CASE( WStringHashCase1 )
 	BOOST_CHECK(str_hash.count(value2) == 1);
 }
 
-BOOST_AUTO_TEST_CASE( atoiCase1 )
+BOOST_AUTO_TEST_CASE( itoaCase1 )
 {
 	uint32 value1 = 0x12AB;
 	std::string value2;
@@ -413,6 +413,26 @@ BOOST_AUTO_TEST_CASE( atoiCase1 )
 	int32 value3 = -0xAB12;
 
 	StringUtil::itoa(value3, value2);
+}
+
+BOOST_AUTO_TEST_CASE( itoaCase2 )
+{
+	uint32 test1 = 0x12AB;
+	std::string value1;
+
+	value1 = StringUtil::itoa(test1, 16);
+
+	BOOST_CHECK(value1 == "12ab");
+
+//	std::cout << value1 << std::endl;
+
+	int32 test2 = -1234;
+
+	value1 = StringUtil::itoa(test2, 10);
+
+	BOOST_CHECK(value1 == "-1234");
+
+//	std::cout << value1 << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

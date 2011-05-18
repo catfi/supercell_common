@@ -29,6 +29,16 @@
 #include <string>
 #include <vector>
 
+namespace std {
+
+inline unsigned int abs(unsigned int x) { return x; }
+
+inline unsigned long int abs(unsigned long int x) { return x; }
+
+inline unsigned long long int abs(unsigned long long int x) { return x; }
+
+}
+
 namespace zillians {
 
 class StringUtil
@@ -85,6 +95,67 @@ public:
 			s.append(itoaAlphabet[index]);
 		}
 	}
+
+	/**
+	 * C++ version 0.4 std::string style "itoa":
+	 * Contributions from Stuart Lowe, Ray-Yuan Sheu,
+	 * Rodrigo de Salvo Braz, Luc Gallant, John Maloney
+	 * and Brian Hunt
+	 */
+	template<typename T>
+	static std::string itoa(T value, int base)
+	{
+		std::string buf;
+
+		// check that the base if valid
+		if (base < 2 || base > 16) return buf;
+
+		enum { kMaxDigits = 35 };
+		buf.reserve( kMaxDigits ); // Pre-allocate enough space.
+
+		T quotient = value;
+
+		// Translating number to string with base:
+		do {
+			buf += "0123456789abcdef"[ std::abs( quotient % base ) ];
+			quotient /= base;
+		} while ( quotient );
+
+		// Append the negative sign
+		if (value < 0) buf += '-';
+
+		std::reverse( buf.begin(), buf.end() );
+		return buf;
+	}
+
+//	/**
+//	 * C++ version 0.4 char* style "itoa":
+//	 * Written by Lukás Chmela
+//	 * Released under GPLv3.
+//	 */
+//	static char* itoa(int value, char* result, int base) {
+//		// check that the base if valid
+//		if (base < 2 || base > 36) { *result = '\0'; return result; }
+//
+//		char* ptr = result, *ptr1 = result, tmp_char;
+//		int tmp_value;
+//
+//		do {
+//			tmp_value = value;
+//			value /= base;
+//			*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
+//		} while ( value );
+//
+//		// Apply negative sign
+//		if (tmp_value < 0) *ptr++ = '-';
+//		*ptr-- = '\0';
+//		while(ptr1 < ptr) {
+//			tmp_char = *ptr;
+//			*ptr--= *ptr1;
+//			*ptr1++ = tmp_char;
+//		}
+//		return result;
+//	}
 
 	static std::wstring toWStr_ascii(std::string s)
 	{
