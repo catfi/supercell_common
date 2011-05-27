@@ -53,7 +53,7 @@ ScalablePoolAllocator::ScalablePoolAllocator(byte* pMemory, size_t size, size_t*
 
 	// Store mGlobalBins in our heap. (NOTE 20101230 Nothing: This is needed before we cannot delete it prior to deletion of ScalablePoolAllocator
 	mGlobalBins = (Stack*)pMemory;//new Stack[BIN_COUNT];
-	for(int i = 0; i < BIN_COUNT; ++i)
+	for(int i = 0; (unsigned)i < BIN_COUNT; ++i)
 	{
 		mGlobalBins[i] = Stack();
 	}
