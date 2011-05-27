@@ -36,28 +36,32 @@ class UUID : public apr_uuid_t
 public:
 	UUID()
 	{ invalidate(); }
+
 	UUID(const UUID& id)
 	{
 #if __WORDSIZE == 32
-		*((uint32*)(&data[0])) = *((uint32*)(&id.data[0]));
-		*((uint32*)(&data[4])) = *((uint32*)(&id.data[4]));
-		*((uint32*)(&data[8])) = *((uint32*)(&id.data[8]));
-		*((uint32*)(&data[12])) = *((uint32*)(&id.data[12]));
+		data.u32[0] = id.data.u32[0];
+		data.u32[1] = id.data.u32[1];
+		data.u32[2] = id.data.u32[2];
+		data.u32[3] = id.data.u32[3];
 #else
-		*((uint64*)(&data[0])) = *((uint64*)(&id.data[0]));
-		*((uint64*)(&data[8])) = *((uint64*)(&id.data[8]));
+		data.u64[0] = id.data.u64[0];
+		data.u64[1] = id.data.u64[1];
 #endif
 	}
+
 	UUID(const char* text)
 	{
 		// parse the data
-		apr_uuid_parse((apr_uuid_t*)this, text);
+		apr_uuid_parse(&data.raw, text);
 	}
+
 	UUID(const std::string& text)
 	{
 		// parse the data
-		apr_uuid_parse((apr_uuid_t*)this, text.c_str());
+		apr_uuid_parse(&data.raw, text.c_str());
 	}
+
 	~UUID()
 	{ }
 
@@ -65,43 +69,45 @@ public:
 	inline bool valid() const
 	{
 #if __WORDSIZE == 32
-		return  ( *((uint32*)(&data[0])) != 0 ) ||
-				( *((uint32*)(&data[4])) != 0 ) ||
-				( *((uint32*)(&data[8])) != 0 ) ||
-				( *((uint32*)(&data[12])) != 0 );
+		return  ( data.u32[0] != 0 ) ||
+				( data.u32[1] != 0 ) ||
+				( data.u32[2] != 0 ) ||
+				( data.u32[3] != 0 );
 #else
-		return  ( *((uint64*)(&data[0])) != 0 ) ||
-				( *((uint64*)(&data[8])) != 0 );
+		return  ( data.u64[0] != 0 ) ||
+				( data.u64[1] != 0 );
 #endif
 	}
+
 	inline bool invalid() const
 	{
 #if __WORDSIZE == 32
-		return  ( *((uint32*)(&data[0])) == 0 ) &&
-				( *((uint32*)(&data[4])) == 0 ) &&
-				( *((uint32*)(&data[8])) == 0 ) &&
-				( *((uint32*)(&data[12])) == 0 );
+		return  ( data.u32[0] == 0 ) &&
+				( data.u32[1] == 0 ) &&
+				( data.u32[2] == 0 ) &&
+				( data.u32[3] == 0 );
 #else
-		return  ( *((uint64*)(&data[0])) == 0 ) &&
-				( *((uint64*)(&data[8])) == 0 );
+		return  ( data.u64[0] == 0 ) &&
+				( data.u64[1] == 0 );
 #endif
 	}
+
 public:
 	inline static void random(UUID& id)
 	{
-		apr_uuid_get((apr_uuid_t*)&id);
+		apr_uuid_get(&id.data.raw);
 	}
 
 	inline static void invalidate(UUID& id)
 	{
 #if __WORDSIZE == 32
-		*((uint32*)(&id.data[0])) = 0;
-		*((uint32*)(&id.data[4])) = 0;
-		*((uint32*)(&id.data[8])) = 0;
-		*((uint32*)(&id.data[12])) = 0;
+		id.data.u32[0] = 0;
+		id.data.u32[1] = 0;
+		id.data.u32[2] = 0;
+		id.data.u32[3] = 0;
 #else
-		*((uint64*)(&id.data[0])) = 0;
-		*((uint64*)(&id.data[8])) = 0;
+		id.data.u64[0] = 0;
+		id.data.u64[1] = 0;
 #endif
 	}
 
@@ -124,13 +130,13 @@ public:
 
 		// copy the data
 #if __WORDSIZE == 32
-		*((uint32*)(&data[0])) = *((uint32*)(&id.data[0]));
-		*((uint32*)(&data[4])) = *((uint32*)(&id.data[4]));
-		*((uint32*)(&data[8])) = *((uint32*)(&id.data[8]));
-		*((uint32*)(&data[12])) = *((uint32*)(&id.data[12]));
+		data.u32[0] = id.data.u32[0];
+		data.u32[1] = id.data.u32[1];
+		data.u32[2] = id.data.u32[2];
+		data.u32[3] = id.data.u32[3];
 #else
-		*((uint64*)(&data[0])) = *((uint64*)(&id.data[0]));
-		*((uint64*)(&data[8])) = *((uint64*)(&id.data[8]));
+		data.u64[0] = id.data.u64[0];
+		data.u64[1] = id.data.u64[1];
 #endif
 
 		return *this;
@@ -138,31 +144,31 @@ public:
 	inline UUID& operator = (const char* text)
 	{
 		// parse the data
-		apr_uuid_parse((apr_uuid_t*)this, text);
+		apr_uuid_parse(&data.raw, text);
 		return *this;
 	}
 	inline UUID& operator = (const std::string& text)
 	{
 		// parse the data
-		apr_uuid_parse((apr_uuid_t*)this, text.c_str());
+		apr_uuid_parse(&data.raw, text.c_str());
 		return *this;
 	}
 	inline bool operator == (const UUID& b) const
 	{
 #if __WORDSIZE == 32
-		return  ( *((uint32*)(&data[0])) == *((uint32*)(&b.data[0])) ) &&
-				( *((uint32*)(&data[4])) == *((uint32*)(&b.data[4])) ) &&
-				( *((uint32*)(&data[8])) == *((uint32*)(&b.data[8])) ) &&
-				( *((uint32*)(&data[12])) == *((uint32*)(&b.data[12])) );
+		return  ( data.u32[0] == b.data.u32[0] ) &&
+				( data.u32[1] == b.data.u32[1] ) &&
+				( data.u32[2] == b.data.u32[2] ) &&
+				( data.u32[3] == b.data.u32[3] );
 #else
-		return  ( *((uint64*)(&data[0])) == *((uint64*)(&b.data[0])) ) &&
-				( *((uint64*)(&data[8])) == *((uint64*)(&b.data[8])) ) ;
+		return  ( data.u64[0] == b.data.u64[0] ) &&
+				( data.u64[1] == b.data.u64[1] ) ;
 #endif
 	}
 	inline bool operator == (const std::string& b) const
 	{
 		char temp[APR_UUID_FORMATTED_LENGTH+1];
-		apr_uuid_format(temp, (apr_uuid_t*)this);
+		apr_uuid_format(temp, &data.raw);
 
 		// perform case insensitive comparison while comparing UUID to string
 		for(int i=0;i<APR_UUID_FORMATTED_LENGTH;++i)
@@ -186,19 +192,19 @@ public:
 	{
 		// TODO find a more efficient implementation here...
 #if __WORDSIZE == 32
-		if( *((uint32*)(&data[0])) == *((uint32*)(&b.data[0])) )
+		if( data.u32[0] == b.data.u32[0] )
 		{
-			if( *((uint32*)(&data[4])) == *((uint32*)(&b.data[4])) )
+			if( data.u32[1] == b.data.u32[1] )
 			{
-				if( *((uint32*)(&data[8])) == *((uint32*)(&b.data[8])) )
+				if( data.u32[2] == b.data.u32[2] )
 				{
-					if( *((uint32*)(&data[12])) == *((uint32*)(&b.data[12])) )
+					if( data.u32[3] == b.data.u32[3] )
 					{
 						return false;
 					}
 					else
 					{
-						if( *((uint32*)(&data[12])) < *((uint32*)(&b.data[12])) )
+						if( data.u32[3] < b.data.u32[3] )
 							return true;
 						else
 							return false;
@@ -206,7 +212,7 @@ public:
 				}
 				else
 				{
-					if( *((uint32*)(&data[8])) < *((uint32*)(&b.data[8])) )
+					if( data.u32[2] < b.data.u32[2] )
 						return true;
 					else
 						return false;
@@ -214,7 +220,7 @@ public:
 			}
 			else
 			{
-				if( *((uint32*)(&data[4])) < *((uint32*)(&b.data[4])) )
+				if( data.u32[1] < b.data.u32[1] )
 					return true;
 				else
 					return false;
@@ -222,21 +228,21 @@ public:
 		}
 		else
 		{
-			if( *((uint32*)(&data[0])) < *((uint32*)(&b.data[0])) )
+			if( data.u32[0] < b.data.u32[0] )
 				return true;
 			else
 				return false;
 		}
 #else
-		if( *((uint64*)(&data[0])) == *((uint64*)(&b.data[0])) )
+		if( data.u64[0] == b.data.u64[0] )
 		{
-			if( *((uint64*)(&data[8])) == *((uint64*)(&b.data[8])) )
+			if( data.u64[1] == b.data.u64[1] )
 			{
 				return false;
 			}
 			else
 			{
-				if( *((uint64*)(&data[8])) < *((uint64*)(&b.data[8])) )
+				if( data.u64[1] < b.data.u64[1] )
 					return true;
 				else
 					return false;
@@ -244,7 +250,7 @@ public:
 		}
 		else
 		{
-			if( *((uint64*)(&data[0])) < *((uint64*)(&b.data[0])) )
+			if( data.u64[0] < b.data.u64[0] )
 				return true;
 			else
 				return false;
@@ -268,18 +274,26 @@ public:
 	inline operator std::string() const
 	{
 		char temp[APR_UUID_FORMATTED_LENGTH+1];
-		apr_uuid_format(temp, (apr_uuid_t*)this);
+		apr_uuid_format(temp, &data.raw);
 
 		std::string to_string= temp;
 		return to_string;
 	}
 
+public:
+	union
+	{
+		apr_uuid_t raw;
+		uint64 u64[2];
+		uint32 u32[4];
+		uint16 u16[8];
+	} data;
 };
 
 inline std::ostream& operator << (std::ostream &stream, const UUID& id)
 {
 	char temp[APR_UUID_FORMATTED_LENGTH+1];
-	apr_uuid_format(temp, (apr_uuid_t*)&id);
+	apr_uuid_format(temp, &id.data.raw);
 	stream << temp;
 	return stream;
 }
@@ -288,7 +302,7 @@ inline std::istream& operator >> (std::istream& stream, const UUID& id)
 {
 	char temp[APR_UUID_FORMATTED_LENGTH+1];
 	stream >> temp;
-	apr_uuid_parse((apr_uuid_t*)&id, temp);
+	apr_uuid_parse((apr_uuid_t*)&id.data.raw, temp);
 	return stream;
 }
 
@@ -297,9 +311,9 @@ struct UUIDHasher
     static size_t hash( const UUID& x )
     {
 #if PLATFORM_BIT_WIDTH == 32
-    	return *((uint32*)(&x.data[0])) + *((uint32*)(&x.data[4])) + *((uint32*)(&x.data[8])) + *((uint32*)(&x.data[12]));
+    	return x.data.u32[0] + x.data.u32[1] + x.data.u32[2] + x.data.u32[3];
 #else
-    	return *((uint64*)(&x.data[0])) + *((uint64*)(&x.data[8]));
+    	return x.data.u64[0] + x.data.u64[1];
 #endif
     }
     static bool equal( const UUID& x, const UUID& y )
