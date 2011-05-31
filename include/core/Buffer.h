@@ -1440,11 +1440,31 @@ public:
 	}
 
 	/**
+	 * @brief Read an int64 (8 byte) variable.
+	 *
+	 * @param value The value to be read.
+	 */
+	inline void readBuiltin(long long int& value)
+	{
+		readDirect(value);
+	}
+
+	/**
 	 * @brief Read an uint64 (8 byte) variable.
 	 *
 	 * @param value The value to be read.
 	 */
 	inline void readBuiltin(uint64& value)
+	{
+		readDirect(value);
+	}
+
+	/**
+	 * @brief Read an uint64 (8 byte) variable.
+	 *
+	 * @param value The value to be read.
+	 */
+	inline void readBuiltin(unsigned long long int& value)
 	{
 		readDirect(value);
 	}
@@ -1865,6 +1885,16 @@ public:
 	}
 
 	/**
+	 * @brief Write an int64 (8 bytes) variable.
+	 *
+	 * @param value The value to be written.
+	 */
+	inline void writeBuiltin(const long long int& value)
+	{
+		writeDirect(value);
+	}
+
+	/**
 	 * @brief Write an uint32 (4 bytes) variable.
 	 *
 	 * @param value The value to be written.
@@ -1890,6 +1920,16 @@ public:
 	 * @param value The value to be written.
 	 */
 	inline void writeBuiltin(const uint64& value)
+	{
+		writeDirect(value);
+	}
+
+	/**
+	 * @brief Write an uint64 (8 bytes) variable.
+	 *
+	 * @param value The value to be written.
+	 */
+	inline void writeBuiltin(const unsigned long long int& value)
 	{
 		writeDirect(value);
 	}
