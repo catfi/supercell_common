@@ -196,6 +196,7 @@ class BufferBase
 	{
 		enum { value =
 			boost::is_same<T, std::string>::value ||
+			boost::is_same<T, std::wstring>::value ||
 			boost::is_same<T, char*>::value ||
 			detail::is_std_vector<T>::value ||
 			detail::is_std_list<T>::value ||
@@ -747,6 +748,17 @@ public:
 	inline static std::size_t probeSizeBuiltin(const std::string &value)
 	{
 		return value.length() + sizeof(uint32);
+	}
+
+	/**
+	 * @brief Probe the actual data size of a given const std::wstring.
+	 *
+	 * @param value The const std::string reference to probe its actual data size.
+	 * @return The actual data size of the const std::string reference stored in the BufferBase object.
+	 */
+	inline static std::size_t probeSizeBuiltin(const std::wstring &value)
+	{
+		return (value.length() + 1) * sizeof(wchar_t);
 	}
 
 	/**
