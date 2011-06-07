@@ -240,6 +240,7 @@ class BufferBase
 			boost::is_same<typename boost::remove_const<T>::type, float>::value ||
 			boost::is_same<typename boost::remove_const<T>::type, double>::value ||
 			boost::is_same<typename boost::remove_const<T>::type, std::string>::value ||
+			boost::is_same<typename boost::remove_const<T>::type, std::wstring>::value ||
 			boost::is_same<typename boost::remove_const<T>::type, UUID>::value ||
 			boost::is_same<T, char*>::value ||
 			boost::is_same<T, const char*>::value ||
@@ -1538,6 +1539,47 @@ public:
 	}
 
 	/**
+	 * @brief Read a std::wstring variable.
+	 *
+	 * @param value The value to be read
+	 */
+	inline void readBuiltin(std::wstring& value)
+	{
+		uint32 length; readDirect(length);
+		uint32 bytes_count = length * sizeof(wchar_t);
+		if(LIKELY(length <= MAX_STRING_LENGTH))
+		{
+			value.clear();
+			if(Mode == BufferMode::plain)
+			{
+				value.append((wchar_t*)rptr(), length);
+			}
+			else
+			{
+				if(rpos() + bytes_count <= mAllocatedSize)
+				{
+					value.append((wchar_t*)rptr(), length);
+				}
+				else
+				{
+					BOOST_ASSERT(false && "Not yet implement for this case");
+					/*	TODO: not sure what to do, feel weired for the second value.append().
+					std::size_t size_to_end = mAllocatedSize - rpos();
+					value.append((wchar*)rptr(), size_to_end / sizeof(wchar_t));
+					value.append((wchar*)mData, length - size_to_end / sizeof(wchar_t));
+					*/
+				}
+			}
+		}
+		else
+		{
+			BOOST_ASSERT(length <= MAX_STRING_LENGTH);
+		}
+
+		rskip(bytes_count);
+	}
+
+	/**
 	 * @brief Read an array of data.
 	 *
 	 * @note The method is pretty dangerous because we don't know the size of value before hand,
@@ -1977,6 +2019,26 @@ public:
 		{
 			writeDirect(length);
 			writeArray((const char*)value.data(), length);
+		}
+		else
+		{
+			BOOST_ASSERT(length <= MAX_STRING_LENGTH);
+		}
+	}
+
+	/**
+	 * @brief Write a std::wstring variable.
+	 *
+	 * @param value The value to be written.
+	 */
+	inline void writeBuiltin(const std::wstring& value)
+	{
+		uint32 length = value.length();
+		uint32 bytes_count = length * sizeof(wchar_t);
+		if(LIKELY(length <= MAX_STRING_LENGTH))
+		{
+			writeDirect(length);
+			writeArray((const char*)value.data(), bytes_count);
 		}
 		else
 		{
