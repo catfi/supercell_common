@@ -539,7 +539,7 @@ public:
 #endif
 
 public:
-	void isMutable() { return !mReadOnly; }
+	bool isMutable() { return !mReadOnly; }
 	void setMutable(bool m = true) { mReadOnly = !m; }
 
 public:
