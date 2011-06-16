@@ -814,6 +814,11 @@ public:
 			size += BufferBase::probeSize(v);
 		}
 
+		inline void skip(std::size_t s)
+		{
+			size += s;
+		}
+
 		std::size_t size;
 	};
 
