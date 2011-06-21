@@ -330,4 +330,9 @@ BOOST_AUTO_TEST_CASE( UUIDCase11 )
 	BOOST_CHECK( !(id0 > id1 && (id0<id1) && !(id0==id1)) );
 }
 
+BOOST_AUTO_TEST_CASE( UUIDCase12 )
+{
+	BOOST_CHECK(sizeof(UUID) == 16);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
