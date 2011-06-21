@@ -22,7 +22,11 @@
 
 #include "utility/UUIDUtil.h"
 
+namespace boost {
+
 std::size_t hash_value(const zillians::UUID& __x)
 {
 	return zillians::UUIDHasher::hash(__x);
+}
+
 }

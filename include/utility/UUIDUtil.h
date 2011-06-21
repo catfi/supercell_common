@@ -31,7 +31,7 @@ namespace zillians {
 
 #define ENABLE_CASE_INSENSITIVE_UUID
 
-class UUID : public apr_uuid_t
+struct UUID
 {
 public:
 	UUID()
@@ -326,7 +326,11 @@ static UUID INVALID_UUID;
 
 }
 
+namespace boost {
+
 extern std::size_t hash_value(const zillians::UUID& __x);
+
+}
 
 #ifdef __PLATFORM_LINUX__
 namespace __gnu_cxx
