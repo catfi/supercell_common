@@ -22,6 +22,7 @@
 INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
 
 ADD_LIBRARY(zillians-common-utility
+    utility/boost/1_46_1/libs/serialization/src/utf8_codecvt_facet.cpp
     utility/crypto/base64.cpp
     utility/crypto/Crypto.cpp
     utility/crypto/machine_info.cpp
@@ -31,4 +32,8 @@ ADD_LIBRARY(zillians-common-utility
     utility/TimerUtil.cpp
 	utility/UUIDUtil.cpp
 	utility/DependencySolver.cpp
+    )
+
+TARGET_LINK_LIBRARIES(zillians-common-utility
+    boost_system
     )

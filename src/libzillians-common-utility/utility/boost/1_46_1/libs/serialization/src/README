@@ -1,0 +1,22 @@
+NOTE: why this strange file organization ?
+
+in boost prior 1_34_0, the impl for "utf8_codecvt_facet.cpp" used to live in:
+    libs/serialization/src/utf8_codecvt_facet.cpp
+
+since boost 1_34_0, the impl for "utf8_codecvt_facet.cpp" moved to:
+    libs/detail/utf8_codecvt_facet.cpp
+    where the original path now holds a shell that includes both the hpp and the cpp.
+
+references:
+    http://www.edobashira.com/2010/03/using-boost-code-facet-for-reading-utf8.html
+    http://semmel.wordpress.com/2011/01/19/processing-utf-8-text-in-c/
+
+    http://boost.org/doc/libs/1_46_1/boost/detail/utf8_codecvt_facet.hpp
+    http://boost.org/doc/libs/1_46_1/libs/detail/utf8_codecvt_facet.cpp
+    http://www.boost.org/doc/libs/1_46_1/libs/serialization/src/utf8_codecvt_facet.cpp
+
+    http://boost.org/doc/libs/1_34_0/boost/detail/utf8_codecvt_facet.hpp
+    http://boost.org/doc/libs/1_34_0/libs/detail/utf8_codecvt_facet.cpp
+    http://www.boost.org/doc/libs/1_34_0/libs/serialization/src/utf8_codecvt_facet.cpp
+
+    http://www.boost.org/doc/libs/1_32_0/libs/serialization/src/utf8_codecvt_facet.cpp
