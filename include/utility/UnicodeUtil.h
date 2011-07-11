@@ -26,13 +26,7 @@
 #include <iostream>
 #include <fstream>
 #include <locale>
-
-#define BOOST_UTF8_BEGIN_NAMESPACE namespace zillians {
-#define BOOST_UTF8_END_NAMESPACE }
-#define BOOST_UTF8_DECL
-
-#include <boost/detail/utf8_codecvt_facet.hpp>
-#include "utility/detail/boost/utf8_codecvt_facet.cpp"
+#include <memory>
 
 namespace zillians {
 
@@ -47,22 +41,38 @@ struct disable_stdio_sync
 
 }
 
+std::locale& get_default_locale();
+std::locale& get_posix_locale();
+std::locale& get_utf8_locale();
+std::locale& get_c_locale();
+
 template<typename StreamT>
 void enable_default_locale(StreamT& stream)
 {
 	static detail::disable_stdio_sync s(false);
-	std::locale default_locale("");
-	stream.imbue(default_locale);
+	stream.imbue(get_default_locale());
+}
+
+template<typename StreamT>
+void enable_posix_locale(StreamT& stream)
+{
+	static detail::disable_stdio_sync s(false);
+	stream.imbue(get_posix_locale());
 }
 
 template<typename StreamT>
 void enable_utf8_locale(StreamT& stream)
 {
 	static detail::disable_stdio_sync s(false);
-	static utf8_codecvt_facet* utf8_facet = new utf8_codecvt_facet;
-	std::locale utf8_locale(std::locale(), utf8_facet);
-	stream.imbue(utf8_locale);
+	stream.imbue(get_utf8_locale());
 }
 
+template<typename StreamT>
+void enable_c_locale(StreamT& stream)
+{
+	static detail::disable_stdio_sync s(false);
+	stream.imbue(get_c_locale());
 }
+}
+
 #endif /* ZILLIANS_UNICODEUTIL_H_ */
