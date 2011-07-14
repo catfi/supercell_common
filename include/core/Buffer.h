@@ -1691,8 +1691,8 @@ public:
 	template <typename K, typename V>
 	inline void readBuiltin(std::pair<K, V>& value)
 	{
-		readBuiltin(value.first);
-		readBuiltin(value.second);
+		read(value.first);
+		read(value.second);
 	}
 
 	/**
@@ -2209,8 +2209,8 @@ public:
 	template <typename K, typename V>
 	inline void writeBuiltin(const std::pair<K,V>& value)
 	{
-		writeBuiltin(value.first);
-		writeBuiltin(value.second);
+		write(value.first);
+		write(value.second);
 	}
 
 	/**
