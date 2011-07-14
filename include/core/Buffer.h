@@ -101,6 +101,19 @@ struct is_std_string< std::basic_string<_CharT, _Traits, _Alloc> >
 	enum { value = true };
 };
 
+template<typename T>
+struct is_std_pair
+{
+	enum { value = false };
+};
+
+template<typename K, typename V>
+struct is_std_pair< std::pair<K, V> >
+{
+	enum { value = true };
+};
+
+
 }
 
 /**
@@ -250,6 +263,7 @@ class BufferBase
 			detail::is_std_list<T>::value ||
 			detail::is_std_map<T>::value ||
 			detail::is_boost_array<T>::value ||
+			detail::is_std_pair<T>::value ||
 			boost::is_same<typename boost::remove_const<T>::type, boost::system::error_code>::value ||
 			//boost::is_same<typename boost::remove_const<T>::type, BufferBase >::value
 			//boost::is_base_and_derived<typename boost::remove_const<T>::type, BufferBase>::value
@@ -783,6 +797,18 @@ public:
 	inline static std::size_t probeSizeBuiltin(const boost::system::error_code& value)
 	{
 		return sizeof(int32) + sizeof(int32);
+	}
+
+	/**
+	 * @brief Probe the actual data size of a given std::pair variable.
+	 *
+	 * @param value The std::pair variable to probe its actual data size.
+	 * @return The actual data size of the std::pair variable stored in the BufferBase object.
+	 */
+	template<typename K, typename V>
+	inline static std::size_t probeSizeBuiltin(const std::pair<K,V>& value)
+	{
+		return probeSize(value.first) + probeSize(value.second);
 	}
 
 	/**
@@ -1658,6 +1684,18 @@ public:
 	}
 
 	/**
+	 * @brief Read a std::pair<K, V> object.
+	 *
+	 * @param value The std::pair<K, V> variable to be read.
+	 */
+	template <typename K, typename V>
+	inline void readBuiltin(std::pair<K, V>& value)
+	{
+		readBuiltin(value.first);
+		readBuiltin(value.second);
+	}
+
+	/**
 	 * @brief Read a std::list<T> object.
 	 *
 	 * @param value The std::list<T> variable to be read.
@@ -2140,9 +2178,9 @@ public:
 	}
 
 	/**
-	 * @brief Write a std::list<T> object.
+	 * @brief Write a std::map<K,V> object.
 	 *
-	 * @param value The std::list<T> variable to be written.
+	 * @param value The std::map<K,V> variable to be written.
 	 */
 	template <typename K, typename V>
 	inline void writeBuiltin(const std::map<K,V>& value)
@@ -2161,6 +2199,18 @@ public:
 		{
 			BOOST_ASSERT(length <= MAX_VECTOR_LENGTH);
 		}
+	}
+
+	/**
+	 * @brief Write a std::pair<K,V> object.
+	 *
+	 * @param value The std::pair<K,V> variable to be written.
+	 */
+	template <typename K, typename V>
+	inline void writeBuiltin(const std::pair<K,V>& value)
+	{
+		writeBuiltin(value.first);
+		writeBuiltin(value.second);
 	}
 
 	/**

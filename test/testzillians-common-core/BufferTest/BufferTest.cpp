@@ -1037,4 +1037,20 @@ BOOST_AUTO_TEST_CASE( CircularBufferSingleProducerSingleConsumerTest )
 	}
 }
 
+
+BOOST_AUTO_TEST_CASE( StdPairSerializeTest )
+{
+	Buffer b;
+	UUID uuid0, uuid1;
+	uuid0.random(); uuid1.random();
+	std::pair<UUID, UUID> buffer(uuid0, uuid1);
+	std::pair<UUID, UUID> result;
+
+	b << buffer;
+	b >> result;
+
+	BOOST_CHECK(result.first == uuid0);
+	BOOST_CHECK(result.second == uuid1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
