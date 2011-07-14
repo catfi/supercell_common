@@ -51,6 +51,7 @@ struct SingletonInitialization
 	};
 };
 
+
 /**
  * Simple implementation of Singleton Pattern
  *
@@ -61,6 +62,25 @@ struct SingletonInitialization
 template <class T, SingletonInitialization::type Init = SingletonInitialization::manual>
 class Singleton
 {
+	template<typename V, SingletonInitialization::type F>
+	struct CreateDelegate;
+
+	template<typename V>
+	struct CreateDelegate<V, SingletonInitialization::automatic>
+	{
+		static void create(V** p)
+		{
+			*p = new V;
+		}
+	};
+
+	template<typename V>
+	struct CreateDelegate<V, SingletonInitialization::manual>
+	{
+		static void create(V** p)
+		{ }
+	};
+
 public:
 	Singleton()
 	{
@@ -87,7 +107,8 @@ public:
 	{
 		if(Init == SingletonInitialization::automatic && !mInstance)
 		{
-			mInstance = new T;
+			CreateDelegate<T, Init>::create(&mInstance);
+			//mInstance = new T;
 		}
 
 		return mInstance;
