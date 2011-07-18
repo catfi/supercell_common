@@ -56,5 +56,12 @@ std::locale& get_default_locale()
 	return default_locale;
 }
 
+void utf8_to_ucs4(const std::string& input, std::wstring& output)
+{
+	typedef boost::u8_to_u32_iterator<std::string::const_iterator> iterator_type;
+	iterator_type first(input.begin());
+	iterator_type last(input.end());
+	std::copy(first, last, std::back_inserter(output));
+}
 
 }

@@ -27,6 +27,9 @@
 #include <fstream>
 #include <locale>
 #include <memory>
+#include <string>
+#include <algorithm>
+#include <boost/regex/pending/unicode_iterator.hpp>
 
 namespace zillians {
 
@@ -73,6 +76,9 @@ void enable_c_locale(StreamT& stream)
 	static detail::disable_stdio_sync s(false);
 	stream.imbue(get_c_locale());
 }
+
+void utf8_to_ucs4(const std::string& input, std::wstring& output);
+
 }
 
 #endif /* ZILLIANS_UNICODEUTIL_H_ */
