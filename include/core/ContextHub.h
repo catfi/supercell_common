@@ -81,11 +81,13 @@ private:
 	};
 
 public:
-	ContextHub()
+	ContextHub() : mSharedContextObjects(NULL)
 	{ }
 
 	virtual ~ContextHub()
-	{ }
+	{
+		SAFE_DELETE(mSharedContextObjects);
+	}
 
 public:
 	/**
@@ -153,19 +155,24 @@ private:
 	inline std::vector< shared_ptr<void> >::reference refSharedContext()
 	{
 		static uint32 index = atomic::add<uint32>(&msContextIndexer, 1);
-		if(UNLIKELY(index >= mSharedContextObjects.size()))
+		if(UNLIKELY(!mSharedContextObjects))
 		{
-			while(index >= mSharedContextObjects.size())
+			mSharedContextObjects = new std::vector< shared_ptr<void> >();
+		}
+
+		if(UNLIKELY(index >= mSharedContextObjects->size()))
+		{
+			while(index >= mSharedContextObjects->size())
 			{
-				mSharedContextObjects.push_back(shared_ptr<void>());
+				mSharedContextObjects->push_back(shared_ptr<void>());
 			}
 		}
 
-		BOOST_ASSERT(index < mSharedContextObjects.size());
-		return mSharedContextObjects[index];
+		BOOST_ASSERT(index < mSharedContextObjects->size());
+		return (*mSharedContextObjects)[index];
 	}
 
-	std::vector< shared_ptr<void> > mSharedContextObjects;
+	std::vector< shared_ptr<void> >* mSharedContextObjects;
 #if ZILLIANS_SERVICEHUB_ALLOW_ARBITRARY_CONTEXT_PLACEMENT_FOR_DIFFERENT_INSTANCE
 	uint32 msContextIndexer;
 #else
