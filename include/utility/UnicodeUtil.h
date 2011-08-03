@@ -79,6 +79,11 @@ void enable_c_locale(StreamT& stream)
 
 void utf8_to_ucs4(const std::string& input, std::wstring& output);
 
+void wcs_to_cstr(const wchar_t* src, char* dest);
+void cstr_to_wcs(const char* src, wchar_t* dest);
+std::wstring s_to_ws(std::string s);
+std::string ws_to_s(std::wstring ws);
+
 }
 
 #endif /* ZILLIANS_UNICODEUTIL_H_ */
