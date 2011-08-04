@@ -49,7 +49,9 @@ class Renderer: public Visitor<const Shape, void>
 public:
 	Renderer()
 	{
-		visits(*this, boost::mpl::vector<Shape, Circle>(), DrawInvoker());
+		REGISTER_VISITABLE(DrawInvoker, Shape, Circle);
+		//visits(*this, boost::mpl::vector<Shape, Circle>(), DrawInvoker());
+		//register_visitable(*this, boost::mpl::vector<Shape, Circle>(), DrawInvoker());
 	}
 
 	void draw(const Shape&)
@@ -62,9 +64,32 @@ public:
 		printf("draw Circle\n");
 	}
 
-	// other draw implementations
+	CREATE_INVOKER(DrawInvoker, draw)
+};
 
-	typedef VISIT_INVOKER( draw ) DrawInvoker;
+class Cloner : public Visitor<const Shape, Shape*>
+{
+public:
+	Cloner()
+	{
+		REGISTER_VISITABLE(CloneInvoker, Shape, Circle);
+		//visits(*this, boost::mpl::vector<Shape, Circle>(), DrawInvoker());
+		//register_visitable(*this, boost::mpl::vector<Shape, Circle>(), CloneInvoker());
+	}
+
+	Shape* clone(const Shape& s)
+	{
+		printf("clone Shape\n");
+		return new Shape();
+	}
+
+	Shape* clone(const Circle& c)
+	{
+		printf("clone Circle\n");
+		return new Circle(c);
+	}
+
+	CREATE_INVOKER(CloneInvoker, clone)
 };
 
 BOOST_AUTO_TEST_SUITE( VisitorTestSuite )
@@ -72,8 +97,11 @@ BOOST_AUTO_TEST_SUITE( VisitorTestSuite )
 BOOST_AUTO_TEST_CASE( VisitorTestCase1 )
 {
 	Circle s;
-	Renderer r;
-	r(s);
+	Renderer renderer;
+	renderer(s);
+
+	Cloner cloner;
+	Circle* cloned_shape = cloner(s);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
