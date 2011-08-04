@@ -34,7 +34,7 @@ namespace zillians { namespace visitor { namespace detail {
 template<typename Base>
 struct tag_counter
 {
-  static size_t s_counter;
+	static size_t s_counter;
 };
 
 template<typename Base>
@@ -109,13 +109,13 @@ struct vtable {
 
 template<typename Visitable, typename Base>
 struct get_visit_method_argument_type {
-  typedef Visitable Type;
+	typedef Visitable Type;
 };
 
 // specialize for const Base
 template<typename Visitable, typename Base >
 struct get_visit_method_argument_type< Visitable, const Base> {
-  typedef const Visitable Type;
+	typedef const Visitable Type;
 };
 
 template<typename Visitor, typename VisitedList, typename Invoker>
@@ -128,7 +128,7 @@ struct create_vtable
 		void operator()(Visitable v)
 		{
 			cvbl->vtable.template add<Visitable>(
-					&Visitor::template thunk<Visitor, Visitable, Invoker>
+					&Visitor::template _thunk<Visitor, Visitable, Invoker>
 			);
 		}
 
@@ -187,7 +187,7 @@ struct Visitor {
 	typedef visitor::detail::vtable<const Base, FunctionT> VTableT;
 
 	template<typename VisitorImpl, typename Visitable, typename Invoker>
-	ReturnType thunk(Base& b)
+	ReturnType _thunk(Base& b)
 	{
 		typedef typename visitor::detail::get_visit_method_argument_type<Visitable, Base>::Type VisitableType;
 		VisitorImpl& visitor = static_cast<VisitorImpl&>(*this);

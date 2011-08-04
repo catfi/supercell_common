@@ -50,8 +50,6 @@ public:
 	Renderer()
 	{
 		REGISTER_VISITABLE(DrawInvoker, Shape, Circle);
-		//visits(*this, boost::mpl::vector<Shape, Circle>(), DrawInvoker());
-		//register_visitable(*this, boost::mpl::vector<Shape, Circle>(), DrawInvoker());
 	}
 
 	void draw(const Shape&)
@@ -73,8 +71,6 @@ public:
 	Cloner()
 	{
 		REGISTER_VISITABLE(CloneInvoker, Shape, Circle);
-		//visits(*this, boost::mpl::vector<Shape, Circle>(), DrawInvoker());
-		//register_visitable(*this, boost::mpl::vector<Shape, Circle>(), CloneInvoker());
 	}
 
 	Shape* clone(const Shape& s)
