@@ -26,6 +26,9 @@
 #include "core/Prerequisite.h"
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/for_each.hpp>
+#include <boost/mpl/front.hpp>
+#include <boost/mpl/pop_front.hpp>
+#include <boost/mpl/empty.hpp>
 
 #define ENABLE_DEBUG_VISITOR	0
 
@@ -57,7 +60,6 @@ size_t get_tag()
 
 template<typename Visitable, typename Base>
 size_t tag_holder<Visitable, Base>::s_tag = get_tag<Visitable, Base>();
-
 
 template<typename Base, typename Function>
 struct vtable {
@@ -112,36 +114,54 @@ struct get_visit_method_argument_type {
 	typedef Visitable Type;
 };
 
-// specialize for const Base
 template<typename Visitable, typename Base >
 struct get_visit_method_argument_type< Visitable, const Base> {
 	typedef const Visitable Type;
 };
 
 template<typename Visitor, typename VisitedList, typename Invoker>
+struct vtable_append_helper;
+
+template<typename Visitor, typename VisitedList, typename Invoker, bool IsEmpty>
+struct vtable_append_helper_impl;
+
+template<typename Visitor, typename VisitedList, typename Invoker>
+struct vtable_append_helper_impl<Visitor, VisitedList, Invoker, true>
+{
+	static void add(typename Visitor::VTableT& vtable)
+	{ }
+};
+
+template<typename Visitor, typename VisitedList, typename Invoker>
+struct vtable_append_helper_impl<Visitor, VisitedList, Invoker, false>
+{
+	static void add(typename Visitor::VTableT& vtable)
+	{
+		typedef typename boost::mpl::front<VisitedList>::type Visitable;
+		vtable.template add<Visitable>(
+				&Visitor::template _thunk<Visitor, Visitable, Invoker>);
+
+		vtable_append_helper<Visitor, typename boost::mpl::pop_front<VisitedList>::type, Invoker>::add(vtable);
+	}
+};
+
+template<typename Visitor, typename VisitedList, typename Invoker>
+struct vtable_append_helper
+{
+	static void add(typename Visitor::VTableT& vtable)
+	{
+		vtable_append_helper_impl<Visitor, VisitedList, Invoker, boost::mpl::empty<VisitedList>::value>::add(vtable);
+	}
+};
+
+template<typename Visitor, typename VisitedList, typename Invoker>
 struct create_vtable
 {
-	struct vtable_append_helper {
-		vtable_append_helper(create_vtable<Visitor, VisitedList, Invoker>* _cvbl) : cvbl(_cvbl) { }
-
-		template< typename Visitable >
-		void operator()(Visitable v)
-		{
-			cvbl->vtable.template add<Visitable>(
-					&Visitor::template _thunk<Visitor, Visitable, Invoker>
-			);
-		}
-
-		create_vtable<Visitor, VisitedList, Invoker>* cvbl;
-	};
-
 	typename Visitor::VTableT vtable;
 
 	create_vtable()
 	{
-		vtable_append_helper helper(this);
-		helper(typename Visitor::BaseT());
-		boost::mpl::for_each<VisitedList>(helper);
+		vtable_append_helper<Visitor, VisitedList, Invoker>::add(vtable);
 	}
 };
 
@@ -197,7 +217,7 @@ struct Visitor {
 
 	const VTableT* mVTable;
 
-	ReturnType operator()(Base& b)
+	ReturnType visit(Base& b)
 	{
 		FunctionT f = (*mVTable)[b.tag()];
 #if ENABLE_DEBUG_VISITOR
@@ -212,19 +232,18 @@ struct Visitor {
 	{
 		visitor.mVTable = visitor::detail::get_static_vtable<Visitor, VisitedList, Invoker>();
 	}
-
 };
 
 #define REGISTER_VISITABLE(invoker, ...)		\
 		_register_visitable(*this, boost::mpl::vector<__VA_ARGS__>(), invoker());
 
-#define CREATE_INVOKER(invoker, function_name)                    \
-		typedef struct { \
-			template<typename VisitorImpl, typename Visitable> \
-			static ReturnT invoke(VisitorImpl& visitor, Visitable& visitable) \
-			{ \
-				return visitor.function_name(visitable); \
-			} \
+#define CREATE_INVOKER(invoker, function_name)	\
+		typedef struct { 															\
+			template<typename VisitorImpl, typename Visitable>						\
+			static ReturnT invoke(VisitorImpl& visitor, Visitable& visitable)		\
+			{																		\
+				return visitor.function_name(visitable);							\
+			}																		\
 		} invoker;
 
 }

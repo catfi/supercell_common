@@ -36,12 +36,27 @@ using namespace std;
 
 class Shape : public VisitableBase<Shape> {
 public:
-	DEFINE_VISITABLE()
+	DEFINE_VISITABLE();
 };
 
 class Circle : public Shape {
 public:
-	DEFINE_VISITABLE()
+	DEFINE_VISITABLE();
+};
+
+class CircleX : public Circle {
+public:
+	DEFINE_VISITABLE();
+};
+
+class CompoundShape : public Shape {
+public:
+	DEFINE_VISITABLE();
+
+	explicit CompoundShape(Shape& _a, Shape& _b) : a(_a), b(_b) { }
+
+	Shape& a;
+	Shape& b;
 };
 
 class Renderer: public Visitor<const Shape, void>
@@ -49,7 +64,7 @@ class Renderer: public Visitor<const Shape, void>
 public:
 	Renderer()
 	{
-		REGISTER_VISITABLE(DrawInvoker, Shape, Circle);
+		REGISTER_VISITABLE(DrawInvoker, Shape, Circle, CircleX, CompoundShape);
 	}
 
 	void draw(const Shape&)
@@ -62,6 +77,13 @@ public:
 		printf("draw Circle\n");
 	}
 
+	void draw(const CompoundShape& shape)
+	{
+		printf("draw CompoundShape\n");
+		visit(shape.a);
+		visit(shape.b);
+	}
+
 	CREATE_INVOKER(DrawInvoker, draw)
 };
 
@@ -70,7 +92,7 @@ class Cloner : public Visitor<const Shape, Shape*>
 public:
 	Cloner()
 	{
-		REGISTER_VISITABLE(CloneInvoker, Shape, Circle);
+		REGISTER_VISITABLE(CloneInvoker, Shape, CircleX);
 	}
 
 	Shape* clone(const Shape& s)
@@ -85,6 +107,12 @@ public:
 		return new Circle(c);
 	}
 
+	Shape* clone(const CircleX& c)
+	{
+		printf("clone CircleX\n");
+		return new CircleX(c);
+	}
+
 	CREATE_INVOKER(CloneInvoker, clone)
 };
 
@@ -93,11 +121,23 @@ BOOST_AUTO_TEST_SUITE( VisitorTestSuite )
 BOOST_AUTO_TEST_CASE( VisitorTestCase1 )
 {
 	Circle s;
+	Shape& ref_s = s;
+
 	Renderer renderer;
-	renderer(s);
+	renderer.visit(ref_s);
 
 	Cloner cloner;
-	Circle* cloned_shape = cloner(s);
+	Shape* cloned_shape = cloner.visit(ref_s);
+}
+
+BOOST_AUTO_TEST_CASE( VisitorTestCase2 )
+{
+	Circle a;
+	Circle b;
+	CompoundShape c(a, b);
+
+	Renderer renderer;
+	renderer.visit(c);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
