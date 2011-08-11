@@ -24,6 +24,7 @@
 #define ZILLIANS_VISITOR_H_
 
 #include "core/Prerequisite.h"
+#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/front.hpp>
@@ -199,8 +200,19 @@ struct VisitableBase
 			return _get_tag_helper(this);	\
 		}
 
+enum class VisitorImplementation
+{
+	recursive_dfs,
+	iterative_dfs, // TODO implement this
+	iterative_bfs, // TODO implement this, the problem is how to handle the return type
+};
+
+template< typename Base, typename ReturnType, VisitorImplementation Impl = VisitorImplementation::recursive_dfs>
+struct Visitor;
+
 template< typename Base, typename ReturnType>
-struct Visitor {
+struct Visitor<Base, ReturnType, VisitorImplementation::recursive_dfs>
+{
 	typedef Base BaseT;
 	typedef ReturnType ReturnT;
 	typedef ReturnType (Visitor::*FunctionT)(Base&);
@@ -233,6 +245,55 @@ struct Visitor {
 		visitor.mVTable = visitor::detail::get_static_vtable<Visitor, VisitedList, Invoker>();
 	}
 };
+
+//
+//template< typename Base, typename ReturnType>
+//struct Visitor<Base, ReturnType, VisitorImplementation::iterative_bfs>
+//{
+//	typedef Base BaseT;
+//	typedef ReturnType ReturnT;
+//	typedef ReturnType (Visitor::*FunctionT)(Base&);
+//	typedef visitor::detail::vtable<const Base, FunctionT> VTableT;
+//
+//	std::queue<Base&> _visitor_queue;
+//
+//	template<typename VisitorImpl, typename Visitable, typename Invoker>
+//	ReturnType _thunk(Base& b)
+//	{
+//		typedef typename visitor::detail::get_visit_method_argument_type<Visitable, Base>::Type VisitableType;
+//		VisitorImpl& visitor = static_cast<VisitorImpl&>(*this);
+//		VisitableType& visitable = static_cast<VisitableType&>(b);
+//		return Invoker::invoke(visitor, visitable);
+//	}
+//
+//	const VTableT* mVTable;
+//
+//	ReturnType visit(Base& b)
+//	{
+//		_visitor_queue.push(b);
+//	}
+//
+//	void operator() ()
+//	{
+//		while(!_visitor_queue.empty())
+//		{
+//			Base& b = _visitor_queue.front();
+//			FunctionT f = (*mVTable)[b.tag()];
+//#if ENABLE_DEBUG_VISITOR
+//			printf("invoke Visitor::%p\n", f);
+//#endif
+//			(this->*f)(b);
+//			_visitor_queue.pop();
+//		}
+//	}
+//
+//	// global helper function
+//	template<typename Visitor, typename VisitedList, typename Invoker>
+//	static void _register_visitable(Visitor& visitor, const VisitedList&, const Invoker&)
+//	{
+//		visitor.mVTable = visitor::detail::get_static_vtable<Visitor, VisitedList, Invoker>();
+//	}
+//};
 
 #define REGISTER_VISITABLE(invoker, ...)		\
 		_register_visitable(*this, boost::mpl::vector<__VA_ARGS__>(), invoker());
