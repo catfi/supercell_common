@@ -34,6 +34,7 @@
 
 #ifdef __PLATFORM_LINUX__
 #include <stdint.h>
+#include <wchar.h>
 #else
 #include <boost/cstdint.hpp>
 #endif

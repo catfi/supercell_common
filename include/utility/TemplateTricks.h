@@ -177,6 +177,14 @@ template <typename Key, typename Value, typename Hash> static inline typename __
 template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_map<Key, Value, Hash>::const_iterator beginof (const __gnu_cxx::hash_map<Key, Value, Hash>& m) { return m.begin(); }
 template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_map<Key, Value, Hash>::const_iterator endof (const __gnu_cxx::hash_map<Key, Value, Hash>& m)   { return m.end(); }
 
+// foreach support for __gnu_cxx::hash_set
+#include <ext/hash_set>
+template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_set<Value, Hash>::iterator beginof (__gnu_cxx::hash_set<Value, Hash>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_set<Value, Hash>::iterator endof (__gnu_cxx::hash_set<Value, Hash>& m)   { return m.end(); }
+
+template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_set<Value, Hash>::const_iterator beginof (const __gnu_cxx::hash_set<Value, Hash>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_set<Value, Hash>::const_iterator endof (const __gnu_cxx::hash_set<Value, Hash>& m)   { return m.end(); }
+
 #define foreach(i, c) \
    for(decltype(beginof(c)) i = beginof(c); i != endof(c); ++i)
 

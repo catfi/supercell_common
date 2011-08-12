@@ -24,7 +24,6 @@
 #define ZILLIANS_VISITOR_H_
 
 #include "core/Prerequisite.h"
-#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/front.hpp>

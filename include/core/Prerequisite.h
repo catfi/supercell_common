@@ -31,6 +31,9 @@
 #include "core/Logger.h"
 
 #if BUILD_WITH_BOOST
+
+#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+
 #include <boost/assert.hpp>
 #include <boost/algorithm/minmax.hpp>
 #include <boost/noncopyable.hpp>
