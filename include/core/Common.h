@@ -31,6 +31,8 @@
 #include <math.h>
 #include <limits.h>
 
+#include <ostream>
+#include <istream>
 #include <iostream>
 #include <fstream>
 #include <strstream>

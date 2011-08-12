@@ -203,7 +203,7 @@ enum class VisitorImplementation
 {
 	recursive_dfs,
 	iterative_dfs, // TODO implement this
-	iterative_bfs, // TODO implement this, the problem is how to handle the return type
+	iterative_bfs, // TODO implement this, the problem is how to handle the return type (simple ignore it
 };
 
 template< typename Base, typename ReturnType, VisitorImplementation Impl = VisitorImplementation::recursive_dfs>
@@ -243,6 +243,69 @@ struct Visitor<Base, ReturnType, VisitorImplementation::recursive_dfs>
 	{
 		visitor.mVTable = visitor::detail::get_static_vtable<Visitor, VisitedList, Invoker>();
 	}
+};
+
+template< typename Base, typename ReturnType>
+struct Visitor<Base, ReturnType, VisitorImplementation::iterative_bfs>
+{
+	typedef Base BaseT;
+	typedef ReturnType ReturnT;
+	typedef ReturnType (Visitor::*FunctionT)(Base&);
+	typedef visitor::detail::vtable<const Base, FunctionT> VTableT;
+
+	Visitor()
+	{
+		// all iterative visitor must have void return type
+		BOOST_MPL_ASSERT(( boost::is_same<ReturnType, void> ));
+	}
+
+	template<typename VisitorImpl, typename Visitable, typename Invoker>
+	ReturnType _thunk(Base& b)
+	{
+		typedef typename visitor::detail::get_visit_method_argument_type<Visitable, Base>::Type VisitableType;
+		VisitorImpl& visitor = static_cast<VisitorImpl&>(*this);
+		VisitableType& visitable = static_cast<VisitableType&>(b);
+		return Invoker::invoke(visitor, visitable);
+	}
+
+	const VTableT* mVTable;
+
+	ReturnType visit(Base& b)
+	{
+		// we hold a pointer reference to the visitable object to avoid any object copy
+		// but this is a bit risky if the object is destroyed during the visitor phase
+		// in most scenario, the visiting operation should be const (non-modifying)
+		// however if there's modification to the tree, all changes to the tree or all object destruction should be staged and processed later
+		next.push(&b);
+
+		// run at the first insertion of visitable object
+		if(next.size() == 1)
+			run();
+	}
+
+	void run()
+	{
+		while(!next.empty())
+		{
+			Base* b = next.front();
+			FunctionT f = (*mVTable)[b->tag()];
+#if ENABLE_DEBUG_VISITOR
+			printf("invoke Visitor::%p\n", f);
+#endif
+			(this->*f)(*b);
+			next.pop();
+		}
+	}
+
+	// global helper function
+	template<typename Visitor, typename VisitedList, typename Invoker>
+	static void _register_visitable(Visitor& visitor, const VisitedList&, const Invoker&)
+	{
+		visitor.mVTable = visitor::detail::get_static_vtable<Visitor, VisitedList, Invoker>();
+	}
+
+protected:
+	std::queue<Base*> next;
 };
 
 //
@@ -296,6 +359,9 @@ struct Visitor<Base, ReturnType, VisitorImplementation::recursive_dfs>
 
 #define REGISTER_VISITABLE(invoker, ...)		\
 		_register_visitable(*this, boost::mpl::vector<__VA_ARGS__>(), invoker());
+
+#define INDIRECT_REGISTER_VISITABLE(p, invoker, ...)		\
+		_register_visitable(*p, boost::mpl::vector<__VA_ARGS__>(), invoker());
 
 #define CREATE_INVOKER(invoker, function_name)	\
 		typedef struct { 															\
