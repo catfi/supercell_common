@@ -144,6 +144,11 @@ public:
 		refSharedContext<T>().reset();
 	}
 
+	inline void resetAll()
+	{
+		SAFE_DELETE(mSharedContextObjects);
+	}
+
 private:
 	/**
 	 * The magic trick to store and access context object by using static
