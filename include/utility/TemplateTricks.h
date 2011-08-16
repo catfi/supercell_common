@@ -25,6 +25,9 @@
 
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/has_xxx.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/mpl/or.hpp>
 
 // Introspection for member templates.
 #define HAS_MEMBER_TEMPLATE_ACCESS( \
@@ -89,6 +92,33 @@
       , HAS_MEMBER_FUNCTION_ACCESS \
     )
 
+//template <typename T>
+//struct is_backward_reversed_iterator
+//{
+//	enum { value =
+//		boost::is_same<typename boost::remove_const<T>::type, int8>::value ||
+//		boost::is_same<typename boost::remove_const<T>::type, uint8>::value ||
+//		boost::is_same<typename boost::remove_const<T>::type, int16>::value ||
+//		boost::is_same<typename boost::remove_const<T>::type, uint16>::value ||
+//		boost::is_same<typename boost::remove_const<T>::type, int32>::value ||
+//		boost::is_same<typename boost::remove_const<T>::type, uint32>::value ||
+//		boost::is_same<typename boost::remove_const<T>::type, int64>::value ||
+//		boost::is_same<typename boost::remove_const<T>::type, uint64>::value ||
+//		boost::is_same<T, char*>::value ||
+//		boost::is_same<T, const char*>::value ||
+//		boost::is_array<T>::value ||
+//		detail::is_std_vector<T>::value ||
+//		detail::is_std_list<T>::value ||
+//		detail::is_std_map<T>::value ||
+//		detail::is_boost_array<T>::value ||
+//		detail::is_std_pair<T>::value ||
+//		boost::is_same<typename boost::remove_const<T>::type, boost::system::error_code>::value ||
+//		//boost::is_same<typename boost::remove_const<T>::type, BufferBase >::value
+//		//boost::is_base_and_derived<typename boost::remove_const<T>::type, BufferBase>::value
+//		is_buffer<T>::value
+//		};
+//};
+
 /* foreach support for non-container type, the indexer iterates through 0 ~ (A-1) */
 static inline zillians::int8 beginof(zillians::int8 a) { return 0; }
 static inline zillians::int8 endof(zillians::int8 a) { return a; }
@@ -110,8 +140,45 @@ static inline zillians::int64 endof(zillians::int64 a) { return a; }
 static inline zillians::uint64 beginof(zillians::uint64 a) { return 0; }
 static inline zillians::uint64 endof(zillians::uint64 a) { return a; }
 
+//static inline zillians::int8 r_beginof(zillians::int8 a) { return a-1; }
+//static inline zillians::int8 r_endof(zillians::int8 a) { return a-1; }
+//static inline zillians::uint8 r_beginof(zillians::uint8 a) { return -1; }
+//static inline zillians::uint8 r_endof(zillians::uint8 a) { return a-1; }
+//
+//static inline void r_next(zillians::int8& a) { --a; }
+//static inline void r_next(zillians::uint8& a) { --a; }
+//
+//static inline zillians::int16 r_beginof(zillians::int16 a) { return a-1; }
+//static inline zillians::int16 r_endof(zillians::int16 a) { return a; }
+//static inline zillians::uint16 r_beginof(zillians::uint16 a) { return 0; }
+//static inline zillians::uint16 r_endof(zillians::uint16 a) { return a; }
+//
+//static inline void r_next(zillians::int16& a) { --a; }
+//static inline void r_next(zillians::uint16& a) { --a; }
+//
+//static inline zillians::int32 r_beginof(zillians::int32 a) { return 0; }
+//static inline zillians::int32 r_endof(zillians::int32 a) { return a; }
+//static inline zillians::uint32 r_beginof(zillians::uint32 a) { return 0; }
+//static inline zillians::uint32 r_endof(zillians::uint32 a) { return a; }
+//
+//static inline void r_next(zillians::int32& a) { --a; }
+//static inline void r_next(zillians::uint32& a) { --a; }
+//
+//static inline zillians::int64 r_beginof(zillians::int64 a) { return 0; }
+//static inline zillians::int64 r_endof(zillians::int64 a) { return a; }
+//static inline zillians::uint64 r_beginof(zillians::uint64 a) { return 0; }
+//static inline zillians::uint64 r_endof(zillians::uint64 a) { return a; }
+//
+//static inline void r_next(zillians::int64& a) { --a; }
+//static inline void r_next(zillians::uint64& a) { --a; }
+
 template <typename T, int N> static inline T* beginof (T (&a)[N]) { return a; }
 template <typename T, int N> static inline T* endof (T (&a)[N])   { return a + N; }
+
+//template <typename T, int N> static inline T* r_beginof (T (&a)[N]) { return &(a[N - 1]); }
+//template <typename T, int N> static inline T* r_endof (T (&a)[N])   { return &a[-1]; }
+//
+//template <typename T> static inline void r_next(T*& i) { --i; }
 
 // foreach support for std::vector
 #include <vector>
@@ -121,6 +188,16 @@ template <typename T, typename Alloc> static inline typename std::vector<T, Allo
 template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::const_iterator beginof (const std::vector<T, Alloc>& v) { return v.begin(); }
 template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::const_iterator endof (const std::vector<T, Alloc>& v)   { return v.end(); }
 
+template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::reverse_iterator r_beginof (std::vector<T, Alloc>& v) { return v.rbegin(); }
+template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::reverse_iterator r_endof (std::vector<T, Alloc>& v)   { return v.rend(); }
+
+template <typename T, typename Alloc> static inline void r_next (typename std::vector<T, Alloc>::reverse_iterator& i) { ++i; }
+
+template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::const_reverse_iterator r_beginof (const std::vector<T, Alloc>& v) { return v.rbegin(); }
+template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::const_reverse_iterator r_endof (const std::vector<T, Alloc>& v)   { return v.rend(); }
+
+template <typename T, typename Alloc> static inline void r_next (typename std::vector<T, Alloc>::const_reverse_iterator& i) { ++i; }
+
 // foreach support for std::list
 #include <list>
 template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::iterator beginof (std::list<T, Alloc>& v) { return v.begin(); }
@@ -129,6 +206,16 @@ template <typename T, typename Alloc> static inline typename std::list<T, Alloc>
 template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::const_iterator beginof (const std::list<T, Alloc>& v) { return v.begin(); }
 template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::const_iterator endof (const std::list<T, Alloc>& v)   { return v.end(); }
 
+template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::reverse_iterator r_beginof (std::list<T, Alloc>& v) { return v.rbegin(); }
+template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::reverse_iterator r_endof (std::list<T, Alloc>& v)   { return v.rend(); }
+
+template <typename T, typename Alloc> static inline void r_next (typename std::list<T, Alloc>::reverse_iterator& i) { ++i; }
+
+template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::const_reverse_iterator r_beginof (const std::list<T, Alloc>& v) { return v.rbegin(); }
+template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::const_reverse_iterator r_endof (const std::list<T, Alloc>& v)   { return v.rend(); }
+
+template <typename T, typename Alloc> static inline void r_next (typename std::list<T, Alloc>::const_reverse_iterator& i) { ++i; }
+
 // foreach support for std::map
 #include <map>
 template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::iterator beginof (std::map<Key, T, Compare, Alloc>& m) { return m.begin(); }
@@ -136,6 +223,16 @@ template <typename Key, typename T, typename Compare, typename Alloc> static inl
 
 template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::const_iterator beginof (const std::map<Key, T, Compare, Alloc>& m) { return m.begin(); }
 template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::const_iterator endof (const std::map<Key, T, Compare, Alloc>& m)   { return m.end(); }
+
+template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::reverse_iterator r_beginof (std::map<Key, T, Compare, Alloc>& m) { return m.rbegin(); }
+template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::reverse_iterator r_endof (std::map<Key, T, Compare, Alloc>& m)   { return m.rend(); }
+
+template <typename Key, typename T, typename Compare, typename Alloc> static inline void r_next (typename std::map<Key, T, Compare, Alloc>::reverse_iterator& i) { ++i; }
+
+template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::const_reverse_iterator r_beginof (const std::map<Key, T, Compare, Alloc>& m) { return m.rbegin(); }
+template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::const_reverse_iterator r_endof (const std::map<Key, T, Compare, Alloc>& m)   { return m.rend(); }
+
+template <typename Key, typename T, typename Compare, typename Alloc> static inline void r_next (typename std::map<Key, T, Compare, Alloc>::const_reverse_iterator& i) { ++i; }
 
 // foreach support for std::tr1::unordered_set
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -187,5 +284,8 @@ template <typename Key, typename Value, typename Hash> static inline typename __
 
 #define foreach(i, c) \
    for(decltype(beginof(c)) i = beginof(c); i != endof(c); ++i)
+
+#define r_foreach(i, c) \
+   for(decltype(r_beginof(c)) i = r_beginof(c); i != r_endof(c); ++i)
 
 #endif /* ZILLIANS_TEMPLATETRICKS_H_ */

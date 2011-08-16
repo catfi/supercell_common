@@ -116,4 +116,50 @@ BOOST_AUTO_TEST_CASE( TemplateTricksTestCase6 )
 	BOOST_CHECK(sum_second == 6);
 }
 
+BOOST_AUTO_TEST_CASE( TemplateTricksTestCase7 )
+{
+	std::vector<int> vec;
+	vec.push_back(1);
+	vec.push_back(2);
+	vec.push_back(3);
+	int sum = 0;
+
+	r_foreach(v, vec)
+		sum += *v;
+	BOOST_CHECK(sum == 6);
+}
+
+BOOST_AUTO_TEST_CASE( TemplateTricksTestCase8 )
+{
+	std::list<int> vec;
+	vec.push_back(1);
+	vec.push_back(2);
+	vec.push_back(3);
+	int sum = 0;
+
+	r_foreach(v, vec)
+		sum += *v;
+	BOOST_CHECK(sum == 6);
+}
+
+BOOST_AUTO_TEST_CASE( TemplateTricksTestCase9 )
+{
+	std::map<int, int> map;
+	map[1] = 1;
+	map[2] = 2;
+	map[3] = 3;
+
+	int sum_first = 0;
+	int sum_second = 0;
+
+	r_foreach(m, map)
+	{
+		sum_first += m->first;
+		sum_second += m->second;
+	}
+
+	BOOST_CHECK(sum_first == 6);
+	BOOST_CHECK(sum_second == 6);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
