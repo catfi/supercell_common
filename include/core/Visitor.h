@@ -194,7 +194,7 @@ struct VisitableBase
 };
 
 #define DEFINE_VISITABLE()					\
-		virtual size_t tag() const			\
+		virtual size_t _tag() const			\
 		{									\
 			return _get_tag_helper(this);	\
 		}
@@ -230,7 +230,7 @@ struct Visitor<Base, ReturnType, VisitorImplementation::recursive_dfs>
 
 	ReturnType visit(Base& b)
 	{
-		FunctionT f = (*mVTable)[b.tag()];
+		FunctionT f = (*mVTable)[b._tag()];
 #if ENABLE_DEBUG_VISITOR
 		printf("invoke recursive dfs visitor::%p\n", f);
 #endif
@@ -280,15 +280,15 @@ struct Visitor<Base, ReturnType, VisitorImplementation::iterative_bfs>
 
 		// run at the first insertion of visitable object
 		if(next.size() == 1)
-			run();
+			_run();
 	}
 
-	void run()
+	void _run()
 	{
 		while(!next.empty())
 		{
 			Base* b = next.front();
-			FunctionT f = (*mVTable)[b->tag()];
+			FunctionT f = (*mVTable)[b->_tag()];
 #if ENABLE_DEBUG_VISITOR
 			printf("invoke iterative bfs visitor::%p\n", f);
 #endif
@@ -344,7 +344,7 @@ struct Visitor<Base, ReturnType, VisitorImplementation::iterative_dfs>
 			next.push(&b);
 
 			// run at the first insertion of visitable object
-			run();
+			_run();
 		}
 		else
 		{
@@ -352,12 +352,12 @@ struct Visitor<Base, ReturnType, VisitorImplementation::iterative_dfs>
 		}
 	}
 
-	void run()
+	void _run()
 	{
 		while(!next.empty())
 		{
 			Base* b = next.top();
-			FunctionT f = (*mVTable)[b->tag()];
+			FunctionT f = (*mVTable)[b->_tag()];
 #if ENABLE_DEBUG_VISITOR
 			printf("invoke iterative bfs visitor::%p\n", f);
 #endif
