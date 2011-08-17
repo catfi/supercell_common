@@ -28,4 +28,4 @@ TARGET_LINK_LIBRARIES(CoroutineBasicTest
     )
 
 zillians_add_simple_test(TARGET CoroutineBasicTest)
-zillians_add_test_subject(SUBJECT common-threading-misc TARGET CoroutineBasicTest)
+zillians_add_test_to_subject(SUBJECT common-threading-misc TARGET CoroutineBasicTest)

@@ -87,7 +87,7 @@ int main()
 
 #define numElements 256
 
-const int numData = 102400000;
+const int numData = 10000000;
 
 struct TestMsg
 {

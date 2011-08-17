@@ -22,6 +22,9 @@
 zillians_create_test_subject(SUBJECT common-utility-critical)
 zillians_create_test_subject(SUBJECT common-utility-misc)
 
+zillians_add_subject_to_subject(PARENT common-critical CHILD common-utility-critical)
+zillians_add_subject_to_subject(PARENT common-misc CHILD common-utility-misc)
+
 ADD_SUBDIRECTORY(GraphUtilTest)
 ADD_SUBDIRECTORY(StringUtilTest)
 ADD_SUBDIRECTORY(UUIDUtilTest)

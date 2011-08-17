@@ -29,4 +29,4 @@ TARGET_LINK_LIBRARIES(BiMapTest
     )
 
 zillians_add_simple_test(TARGET BiMapTest)
-zillians_add_test_subject(SUBJECT common-core-misc TARGET BiMapTest)
+zillians_add_test_to_subject(SUBJECT common-core-misc TARGET BiMapTest)

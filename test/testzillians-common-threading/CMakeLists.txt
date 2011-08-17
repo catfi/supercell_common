@@ -22,6 +22,9 @@
 zillians_create_test_subject(SUBJECT common-threading-critical)
 zillians_create_test_subject(SUBJECT common-threading-misc)
 
+zillians_add_subject_to_subject(PARENT common-critical CHILD common-threading-critical)
+zillians_add_subject_to_subject(PARENT common-misc CHILD common-threading-misc)
+
 ADD_SUBDIRECTORY(DispatcherThreadTest)
 ADD_SUBDIRECTORY(TbbParallelForTest)
 ADD_SUBDIRECTORY(CoroutineBasicTest)

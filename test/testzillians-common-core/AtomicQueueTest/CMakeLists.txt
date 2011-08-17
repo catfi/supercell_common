@@ -35,7 +35,7 @@ TARGET_LINK_LIBRARIES(SpscQueueTest
     )
 
 zillians_add_simple_test(TARGET AtomicQueueTest)
-zillians_add_test_subject(SUBJECT common-core-misc TARGET AtomicQueueTest)
+zillians_add_test_to_subject(SUBJECT common-core-misc TARGET AtomicQueueTest)
 
 zillians_add_simple_test(TARGET SpscQueueTest)
-zillians_add_test_subject(SUBJECT common-core-misc TARGET SpscQueueTest)
+zillians_add_test_to_subject(SUBJECT common-core-misc TARGET SpscQueueTest)

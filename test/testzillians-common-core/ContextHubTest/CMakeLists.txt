@@ -27,4 +27,4 @@ TARGET_LINK_LIBRARIES(ContextHubTest
     zillians-common-core)
 
 zillians_add_simple_test(TARGET ContextHubTest)
-
+zillians_add_test_to_subject(SUBJECT common-core-critical TARGET ContextHubTest)

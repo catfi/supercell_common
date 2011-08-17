@@ -19,6 +19,14 @@
 # Contact Information: info@zillians.com
 #
 
+zillians_create_test_subject(SUBJECT common)
+
+zillians_create_test_subject(SUBJECT common-critical)
+zillians_add_subject_to_subject(PARENT common CHILD common-critical)
+
+zillians_create_test_subject(SUBJECT common-misc)
+zillians_add_subject_to_subject(PARENT common CHILD common-misc)
+
 ADD_SUBDIRECTORY(testzillians-common-core)
 ADD_SUBDIRECTORY(testzillians-common-networking)
 ADD_SUBDIRECTORY(testzillians-common-threading)

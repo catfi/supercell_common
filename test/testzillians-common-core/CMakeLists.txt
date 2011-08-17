@@ -22,6 +22,9 @@
 zillians_create_test_subject(SUBJECT common-core-critical)
 zillians_create_test_subject(SUBJECT common-core-misc)
 
+zillians_add_subject_to_subject(PARENT common-critical CHILD common-core-critical)
+zillians_add_subject_to_subject(PARENT common-misc CHILD common-core-misc)
+
 IF(JUSTTHREAD_FOUND)
     ADD_SUBDIRECTORY(AdvancedThreadingTest)
     ADD_SUBDIRECTORY(TransactionTest)

@@ -27,3 +27,4 @@ TARGET_LINK_LIBRARIES(VisitorTest
     zillians-common-core)
 
 zillians_add_simple_test(TARGET VisitorTest)
+zillians_add_test_to_subject(SUBJECT common-core-critical TARGET VisitorTest)

@@ -171,7 +171,10 @@ void reader(spsc_queue<int>* q, int n)
 // usage example
 int main(int argc, char** argv)
 {
-	int n = atoi(argv[1]);
+	int n = 10000000;
+	if(argc >= 2)
+		n = atoi(argv[1]);
+
 	spsc_queue<int> q;
 
 	tbb::tick_count start, end;

@@ -28,3 +28,4 @@ TARGET_LINK_LIBRARIES(TransactionTest
     ${JUSTTHREAD_LIBRARIES_STATIC})
 
 zillians_add_simple_test(TARGET TransactionTest)
+zillians_add_test_to_subject(SUBJECT common-core-critical TARGET TransactionTest)

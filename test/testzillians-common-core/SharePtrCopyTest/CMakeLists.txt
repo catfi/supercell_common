@@ -27,4 +27,4 @@ TARGET_LINK_LIBRARIES(SharePtrCopyTest
     zillians-common-core)
 
 zillians_add_simple_test(TARGET SharePtrCopyTest)
-zillians_add_test_subject(SUBJECT common-core-misc TARGET SharePtrCopyTest)
+zillians_add_test_to_subject(SUBJECT common-core-misc TARGET SharePtrCopyTest)
