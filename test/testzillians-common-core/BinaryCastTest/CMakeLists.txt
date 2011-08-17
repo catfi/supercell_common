@@ -27,3 +27,4 @@ TARGET_LINK_LIBRARIES(BinaryCastTest
     zillians-common-core)
 
 zillians_add_simple_test(TARGET BinaryCastTest)
+zillians_add_test_subject(SUBJECT common-core-misc TARGET BinaryCastTest)

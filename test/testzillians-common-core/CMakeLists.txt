@@ -19,6 +19,9 @@
 # Contact Information: info@zillians.com
 #
 
+zillians_create_test_subject(SUBJECT common-core-critical)
+zillians_create_test_subject(SUBJECT common-core-misc)
+
 IF(JUSTTHREAD_FOUND)
     ADD_SUBDIRECTORY(AdvancedThreadingTest)
     ADD_SUBDIRECTORY(TransactionTest)

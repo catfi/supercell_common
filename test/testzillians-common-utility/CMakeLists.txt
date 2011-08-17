@@ -19,6 +19,9 @@
 # Contact Information: info@zillians.com
 #
 
+zillians_create_test_subject(SUBJECT common-utility-critical)
+zillians_create_test_subject(SUBJECT common-utility-misc)
+
 ADD_SUBDIRECTORY(GraphUtilTest)
 ADD_SUBDIRECTORY(StringUtilTest)
 ADD_SUBDIRECTORY(UUIDUtilTest)

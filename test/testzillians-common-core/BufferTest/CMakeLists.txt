@@ -27,3 +27,4 @@ TARGET_LINK_LIBRARIES(BufferTest
     zillians-common-core)
 
 zillians_add_simple_test(TARGET BufferTest)
+zillians_add_test_subject(SUBJECT common-core-critical TARGET BufferTest)

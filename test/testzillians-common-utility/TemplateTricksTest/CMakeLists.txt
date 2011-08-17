@@ -29,3 +29,4 @@ TARGET_LINK_LIBRARIES(TemplateTricksTest
     )
 
 zillians_add_simple_test(TARGET TemplateTricksTest)
+zillians_add_test_subject(SUBJECT common-utility-critical TARGET TemplateTricksTest)

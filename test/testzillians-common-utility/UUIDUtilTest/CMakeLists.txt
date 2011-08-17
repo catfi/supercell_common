@@ -29,5 +29,6 @@ target_link_libraries(UUIDUtilTest
     )
 
 zillians_add_simple_test(TARGET UUIDUtilTest)
+zillians_add_test_subject(SUBJECT common-utility-critical TARGET UUIDUtilTest)
 #zillians_add_compare_output_test(UUIDUtilTest ${CMAKE_CURRENT_SOURCE_DIR}/expected_output.txt)
 #zillians_add_regex_match_output_test(UUIDUtilTest "*.Error" "MATCH_FOR_FAILURE")

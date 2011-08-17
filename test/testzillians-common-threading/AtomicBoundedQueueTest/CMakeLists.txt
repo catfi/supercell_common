@@ -28,3 +28,4 @@ TARGET_LINK_LIBRARIES(AtomicBoundedQueueTest
     )
 
 zillians_add_simple_test(TARGET AtomicBoundedQueueTest)
+zillians_add_test_subject(SUBJECT common-threading-misc TARGET AtomicBoundedQueueTest)

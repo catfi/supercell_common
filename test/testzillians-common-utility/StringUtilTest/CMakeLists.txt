@@ -29,3 +29,4 @@ TARGET_LINK_LIBRARIES(StringUtilTest
     )
 
 zillians_add_simple_test(TARGET StringUtilTest)
+zillians_add_test_subject(SUBJECT common-utility-critical TARGET StringUtilTest)

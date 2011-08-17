@@ -29,3 +29,4 @@ TARGET_LINK_LIBRARIES(ScalablePoolAllocatorTest
     )
 
 zillians_add_simple_test(TARGET ScalablePoolAllocatorTest)
+zillians_add_test_subject(SUBJECT common-core-misc TARGET ScalablePoolAllocatorTest)

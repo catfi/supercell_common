@@ -19,6 +19,9 @@
 # Contact Information: info@zillians.com
 #
 
+zillians_create_test_subject(SUBJECT common-threading-critical)
+zillians_create_test_subject(SUBJECT common-threading-misc)
+
 ADD_SUBDIRECTORY(DispatcherThreadTest)
 ADD_SUBDIRECTORY(TbbParallelForTest)
 ADD_SUBDIRECTORY(CoroutineBasicTest)
