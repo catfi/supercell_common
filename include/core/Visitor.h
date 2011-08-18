@@ -227,14 +227,36 @@ struct Visitor<Base, ReturnType, VisitorImplementation::recursive_dfs>
 	}
 
 	const VTableT* mVTable;
+	bool mTerminated;
+
+	Visitor() : mTerminated(false)
+	{ }
 
 	ReturnType visit(Base& b)
 	{
-		FunctionT f = (*mVTable)[b._tag()];
+		if(!mTerminated)
+		{
+			FunctionT f = (*mVTable)[b._tag()];
 #if ENABLE_DEBUG_VISITOR
-		printf("invoke recursive dfs visitor::%p\n", f);
+			printf("invoke recursive dfs visitor::%p\n", f);
 #endif
-		return (this->*f)(b);
+			return (this->*f)(b);
+		}
+	}
+
+	inline void terminate()
+	{
+		mTerminated = true;
+	}
+
+	inline bool isTerminated()
+	{
+		return mTerminated;
+	}
+
+	inline void reset()
+	{
+		mTerminated = false;
 	}
 
 	// global helper function
@@ -253,7 +275,7 @@ struct Visitor<Base, ReturnType, VisitorImplementation::iterative_bfs>
 	typedef ReturnType (Visitor::*FunctionT)(Base&);
 	typedef visitor::detail::vtable<const Base, FunctionT> VTableT;
 
-	Visitor()
+	Visitor() : mTerminated(false)
 	{
 		// all iterative visitor must have void return type
 		BOOST_MPL_ASSERT(( boost::is_same<ReturnType, void> ));
@@ -269,18 +291,37 @@ struct Visitor<Base, ReturnType, VisitorImplementation::iterative_bfs>
 	}
 
 	const VTableT* mVTable;
+	bool mTerminated;
+
+	inline void terminate()
+	{
+		mTerminated = true;
+	}
+
+	inline bool isTerminated()
+	{
+		return mTerminated;
+	}
+
+	inline void reset()
+	{
+		mTerminated = false;
+	}
 
 	ReturnType visit(Base& b)
 	{
-		// we hold a pointer reference to the visitable object to avoid any object copy
-		// but this is a bit risky if the object is destroyed during the visitor phase
-		// in most scenario, the visiting operation should be const (non-modifying)
-		// however if there's modification to the tree, all changes to the tree or all object destruction should be staged and processed later
-		next.push(&b);
+		if(!mTerminated)
+		{
+			// we hold a pointer reference to the visitable object to avoid any object copy
+			// but this is a bit risky if the object is destroyed during the visitor phase
+			// in most scenario, the visiting operation should be const (non-modifying)
+			// however if there's modification to the tree, all changes to the tree or all object destruction should be staged and processed later
+			next.push(&b);
 
-		// run at the first insertion of visitable object
-		if(next.size() == 1)
-			_run();
+			// run at the first insertion of visitable object
+			if(next.size() == 1)
+				_run();
+		}
 	}
 
 	void _run()
@@ -316,7 +357,7 @@ struct Visitor<Base, ReturnType, VisitorImplementation::iterative_dfs>
 	typedef ReturnType (Visitor::*FunctionT)(Base&);
 	typedef visitor::detail::vtable<const Base, FunctionT> VTableT;
 
-	Visitor()
+	Visitor() : mTerminated(false)
 	{
 		// all iterative visitor must have void return type
 		BOOST_MPL_ASSERT(( boost::is_same<ReturnType, void> ));
@@ -332,23 +373,42 @@ struct Visitor<Base, ReturnType, VisitorImplementation::iterative_dfs>
 	}
 
 	const VTableT* mVTable;
+	bool mTerminated;
+
+	inline void terminate()
+	{
+		mTerminated = true;
+	}
+
+	inline bool isTerminated()
+	{
+		return mTerminated;
+	}
+
+	inline void reset()
+	{
+		mTerminated = false;
+	}
 
 	ReturnType visit(Base& b)
 	{
-		// we hold a pointer reference to the visitable object to avoid any object copy
-		// but this is a bit risky if the object is destroyed during the visitor phase
-		// in most scenario, the visiting operation should be const (non-modifying)
-		// however if there's modification to the tree, all changes to the tree or all object destruction should be staged and processed later
-		if(next.size() == 0)
+		if(!mTerminated)
 		{
-			next.push(&b);
+			// we hold a pointer reference to the visitable object to avoid any object copy
+			// but this is a bit risky if the object is destroyed during the visitor phase
+			// in most scenario, the visiting operation should be const (non-modifying)
+			// however if there's modification to the tree, all changes to the tree or all object destruction should be staged and processed later
+			if(next.size() == 0)
+			{
+				next.push(&b);
 
-			// run at the first insertion of visitable object
-			_run();
-		}
-		else
-		{
-			temp.push(&b);
+				// run at the first insertion of visitable object
+				_run();
+			}
+			else
+			{
+				temp.push(&b);
+			}
 		}
 	}
 
@@ -393,6 +453,15 @@ protected:
 		typedef struct { 															\
 			template<typename VisitorImpl, typename Visitable>						\
 			static ReturnT invoke(VisitorImpl& visitor, Visitable& visitable)		\
+			{																		\
+				return visitor.function_name(visitable);							\
+			}																		\
+		} invoker;
+
+#define CREATE_VOID_INVOKER(invoker, function_name)	\
+		typedef struct { 															\
+			template<typename VisitorImpl, typename Visitable>						\
+			static void invoke(VisitorImpl& visitor, Visitable& visitable)			\
 			{																		\
 				return visitor.function_name(visitable);							\
 			}																		\
