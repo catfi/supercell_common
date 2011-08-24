@@ -276,16 +276,16 @@ template <typename Key, typename Value, typename Hash> static inline typename __
 
 // foreach support for __gnu_cxx::hash_set
 #include <ext/hash_set>
-template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_set<Value, Hash>::iterator beginof (__gnu_cxx::hash_set<Value, Hash>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_set<Value, Hash>::iterator endof (__gnu_cxx::hash_set<Value, Hash>& m)   { return m.end(); }
+template <typename Key, typename Value, typename Hash, typename EqualKey, typename Alloc> static inline typename __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>::iterator beginof (__gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash, typename EqualKey, typename Alloc> static inline typename __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>::iterator endof (__gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>& m)   { return m.end(); }
 
-template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_set<Value, Hash>::const_iterator beginof (const __gnu_cxx::hash_set<Value, Hash>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_set<Value, Hash>::const_iterator endof (const __gnu_cxx::hash_set<Value, Hash>& m)   { return m.end(); }
+template <typename Key, typename Value, typename Hash, typename EqualKey, typename Alloc> static inline typename __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>::const_iterator beginof (const __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>& m) { return m.begin(); }
+template <typename Key, typename Value, typename Hash, typename EqualKey, typename Alloc> static inline typename __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>::const_iterator endof (const __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>& m)   { return m.end(); }
 
 #define foreach(i, c) \
-   for(decltype(beginof(c)) i = beginof(c); i != endof(c); ++i)
+   for(decltype(beginof(c)) i = beginof(c), e = endof(c); i != e; ++i)
 
 #define r_foreach(i, c) \
-   for(decltype(r_beginof(c)) i = r_beginof(c); i != r_endof(c); ++i)
+   for(decltype(r_beginof(c)) i = r_beginof(c), e = r_endof(c); i != e; ++i)
 
 #endif /* ZILLIANS_TEMPLATETRICKS_H_ */
