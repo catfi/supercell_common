@@ -20,104 +20,10 @@
  * @date Aug 6, 2010 sdk - Initial version created.
  */
 
-#ifndef ZILLIANS_TEMPLATETRICKS_H_
-#define ZILLIANS_TEMPLATETRICKS_H_
+#ifndef ZILLIANS_FOREACH_H_
+#define ZILLIANS_FOREACH_H_
 
-#include <boost/mpl/assert.hpp>
-#include <boost/mpl/has_xxx.hpp>
-#include <boost/type_traits.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/mpl/or.hpp>
-
-// Introspection for member templates.
-#define HAS_MEMBER_TEMPLATE_ACCESS( \
-            args, class_type, param \
-        ) \
-    class_type::template BOOST_PP_ARRAY_ELEM(1, args) \
-/**/
-#define HAS_MEMBER_TEMPLATE_SUBSTITUTE_PARAMETER( \
-            args, param \
-        ) \
-    template< \
-        BOOST_PP_ENUM_PARAMS( \
-            BOOST_PP_ARRAY_ELEM(2, args) \
-          , typename param \
-        ) \
-> \
-    class param
-
-#define HAS_MEMBER_TEMPLATE(name, n) \
-    BOOST_MPL_HAS_MEMBER_IMPLEMENTATION( \
-        ( 4, ( BOOST_PP_CAT(has_, name), name, n, false ) ) \
-      , BOOST_MPL_HAS_MEMBER_INTROSPECT \
-      , HAS_MEMBER_TEMPLATE_SUBSTITUTE_PARAMETER \
-      , HAS_MEMBER_TEMPLATE_ACCESS \
-    )
-
-// Introspection for member functions.
-#define HAS_MEMBER_FUNCTION_ACCESS( \
-            args, class_type, param \
-        ) \
-    &class_type::BOOST_PP_ARRAY_ELEM(1, args)
-
-#define HAS_MEMBER_FUNCTION_SUBSTITUTE_PARAMETER( \
-            args, param \
-        ) \
-    BOOST_PP_TUPLE_ELEM(2, 0, BOOST_PP_ARRAY_ELEM(4, args)) \
-    (U::*) \
-    BOOST_PP_TUPLE_ELEM(2, 1, BOOST_PP_ARRAY_ELEM(4, args))
-
-#define HAS_MEMBER_FUNCTION(name, sig) \
-    BOOST_MPL_HAS_MEMBER_IMPLEMENTATION( \
-        ( 5, ( BOOST_PP_CAT(has_, name), name, 0, false, sig ) ) \
-      , BOOST_MPL_HAS_MEMBER_INTROSPECT \
-      , HAS_MEMBER_FUNCTION_SUBSTITUTE_PARAMETER \
-      , HAS_MEMBER_FUNCTION_ACCESS \
-    )
-
-// Introspection for member static functions.
-#define HAS_MEMBER_STATIC_FUNCTION_SUBSTITUTE_PARAMETER( \
-            args, param \
-        ) \
-    BOOST_PP_TUPLE_ELEM(2, 0, BOOST_PP_ARRAY_ELEM(4, args)) \
-    (*) \
-    BOOST_PP_TUPLE_ELEM(2, 1, BOOST_PP_ARRAY_ELEM(4, args))
-
-
-#define HAS_MEMBER_STATIC_FUNCTION(name, sig) \
-    BOOST_MPL_HAS_MEMBER_IMPLEMENTATION( \
-        ( 5, ( BOOST_PP_CAT(has_, name), name, 0, false, sig ) ) \
-      , BOOST_MPL_HAS_MEMBER_INTROSPECT \
-      , HAS_MEMBER_STATIC_FUNCTION_SUBSTITUTE_PARAMETER \
-      , HAS_MEMBER_FUNCTION_ACCESS \
-    )
-
-//template <typename T>
-//struct is_backward_reversed_iterator
-//{
-//	enum { value =
-//		boost::is_same<typename boost::remove_const<T>::type, int8>::value ||
-//		boost::is_same<typename boost::remove_const<T>::type, uint8>::value ||
-//		boost::is_same<typename boost::remove_const<T>::type, int16>::value ||
-//		boost::is_same<typename boost::remove_const<T>::type, uint16>::value ||
-//		boost::is_same<typename boost::remove_const<T>::type, int32>::value ||
-//		boost::is_same<typename boost::remove_const<T>::type, uint32>::value ||
-//		boost::is_same<typename boost::remove_const<T>::type, int64>::value ||
-//		boost::is_same<typename boost::remove_const<T>::type, uint64>::value ||
-//		boost::is_same<T, char*>::value ||
-//		boost::is_same<T, const char*>::value ||
-//		boost::is_array<T>::value ||
-//		detail::is_std_vector<T>::value ||
-//		detail::is_std_list<T>::value ||
-//		detail::is_std_map<T>::value ||
-//		detail::is_boost_array<T>::value ||
-//		detail::is_std_pair<T>::value ||
-//		boost::is_same<typename boost::remove_const<T>::type, boost::system::error_code>::value ||
-//		//boost::is_same<typename boost::remove_const<T>::type, BufferBase >::value
-//		//boost::is_base_and_derived<typename boost::remove_const<T>::type, BufferBase>::value
-//		is_buffer<T>::value
-//		};
-//};
+#include "core/Types.h"
 
 /* foreach support for non-container type, the indexer iterates through 0 ~ (A-1) */
 static inline zillians::int8 beginof(zillians::int8 a) { return 0; }
@@ -288,4 +194,4 @@ template <typename Key, typename Value, typename Hash, typename EqualKey, typena
 #define r_foreach(i, c) \
    for(decltype(r_beginof(c)) i = r_beginof(c), e = r_endof(c); i != e; ++i)
 
-#endif /* ZILLIANS_TEMPLATETRICKS_H_ */
+#endif /* ZILLIANS_FOREACH_H_ */

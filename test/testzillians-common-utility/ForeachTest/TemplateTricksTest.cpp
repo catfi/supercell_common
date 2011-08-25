@@ -21,7 +21,7 @@
  */
 
 #include "core/Prerequisite.h"
-#include "utility/TemplateTricks.h"
+#include "utility/Foreach.h"
 #include <tr1/unordered_set>
 
 #define BOOST_TEST_MODULE TemplateTricksTest
