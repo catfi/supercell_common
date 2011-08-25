@@ -21,12 +21,12 @@
 
 INCLUDE_DIRECTORIES(${zillians-common_SOURCE_DIR}/include/)
 
-ADD_EXECUTABLE(TemplateTricksTest TemplateTricksTest.cpp)
+ADD_EXECUTABLE(ForeachTest ForeachTest.cpp)
 
-TARGET_LINK_LIBRARIES(TemplateTricksTest
+TARGET_LINK_LIBRARIES(ForeachTest
     zillians-common-core
     zillians-common-utility
     )
 
-zillians_add_simple_test(TARGET TemplateTricksTest)
-zillians_add_test_to_subject(SUBJECT common-utility-critical TARGET TemplateTricksTest)
+zillians_add_simple_test(TARGET ForeachTest)
+zillians_add_test_to_subject(SUBJECT common-utility-critical TARGET ForeachTest)
