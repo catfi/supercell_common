@@ -24,174 +24,557 @@
 #define ZILLIANS_FOREACH_H_
 
 #include "core/Types.h"
+#include <boost/foreach.hpp>
+#include <boost/type_traits.hpp>
 
-/* foreach support for non-container type, the indexer iterates through 0 ~ (A-1) */
-static inline zillians::int8 beginof(zillians::int8 a) { return 0; }
-static inline zillians::int8 endof(zillians::int8 a) { return a; }
-static inline zillians::uint8 beginof(zillians::uint8 a) { return 0; }
-static inline zillians::uint8 endof(zillians::uint8 a) { return a; }
-
-static inline zillians::int16 beginof(zillians::int16 a) { return 0; }
-static inline zillians::int16 endof(zillians::int16 a) { return a; }
-static inline zillians::uint16 beginof(zillians::uint16 a) { return 0; }
-static inline zillians::uint16 endof(zillians::uint16 a) { return a; }
-
-static inline zillians::int32 beginof(zillians::int32 a) { return 0; }
-static inline zillians::int32 endof(zillians::int32 a) { return a; }
-static inline zillians::uint32 beginof(zillians::uint32 a) { return 0; }
-static inline zillians::uint32 endof(zillians::uint32 a) { return a; }
-
-static inline zillians::int64 beginof(zillians::int64 a) { return 0; }
-static inline zillians::int64 endof(zillians::int64 a) { return a; }
-static inline zillians::uint64 beginof(zillians::uint64 a) { return 0; }
-static inline zillians::uint64 endof(zillians::uint64 a) { return a; }
-
-//static inline zillians::int8 r_beginof(zillians::int8 a) { return a-1; }
-//static inline zillians::int8 r_endof(zillians::int8 a) { return a-1; }
-//static inline zillians::uint8 r_beginof(zillians::uint8 a) { return -1; }
-//static inline zillians::uint8 r_endof(zillians::uint8 a) { return a-1; }
-//
-//static inline void r_next(zillians::int8& a) { --a; }
-//static inline void r_next(zillians::uint8& a) { --a; }
-//
-//static inline zillians::int16 r_beginof(zillians::int16 a) { return a-1; }
-//static inline zillians::int16 r_endof(zillians::int16 a) { return a; }
-//static inline zillians::uint16 r_beginof(zillians::uint16 a) { return 0; }
-//static inline zillians::uint16 r_endof(zillians::uint16 a) { return a; }
-//
-//static inline void r_next(zillians::int16& a) { --a; }
-//static inline void r_next(zillians::uint16& a) { --a; }
-//
-//static inline zillians::int32 r_beginof(zillians::int32 a) { return 0; }
-//static inline zillians::int32 r_endof(zillians::int32 a) { return a; }
-//static inline zillians::uint32 r_beginof(zillians::uint32 a) { return 0; }
-//static inline zillians::uint32 r_endof(zillians::uint32 a) { return a; }
-//
-//static inline void r_next(zillians::int32& a) { --a; }
-//static inline void r_next(zillians::uint32& a) { --a; }
-//
-//static inline zillians::int64 r_beginof(zillians::int64 a) { return 0; }
-//static inline zillians::int64 r_endof(zillians::int64 a) { return a; }
-//static inline zillians::uint64 r_beginof(zillians::uint64 a) { return 0; }
-//static inline zillians::uint64 r_endof(zillians::uint64 a) { return a; }
-//
-//static inline void r_next(zillians::int64& a) { --a; }
-//static inline void r_next(zillians::uint64& a) { --a; }
-
-template <typename T, int N> static inline T* beginof (T (&a)[N]) { return a; }
-template <typename T, int N> static inline T* endof (T (&a)[N])   { return a + N; }
-
-//template <typename T, int N> static inline T* r_beginof (T (&a)[N]) { return &(a[N - 1]); }
-//template <typename T, int N> static inline T* r_endof (T (&a)[N])   { return &a[-1]; }
-//
-//template <typename T> static inline void r_next(T*& i) { --i; }
-
-// foreach support for std::vector
 #include <vector>
-template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::iterator beginof (std::vector<T, Alloc>& v) { return v.begin(); }
-template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::iterator endof (std::vector<T, Alloc>& v)   { return v.end(); }
-
-template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::const_iterator beginof (const std::vector<T, Alloc>& v) { return v.begin(); }
-template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::const_iterator endof (const std::vector<T, Alloc>& v)   { return v.end(); }
-
-template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::reverse_iterator r_beginof (std::vector<T, Alloc>& v) { return v.rbegin(); }
-template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::reverse_iterator r_endof (std::vector<T, Alloc>& v)   { return v.rend(); }
-
-template <typename T, typename Alloc> static inline void r_next (typename std::vector<T, Alloc>::reverse_iterator& i) { ++i; }
-
-template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::const_reverse_iterator r_beginof (const std::vector<T, Alloc>& v) { return v.rbegin(); }
-template <typename T, typename Alloc> static inline typename std::vector<T, Alloc>::const_reverse_iterator r_endof (const std::vector<T, Alloc>& v)   { return v.rend(); }
-
-template <typename T, typename Alloc> static inline void r_next (typename std::vector<T, Alloc>::const_reverse_iterator& i) { ++i; }
-
-// foreach support for std::list
 #include <list>
-template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::iterator beginof (std::list<T, Alloc>& v) { return v.begin(); }
-template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::iterator endof (std::list<T, Alloc>& v)   { return v.end(); }
-
-template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::const_iterator beginof (const std::list<T, Alloc>& v) { return v.begin(); }
-template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::const_iterator endof (const std::list<T, Alloc>& v)   { return v.end(); }
-
-template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::reverse_iterator r_beginof (std::list<T, Alloc>& v) { return v.rbegin(); }
-template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::reverse_iterator r_endof (std::list<T, Alloc>& v)   { return v.rend(); }
-
-template <typename T, typename Alloc> static inline void r_next (typename std::list<T, Alloc>::reverse_iterator& i) { ++i; }
-
-template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::const_reverse_iterator r_beginof (const std::list<T, Alloc>& v) { return v.rbegin(); }
-template <typename T, typename Alloc> static inline typename std::list<T, Alloc>::const_reverse_iterator r_endof (const std::list<T, Alloc>& v)   { return v.rend(); }
-
-template <typename T, typename Alloc> static inline void r_next (typename std::list<T, Alloc>::const_reverse_iterator& i) { ++i; }
-
-// foreach support for std::map
 #include <map>
-template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::iterator beginof (std::map<Key, T, Compare, Alloc>& m) { return m.begin(); }
-template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::iterator endof (std::map<Key, T, Compare, Alloc>& m)   { return m.end(); }
-
-template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::const_iterator beginof (const std::map<Key, T, Compare, Alloc>& m) { return m.begin(); }
-template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::const_iterator endof (const std::map<Key, T, Compare, Alloc>& m)   { return m.end(); }
-
-template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::reverse_iterator r_beginof (std::map<Key, T, Compare, Alloc>& m) { return m.rbegin(); }
-template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::reverse_iterator r_endof (std::map<Key, T, Compare, Alloc>& m)   { return m.rend(); }
-
-template <typename Key, typename T, typename Compare, typename Alloc> static inline void r_next (typename std::map<Key, T, Compare, Alloc>::reverse_iterator& i) { ++i; }
-
-template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::const_reverse_iterator r_beginof (const std::map<Key, T, Compare, Alloc>& m) { return m.rbegin(); }
-template <typename Key, typename T, typename Compare, typename Alloc> static inline typename std::map<Key, T, Compare, Alloc>::const_reverse_iterator r_endof (const std::map<Key, T, Compare, Alloc>& m)   { return m.rend(); }
-
-template <typename Key, typename T, typename Compare, typename Alloc> static inline void r_next (typename std::map<Key, T, Compare, Alloc>::const_reverse_iterator& i) { ++i; }
-
-// foreach support for std::tr1::unordered_set
+#include <queue>
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 #include <unordered_set>
-template <typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::unordered_set<Value, Hash, Pred, Alloc>::iterator beginof (std::unordered_set<Value, Hash, Pred, Alloc>& m) { return m.begin(); }
-template <typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::unordered_set<Value, Hash, Pred, Alloc>::iterator endof (std::unordered_set<Value, Hash, Pred, Alloc>& m)   { return m.end(); }
-
-template <typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::unordered_set<Value, Hash, Pred, Alloc>::const_iterator beginof (const std::unordered_set<Value, Hash, Pred, Alloc>& m) { return m.begin(); }
-template <typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::unordered_set<Value, Hash, Pred, Alloc>::const_iterator endof (const std::unordered_set<Value, Hash, Pred, Alloc>& m)   { return m.end(); }
-
 #include <unordered_map>
-template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::unordered_map<Key, Value, Hash, Pred, Alloc>::iterator beginof (std::unordered_map<Key, Value, Hash, Pred, Alloc>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::unordered_map<Key, Value, Hash, Pred, Alloc>::iterator endof (std::unordered_map<Key, Value, Hash, Pred, Alloc>& m)   { return m.end(); }
-
-template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::unordered_map<Key, Value, Hash, Pred, Alloc>::const_iterator beginof (const std::unordered_map<Key, Value, Hash, Pred, Alloc>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::unordered_map<Key, Value, Hash, Pred, Alloc>::const_iterator endof (const std::unordered_map<Key, Value, Hash, Pred, Alloc>& m)   { return m.end(); }
 #else
 #include <tr1/unordered_set>
-template <typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::tr1::unordered_set<Value, Hash, Pred, Alloc>::iterator beginof (std::tr1::unordered_set<Value, Hash, Pred, Alloc>& m) { return m.begin(); }
-template <typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::tr1::unordered_set<Value, Hash, Pred, Alloc>::iterator endof (std::tr1::unordered_set<Value, Hash, Pred, Alloc>& m)   { return m.end(); }
-
-template <typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::tr1::unordered_set<Value, Hash, Pred, Alloc>::const_iterator beginof (const std::tr1::unordered_set<Value, Hash, Pred, Alloc>& m) { return m.begin(); }
-template <typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::tr1::unordered_set<Value, Hash, Pred, Alloc>::const_iterator endof (const std::tr1::unordered_set<Value, Hash, Pred, Alloc>& m)   { return m.end(); }
-
-// foreach support for std::tr1::unordered_map
 #include <tr1/unordered_map>
-template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>::iterator beginof (std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>::iterator endof (std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+#endif
+#include <ext/hash_set>
+#include <ext/hash_map>
 
-template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>::const_iterator beginof (const std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc> static inline typename std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>::const_iterator endof (const std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>& m)   { return m.end(); }
+namespace zillians {
+
+template<typename T>
+struct foreach_trait;
+
+template<>
+struct foreach_trait<zillians::int8>
+{
+	typedef zillians::int8 container_type;
+	typedef zillians::int8 iterator_type;
+	typedef zillians::int8 const_iterator_type;
+	typedef zillians::int8 value_type;
+
+	static inline iterator_type beginof(container_type a)
+	{
+		return 0;
+	}
+	static inline iterator_type endof(container_type a)
+	{
+		return a;
+	}
+};
+
+template<>
+struct foreach_trait<zillians::int16>
+{
+	typedef zillians::int16 container_type;
+	typedef zillians::int16 iterator_type;
+	typedef zillians::int16 const_iterator_type;
+	typedef zillians::int16 value_type;
+
+	static inline iterator_type beginof(container_type a)
+	{
+		return 0;
+	}
+	static inline iterator_type endof(container_type a)
+	{
+		return a;
+	}
+};
+
+template<>
+struct foreach_trait<zillians::int32>
+{
+	typedef zillians::int32 container_type;
+	typedef zillians::int32 iterator_type;
+	typedef zillians::int32 const_iterator_type;
+	typedef zillians::int32 value_type;
+
+	static inline iterator_type beginof(container_type a)
+	{
+		return 0;
+	}
+	static inline iterator_type endof(container_type a)
+	{
+		return a;
+	}
+};
+
+template<>
+struct foreach_trait<zillians::int64>
+{
+	typedef zillians::int64 container_type;
+	typedef zillians::int64 iterator_type;
+	typedef zillians::int64 const_iterator_type;
+	typedef zillians::int64 value_type;
+
+	static inline iterator_type beginof(container_type a)
+	{
+		return 0;
+	}
+	static inline iterator_type endof(container_type a)
+	{
+		return a;
+	}
+};
+
+template<>
+struct foreach_trait<zillians::uint8>
+{
+	typedef zillians::uint8 container_type;
+	typedef zillians::uint8 iterator_type;
+	typedef zillians::uint8 const_iterator_type;
+	typedef zillians::uint8 value_type;
+
+	static inline iterator_type beginof(container_type a)
+	{
+		return 0;
+	}
+	static inline iterator_type endof(container_type a)
+	{
+		return a;
+	}
+};
+
+template<>
+struct foreach_trait<zillians::uint16>
+{
+	typedef zillians::uint16 container_type;
+	typedef zillians::uint16 iterator_type;
+	typedef zillians::uint16 const_iterator_type;
+	typedef zillians::uint16 value_type;
+
+	static inline iterator_type beginof(container_type a)
+	{
+		return 0;
+	}
+	static inline iterator_type endof(container_type a)
+	{
+		return a;
+	}
+};
+template<>
+struct foreach_trait<zillians::uint32>
+{
+	typedef zillians::uint32 container_type;
+	typedef zillians::uint32 iterator_type;
+	typedef zillians::uint32 const_iterator_type;
+	typedef zillians::uint32 value_type;
+
+	static inline iterator_type beginof(container_type a)
+	{
+		return 0;
+	}
+	static inline iterator_type endof(container_type a)
+	{
+		return a;
+	}
+};
+template<>
+struct foreach_trait<zillians::uint64>
+{
+	typedef zillians::uint64 container_type;
+	typedef zillians::uint64 iterator_type;
+	typedef zillians::uint64 const_iterator_type;
+	typedef zillians::uint64 value_type;
+
+	static inline iterator_type beginof(container_type a)
+	{
+		return 0;
+	}
+	static inline iterator_type endof(container_type a)
+	{
+		return a;
+	}
+};
+
+template <typename T, int N>
+struct foreach_trait<T[N]>
+{
+	typedef T container_type[N];
+	typedef T* iterator_type;
+	typedef const T* const_iterator_type;
+	typedef T value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a; }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a + N; }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a; }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a + N; }
+
+};
+
+template <typename T, typename Alloc>
+struct foreach_trait<std::vector<T, Alloc>>
+{
+	typedef std::vector<T,Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::reverse_iterator reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_reverse_iterator const_reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline reverse_iterator_type reverse_beginof(container_type& a)
+	{ return a.rbegin(); }
+
+	static inline reverse_iterator_type reverse_endof(container_type& a)
+	{ return a.rend(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+
+	static inline const_reverse_iterator_type reverse_beginof(const container_type& a)
+	{ return a.rbegin(); }
+
+	static inline const_reverse_iterator_type reverse_endof(const container_type& a)
+	{ return a.rend(); }
+
+};
+
+template <typename T, typename Alloc>
+struct foreach_trait<std::list<T, Alloc>>
+{
+	typedef std::list<T, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::reverse_iterator reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_reverse_iterator const_reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline reverse_iterator_type reverse_beginof(container_type& a)
+	{ return a.rbegin(); }
+
+	static inline reverse_iterator_type reverse_endof(container_type& a)
+	{ return a.rend(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+
+	static inline const_reverse_iterator_type reverse_beginof(const container_type& a)
+	{ return a.rbegin(); }
+
+	static inline const_reverse_iterator_type reverse_endof(const container_type& a)
+	{ return a.rend(); }
+
+};
+
+template <typename Key, typename T, typename Compare, typename Alloc>
+struct foreach_trait<std::map<Key, T, Compare, Alloc>>
+{
+	typedef std::map<Key, T, Compare, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::reverse_iterator reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_reverse_iterator const_reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline reverse_iterator_type reverse_beginof(container_type& a)
+	{ return a.rbegin(); }
+
+	static inline reverse_iterator_type reverse_endof(container_type& a)
+	{ return a.rend(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+
+	static inline const_reverse_iterator_type reverse_beginof(const container_type& a)
+	{ return a.rbegin(); }
+
+	static inline const_reverse_iterator_type reverse_endof(const container_type& a)
+	{ return a.rend(); }
+
+};
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+template <typename Value, typename Hash, typename Pred, typename Alloc>
+struct foreach_trait<std::unordered_set<Value, Hash, Pred, Alloc>>
+{
+	typedef std::unordered_set<Value, Hash, Pred, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+};
+
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc>
+struct foreach_trait<std::unordered_map<Key, Value, Hash, Pred, Alloc>>
+{
+	typedef std::unordered_map<Key, Value, Hash, Pred, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+};
+#else
+template <typename Value, typename Hash, typename Pred, typename Alloc>
+struct foreach_trait<std::tr1::unordered_set<Value, Hash, Pred, Alloc>>
+{
+	typedef std::tr1::unordered_set<Value, Hash, Pred, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+};
+
+template <typename Key, typename Value, typename Hash, typename Pred, typename Alloc>
+struct foreach_trait<std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc>>
+{
+	typedef std::tr1::unordered_map<Key, Value, Hash, Pred, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+};
 #endif
 
-// foreach support for __gnu_cxx::hash_map
-#include <ext/hash_map>
-template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_map<Key, Value, Hash>::iterator beginof (__gnu_cxx::hash_map<Key, Value, Hash>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_map<Key, Value, Hash>::iterator endof (__gnu_cxx::hash_map<Key, Value, Hash>& m)   { return m.end(); }
+template <typename Key, typename Value, typename EqualKey, typename Hash, typename Alloc>
+struct foreach_trait<__gnu_cxx::hash_map<Key, Value, Hash, EqualKey, Alloc>>
+{
+	typedef __gnu_cxx::hash_map<Key, Value, Hash, EqualKey, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
 
-template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_map<Key, Value, Hash>::const_iterator beginof (const __gnu_cxx::hash_map<Key, Value, Hash>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash> static inline typename __gnu_cxx::hash_map<Key, Value, Hash>::const_iterator endof (const __gnu_cxx::hash_map<Key, Value, Hash>& m)   { return m.end(); }
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
 
-// foreach support for __gnu_cxx::hash_set
-#include <ext/hash_set>
-template <typename Key, typename Value, typename Hash, typename EqualKey, typename Alloc> static inline typename __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>::iterator beginof (__gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash, typename EqualKey, typename Alloc> static inline typename __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>::iterator endof (__gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>& m)   { return m.end(); }
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
 
-template <typename Key, typename Value, typename Hash, typename EqualKey, typename Alloc> static inline typename __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>::const_iterator beginof (const __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>& m) { return m.begin(); }
-template <typename Key, typename Value, typename Hash, typename EqualKey, typename Alloc> static inline typename __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>::const_iterator endof (const __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>& m)   { return m.end(); }
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+};
+
+template <typename Value, typename Hash, typename EqualKey, typename Alloc>
+struct foreach_trait<__gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>>
+{
+	typedef __gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+};
+
+struct foreach_value_dummy_cond
+{
+	foreach_value_dummy_cond() : value(true)
+	{ }
+
+	foreach_value_dummy_cond(bool value) : value(value)
+	{ }
+
+	foreach_value_dummy_cond& operator = (bool v)
+	{
+		value = v;
+		return *this;
+	}
+
+	operator bool() const
+	{
+		return false;
+	}
+
+	bool value;
+};
+
+}
+
+#define make_begin(c)	\
+		zillians::foreach_trait<boost::remove_const<boost::remove_reference<decltype((c))>::type>::type>::beginof((c))
+
+#define make_end(c)	\
+		zillians::foreach_trait<boost::remove_const<boost::remove_reference<decltype((c))>::type>::type>::endof((c))
+
+#define make_reverse_begin(c)	\
+		zillians::foreach_trait<boost::remove_const<boost::remove_reference<decltype((c))>::type>::type>::reverse_beginof((c))
+
+#define make_reverse_end(c)	\
+		zillians::foreach_trait<boost::remove_const<boost::remove_reference<decltype((c))>::type>::type>::reverse_endof((c))
+
+#define make_deduced_begin(c)	\
+		zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::beginof((c))
+
+#define make_deduced_end(c)	\
+		zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::endof((c))
+
+#define make_deduced_reverse_begin(c)	\
+		zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::reverse_beginof((c))
+
+#define make_deduced_reverse_end(c)	\
+		zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::reverse_endof((c))
 
 #define foreach(i, c) \
-   for(decltype(beginof(c)) i = beginof(c), e = endof(c); i != e; ++i)
+		for(auto i = make_begin((c)), _end_of_foreach = make_end((c)); i != _end_of_foreach; ++i)
 
-#define r_foreach(i, c) \
-   for(decltype(r_beginof(c)) i = r_beginof(c), e = r_endof(c); i != e; ++i)
+
+#define foreach_value(i, c) \
+		for(auto _iter_foreach = make_begin((c)), _end_of_foreach = make_end((c)); _iter_foreach != _end_of_foreach; ++_iter_foreach) \
+			if(zillians::foreach_value_dummy_cond __dummy_cond = true) { } else \
+				for(auto i = *_iter_foreach; __dummy_cond.value; __dummy_cond.value = false)
+
+#define deduced_foreach(i, c) \
+		for(auto i = make_deduced_begin((c)), _end_of_foreach = make_deduced_end((c)); i != _end_of_foreach; ++i)
+
+#define deduced_foreach_value(i, c) \
+		for(auto _iter_foreach = make_deduced_begin((c)), _end_of_foreach = make_deduced_end((c)); _iter_foreach != _end_of_foreach; ++_iter_foreach) \
+			if(zillians::foreach_value_dummy_cond __dummy_cond = true) { } else \
+				for(auto i = *_iter_foreach; __dummy_cond.value; __dummy_cond.value = false)
+
+#define reverse_foreach(i, c) \
+		for(auto i = make_reverse_begin((c)), _end_of_foreach = make_reverse_end((c)); i != _end_of_foreach; ++i)
+
+#define reverse_foreach_value(i, c) \
+		for(auto _iter_foreach = make_reverse_begin((c)), _end_of_foreach = make_reverse_end((c)); _iter_foreach != _end_of_foreach; ++_iter_foreach) \
+			if(zillians::foreach_value_dummy_cond __dummy_cond = true) { } else \
+				for(auto i = *_iter_foreach; __dummy_cond.value; __dummy_cond.value = false)
+
+#define deduced_reverse_foreach(i, c) \
+		for(auto i = zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::reverse_beginof((c)), _end_of_foreach = zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::reverse_endof((c)); i != _end_of_foreach; ++i)
+
+#define deduced_reverse_foreach_value(i, c) \
+		for(auto _iter_foreach = make_deduced_reverse_begin((c)), _end_of_foreach = make_deduced_reverse_end((c)); _iter_foreach != _end_of_foreach; ++_iter_foreach) \
+			if(zillians::foreach_value_dummy_cond __dummy_cond = true) { } else \
+				for(auto i = *_iter_foreach; __dummy_cond.value; __dummy_cond.value = false)
+
+#define is_begin_of_foreach(i, c)  \
+		((i) == zillians::foreach_trait<boost::remove_const<boost::remove_reference<decltype((c))>::type>::type>::beginof(c))
+
+#define is_end_of_foreach(i, c)  \
+		((i+1) == _end_of_foreach)
+
+#define is_begin_of_reverse_foreach(i, c)  \
+		((i) == zillians::foreach_trait<boost::remove_const<boost::remove_reference<decltype((c))>::type>::type>::reverse_beginof((c)))
+
+#define is_end_of_reverse_foreach(i, c)  \
+		((i+1) == _end_of_foreach)
+
+#define is_begin_of_foreach_value(c)  \
+		((_iter_foreach) == zillians::foreach_trait<boost::remove_const<boost::remove_reference<decltype((c))>::type>::type>::beginof((c)))
+
+#define is_end_of_foreach_value(c)	\
+		((_iter_foreach+1) == _end_of_foreach)
+
+#define is_begin_of_reverse_foreach_value(c)  \
+		((_iter_foreach) == zillians::foreach_trait<boost::remove_const<boost::remove_reference<decltype((c))>::type>::type>::reverse_beginof((c)))
+
+#define is_end_of_reverse_foreach_value(c)	\
+		((_iter_foreach+1) == _end_of_foreach)
+
+
+
+#define is_begin_of_deduced_foreach(i, c)  \
+		((i) == zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::beginof((c)))
+
+#define is_end_of_deduced_foreach(i, c)  \
+		((i+1) == _end_of_foreach)
+
+#define is_begin_of_deduced_reverse_foreach(i, c)  \
+		((i) == zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::reverse_beginof((c)))
+
+#define is_end_of_deduced_reverse_foreach(i, c)  \
+		((i+1) == _end_of_foreach)
+
+#define is_begin_of_deduced_foreach_value(c)  \
+		((_iter_foreach) == zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::beginof((c)))
+
+#define is_end_of_deduced_foreach_value(c)	\
+		((_iter_foreach+1) == _end_of_foreach)
+
+#define is_begin_of_deduced_reverse_foreach_value(c)  \
+		((_iter_foreach) == zillians::foreach_trait<BOOST_DEDUCED_TYPENAME boost::remove_const<BOOST_DEDUCED_TYPENAME boost::remove_reference<decltype((c))>::type>::type>::reverse_beginof((c)))
+
+#define is_end_of_deduced_reverse_foreach_value(c)	\
+		((_iter_foreach+1) == _end_of_foreach)
 
 #endif /* ZILLIANS_FOREACH_H_ */
