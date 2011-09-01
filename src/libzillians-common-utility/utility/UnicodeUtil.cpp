@@ -67,6 +67,14 @@ void utf8_to_ucs4(const std::string& input, std::wstring& output)
 	std::copy(first, last, std::back_inserter(output));
 }
 
+void ucs4_to_utf8(const std::wstring& input, std::string& output)
+{
+	typedef boost::u32_to_u8_iterator<std::wstring::const_iterator> iterator_type;
+	iterator_type first(input.begin());
+	iterator_type last(input.end());
+	std::copy(first, last, std::back_inserter(output));
+}
+
 void wcs_to_cstr(const wchar_t* src, char* dest)
 {
     static std::locale ascii_locale;

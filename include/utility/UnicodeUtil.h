@@ -78,6 +78,7 @@ void enable_c_locale(StreamT& stream)
 }
 
 void utf8_to_ucs4(const std::string& input, std::wstring& output);
+void ucs4_to_utf8(const std::wstring& input, std::string& output);
 
 void wcs_to_cstr(const wchar_t* src, char* dest);
 void cstr_to_wcs(const char* src, wchar_t* dest);
