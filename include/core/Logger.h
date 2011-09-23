@@ -25,7 +25,9 @@
 
 #ifdef BUILD_WITH_LOG4CXX
 
-#define LOG4CXX_WCHAR_T_API
+#ifndef LOG4CXX_WCHAR_T_API
+#    define LOG4CXX_WCHAR_T_API
+#endif
 
 #include <log4cxx/logger.h>
 #include <log4cxx/basicconfigurator.h>
