@@ -76,14 +76,9 @@ std::string Crypto_t::genHardwareIdentKey()
 	return GetMacAddress();
 }
 
-bool Crypto_t::symmetricCipher(const std::string& file, int nid, const std::string& key, const std::string& iv, bool encode, std::vector<unsigned char>& buffer)
-{
-	BIO* bin;
-	if ( (bin = BIO_new_file(file.c_str(), "rb")) == NULL )
-	{
-		return false;
-	}
 
+bool Crypto_t::symmetricCipher(const std::vector<unsigned char>& in_buffer, int nid, const std::string& key, const std::string& iv, bool encode, std::vector<unsigned char>& buffer)
+{
 	// load all cipher modules
 	OpenSSL_add_all_ciphers();
 
@@ -101,30 +96,24 @@ bool Crypto_t::symmetricCipher(const std::string& file, int nid, const std::stri
 	EVP_CIPHER_CTX ctx = {0};
 	EVP_CIPHER_CTX_init(&ctx);
 	EVP_CipherInit_ex(&ctx, cipher, NULL, (const unsigned char*)key.c_str(), (const unsigned char*)iv.c_str(), encode);
-
 	size_t block_size = EVP_CIPHER_block_size(cipher);
-	unsigned char raw_buffer[1024];
-	unsigned char* encrypt_buffer = (unsigned char*) malloc(block_size + sizeof(raw_buffer));
+	unsigned char* encrypt_buffer = (unsigned char*) malloc(block_size + in_buffer.size());
 
 	// Read the raw buffer and convert to encrypt one. And then collect to the output buffer
-	int read_count = 0;
+
 	int out_count = 0;
 	buffer.clear();
 	bool fail = false;
 
 	while (true)
 	{
-		while ((read_count = BIO_read(bin, raw_buffer, sizeof(raw_buffer))) > 0)
+		if (!EVP_CipherUpdate(&ctx, encrypt_buffer, &out_count, &in_buffer[0], in_buffer.size()))
 		{
-			if (!EVP_CipherUpdate(&ctx, encrypt_buffer, &out_count, raw_buffer, read_count))
-			{
-				fail = true;
-				break;
-			}
-			for (int i = 0; i < out_count; i++)
-				buffer.push_back(encrypt_buffer[i]);
+			fail = true;
+			break;
 		}
-		if (fail) break;
+		for (int i = 0; i < out_count; i++)
+			buffer.push_back(encrypt_buffer[i]);
 
 		// handling the last block
 		unsigned char* block = encrypt_buffer + out_count;
@@ -141,9 +130,35 @@ bool Crypto_t::symmetricCipher(const std::string& file, int nid, const std::stri
 	// free resource
 	free(encrypt_buffer);
 	EVP_CIPHER_CTX_cleanup(&ctx);
+	return (fail == true) ? (false) : (true);
+}
+
+bool Crypto_t::symmetricCipher(const std::string& file, int nid, const std::string& key, const std::string& iv, bool encode, std::vector<unsigned char>& buffer)
+{
+	/*
+	 * Read the buffer from files
+	 */
+	BIO* bin;
+	if ( (bin = BIO_new_file(file.c_str(), "rb")) == NULL )
+	{
+		return false;
+	}
+
+	int read_count = 0;
+	unsigned char raw_buffer[1024];
+	std::vector<unsigned char> in_buffer;
+	while ((read_count = BIO_read(bin, raw_buffer, sizeof(raw_buffer))) > 0)
+	{
+		for (int i = 0; i < read_count; i++)
+			in_buffer.push_back(raw_buffer[i]);
+	}
+
 	BIO_free_all(bin);
 
-	return (fail == true) ? (false) : (true);
+	/*
+	 * Do the real symmetric cipher
+	 */
+	return symmetricCipher(in_buffer, nid, key, iv, encode, buffer);
 }
 
 }

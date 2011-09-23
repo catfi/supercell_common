@@ -83,6 +83,7 @@ BOOST_AUTO_TEST_CASE( Cipher_AES_256_CBC_Test )
 	// Decrypt from the encrypt file
 	std::vector<unsigned char> decrypt_buffer;
 	BOOST_CHECK( Crypto_t::symmetricCipher(encrypt_filepath.generic_string(), NID_aes_256_cbc, key, iv, false, decrypt_buffer) );
+	std::cout << "Decrypt buffer size = " << decrypt_buffer.size() << std::endl;
 
 	// Check the buffer whether it is the same
 	BOOST_CHECK( source_buffer == decrypt_buffer );

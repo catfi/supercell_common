@@ -46,6 +46,7 @@ struct Crypto_t
 	 * @return True if success; otherwise, false
 	 */
 	static bool symmetricCipher(const std::string& file, int nid, const std::string& key, const std::string& iv, bool encode, std::vector<unsigned char>& buffer);
+	static bool symmetricCipher(const std::vector<unsigned char>& in_buffer, int nid, const std::string& key, const std::string& iv, bool encode, std::vector<unsigned char>& buffer);
 };
 
 }
