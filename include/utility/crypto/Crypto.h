@@ -24,6 +24,7 @@
 #define ZILLIANS_CRYPTO_H_
 
 #include <string>
+#include <vector>
 
 namespace zillians {
 
@@ -32,6 +33,19 @@ struct Crypto_t
 	static std::string encryptStringBasic(std::string Data, std::string Key, bool PostBase64Encode = true);
 	static std::string decryptStringBasic(std::string Data, std::string Key, bool PreBase64Decode = true);
 	static std::string genHardwareIdentKey();
+
+	/**
+	 * Symmetric cipher by using openssl library.
+	 *
+	 * @param file : input file path for decrypt/encrypt
+	 * @param nid : specify algorithm (ref. grep NID_ /usr/include/openssl/obj_mac.h)
+	 * @param key : key for specific algorithm
+	 * @param iv : IV for specific algorithm
+	 * @param encode : true if we encode the buffer from file; otherwise, decode it from file
+	 * @param buffer: the output buffer
+	 * @return True if success; otherwise, false
+	 */
+	static bool symmetricCipher(const std::string& file, int nid, const std::string& key, const std::string& iv, bool encode, std::vector<unsigned char>& buffer);
 };
 
 }

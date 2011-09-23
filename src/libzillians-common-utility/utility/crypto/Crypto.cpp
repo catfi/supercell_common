@@ -25,6 +25,8 @@
 #include "utility/crypto/machine_info.h"
 #include <ctype.h>
 #include <iostream>
+#include <openssl/bio.h>
+#include <openssl/evp.h>
 
 static char _encode_char_rolling_offset(char data_char, char key_char)
 {
@@ -72,6 +74,76 @@ std::string Crypto_t::decryptStringBasic(std::string Data, std::string Key, bool
 std::string Crypto_t::genHardwareIdentKey()
 {
 	return GetMacAddress();
+}
+
+bool Crypto_t::symmetricCipher(const std::string& file, int nid, const std::string& key, const std::string& iv, bool encode, std::vector<unsigned char>& buffer)
+{
+	BIO* bin;
+	if ( (bin = BIO_new_file(file.c_str(), "rb")) == NULL )
+	{
+		return false;
+	}
+
+	// load all cipher modules
+	OpenSSL_add_all_ciphers();
+
+	// Select the specific cipher module
+	const EVP_CIPHER* cipher = EVP_get_cipherbynid(nid);
+	if (!cipher) return false;
+
+	// Each cipher has its own taste for the key and IV. So we need to check if the input key and IV is appropriate
+	// for the specific cipher module
+	if (key.size() < EVP_CIPHER_key_length(cipher) || iv.size() < EVP_CIPHER_iv_length(cipher))
+	{
+		return false;
+	}
+
+	EVP_CIPHER_CTX ctx = {0};
+	EVP_CIPHER_CTX_init(&ctx);
+	EVP_CipherInit_ex(&ctx, cipher, NULL, (const unsigned char*)key.c_str(), (const unsigned char*)iv.c_str(), encode);
+
+	size_t block_size = EVP_CIPHER_block_size(cipher);
+	unsigned char raw_buffer[1024];
+	unsigned char* encrypt_buffer = (unsigned char*) malloc(block_size + sizeof(raw_buffer));
+
+	// Read the raw buffer and convert to encrypt one. And then collect to the output buffer
+	int read_count = 0;
+	int out_count = 0;
+	buffer.clear();
+	bool fail = false;
+
+	while (true)
+	{
+		while ((read_count = BIO_read(bin, raw_buffer, sizeof(raw_buffer))) > 0)
+		{
+			if (!EVP_CipherUpdate(&ctx, encrypt_buffer, &out_count, raw_buffer, read_count))
+			{
+				fail = true;
+				break;
+			}
+			for (int i = 0; i < out_count; i++)
+				buffer.push_back(encrypt_buffer[i]);
+		}
+		if (fail) break;
+
+		// handling the last block
+		unsigned char* block = encrypt_buffer + out_count;
+		if (!EVP_CipherFinal_ex(&ctx, block, &out_count))
+		{
+			fail = true;
+			break;
+		}
+		for (int i = 0; i < out_count; i++)
+			buffer.push_back(block[i]);
+		break;
+	}
+
+	// free resource
+	free(encrypt_buffer);
+	EVP_CIPHER_CTX_cleanup(&ctx);
+	BIO_free_all(bin);
+
+	return (fail == true) ? (false) : (true);
 }
 
 }
