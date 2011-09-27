@@ -36,4 +36,5 @@ ADD_LIBRARY(zillians-common-utility
 
 TARGET_LINK_LIBRARIES(zillians-common-utility
     boost_system
+    ${OPENSSL_LIBRARIES}
     )
