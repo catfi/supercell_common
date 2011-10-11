@@ -30,6 +30,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <set>
 #include <queue>
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 #include <unordered_set>
@@ -315,7 +316,111 @@ struct foreach_trait<std::map<Key, T, Compare, Alloc>>
 
 	static inline const_reverse_iterator_type reverse_endof(const container_type& a)
 	{ return a.rend(); }
+};
 
+template <typename Key, typename T, typename Compare, typename Alloc>
+struct foreach_trait<std::multimap<Key, T, Compare, Alloc>>
+{
+	typedef std::multimap<Key, T, Compare, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::reverse_iterator reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_reverse_iterator const_reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline reverse_iterator_type reverse_beginof(container_type& a)
+	{ return a.rbegin(); }
+
+	static inline reverse_iterator_type reverse_endof(container_type& a)
+	{ return a.rend(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+
+	static inline const_reverse_iterator_type reverse_beginof(const container_type& a)
+	{ return a.rbegin(); }
+
+	static inline const_reverse_iterator_type reverse_endof(const container_type& a)
+	{ return a.rend(); }
+};
+
+template <typename Key, typename Compare, typename Alloc>
+struct foreach_trait<std::set<Key, Compare, Alloc>>
+{
+	typedef std::set<Key, Compare, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::reverse_iterator reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_reverse_iterator const_reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline reverse_iterator_type reverse_beginof(container_type& a)
+	{ return a.rbegin(); }
+
+	static inline reverse_iterator_type reverse_endof(container_type& a)
+	{ return a.rend(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+
+	static inline const_reverse_iterator_type reverse_beginof(const container_type& a)
+	{ return a.rbegin(); }
+
+	static inline const_reverse_iterator_type reverse_endof(const container_type& a)
+	{ return a.rend(); }
+};
+
+template <typename Key, typename Compare, typename Alloc>
+struct foreach_trait<std::multiset<Key, Compare, Alloc>>
+{
+	typedef std::multiset<Key, Compare, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::reverse_iterator reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_reverse_iterator const_reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline reverse_iterator_type reverse_beginof(container_type& a)
+	{ return a.rbegin(); }
+
+	static inline reverse_iterator_type reverse_endof(container_type& a)
+	{ return a.rend(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+
+	static inline const_reverse_iterator_type reverse_beginof(const container_type& a)
+	{ return a.rbegin(); }
+
+	static inline const_reverse_iterator_type reverse_endof(const container_type& a)
+	{ return a.rend(); }
 };
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
