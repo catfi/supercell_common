@@ -32,6 +32,7 @@ ADD_LIBRARY(zillians-common-utility
 	utility/UUIDUtil.cpp
 	utility/DependencySolver.cpp
 	utility/UnicodeUtil.cpp
+	utility/sha1.cpp
     )
 
 TARGET_LINK_LIBRARIES(zillians-common-utility
