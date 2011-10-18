@@ -107,6 +107,6 @@ struct ContextHubSerialization
 
 }
 
-BOOST_CLASS_EXPORT_GUID(zillians::ContextHubSerializationBase, "ContextHubSerializationBase")
+//BOOST_CLASS_EXPORT_GUID(zillians::ContextHubSerializationBase, "ContextHubSerializationBase")
 
 #endif /* ZILLIANS_CONTEXTHUBSERIALIZATION_H_ */
