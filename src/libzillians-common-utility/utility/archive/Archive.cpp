@@ -29,7 +29,8 @@ namespace zillians {
 Archive::Archive(const std::string& archive_name, ArchiveMode mode) :
 	mArchive(NULL),
 	mArchiveName(archive_name),
-	mArchiveMode(mode)
+	mArchiveMode(mode),
+	mCompressLevel(Z_DEFAULT_COMPRESSION)
 {}
 
 Archive::~Archive()
@@ -83,7 +84,7 @@ bool Archive::add(ArchiveItem_t& archive_item)
 	result = zipOpenNewFileInZip3_64(mArchive, archive_item.filename.c_str(), &archive_item.zip_info,
 								NULL, 0, NULL, 0, NULL /* comment */,
 								Z_DEFLATED,
-								Z_DEFAULT_COMPRESSION, 0,
+								mCompressLevel, 0,
 								/* -MAX_WBITS, DEF_MEM_LEVEL, Z_DEFAULT_STRATEGY, */
 								-MAX_WBITS, DEF_MEM_LEVEL, Z_DEFAULT_STRATEGY,
 								NULL /* PASSWORD */, 0 /* CRC */, 0 /* large file */);
@@ -181,6 +182,13 @@ bool Archive::extractCurrentFile(ArchiveItem_t& archive_item)
     if (result != UNZ_OK) return false;
 
 	return true;
+}
+
+void Archive::setCompressLevel(int level)
+{
+	// the range is 0~9
+	mCompressLevel = (level < 0) ? (0) : level;
+	mCompressLevel = (mCompressLevel > 9) ? (9) : mCompressLevel;
 }
 
 }

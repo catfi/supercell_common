@@ -82,6 +82,7 @@ BOOST_AUTO_TEST_CASE( Archive_Test )
 	{
 		Archive ar(archive_path.generic_string(), ArchiveMode::ARCHIVE_FILE_DECOMPRESS);
 
+		ar.setCompressLevel(9);
 		BOOST_CHECK( ar.open() );
 		BOOST_CHECK( ar.extractAll(archive_items) );
 		BOOST_CHECK( ar.close() );

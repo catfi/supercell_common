@@ -95,6 +95,13 @@ public:
 	 */
 	bool extractAll(std::vector<ArchiveItem_t>& archive_items);
 
+	/**
+	 * Set the compress level. Range is 0~9.
+	 *
+	 * @param level : level of compression
+	 */
+	void setCompressLevel(int level);
+
 private:
 	bool extractCurrentFile(ArchiveItem_t& archive_item);
 
@@ -102,6 +109,9 @@ private:
 	std::string mArchiveName;
 	zip_file_t mArchive;
 	ArchiveMode mArchiveMode;
+
+	// Only work for compression
+	int mCompressLevel;
 };
 
 }
