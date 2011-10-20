@@ -122,6 +122,64 @@ bool Archive::add(const std::string& filename)
 
 bool Archive::extractAll(std::vector<ArchiveItem_t>& archive_items)
 {
+	if (mArchive == NULL || mArchiveMode != ArchiveMode::ARCHIVE_FILE_DECOMPRESS) return false;
+
+    unz_global_info64 global_info;
+
+    if ( unzGetGlobalInfo64(mArchive, &global_info) != UNZ_OK) return false;
+
+    // Extract one file at a time and then jump to the next file
+   	archive_items.resize( global_info.number_entry );
+    for (int i = 0; i < global_info.number_entry; i++)
+    {
+    	if (!extractCurrentFile(archive_items[i])) return false;
+
+    	// We don't need to jump to the next file if the current one is that last
+    	if (i != global_info.number_entry - 1)
+    	{
+    		int result = unzGoToNextFile(mArchive);
+    		if (result != UNZ_OK) return false;
+    	}
+    }
+
+	return true;
+}
+
+bool Archive::extractCurrentFile(ArchiveItem_t& archive_item)
+{
+    unz_file_info64 file_info;
+	int result;
+
+	// TODO: Uh... make the file length more reasonable
+	const int max_filename_length = 1024;
+	char inzip_filename[max_filename_length] = {0};
+
+	// Retrive current file information
+    result = unzGetCurrentFileInfo64(mArchive, &file_info, inzip_filename, max_filename_length, NULL, 0, NULL, 0);
+    if (result != UNZ_OK) return false;
+
+    archive_item.filename = inzip_filename;
+    archive_item.unzip_info = file_info;
+
+	// Open current file
+	result = unzOpenCurrentFile(mArchive);
+	if (result != UNZ_OK) return false;
+
+    // Now, retrieve the buffer chunk by chunk
+    int read_count = 0;
+    char byte;
+
+    while ( (read_count = unzReadCurrentFile(mArchive, &byte, 1)) > 0 )
+    {
+    	archive_item.buffer.push_back(byte);
+    }
+    // Check unzReadCurrentFile comment, you will know there's an error if the read count is negative.
+    if (read_count < 0) return false;
+
+    // Close the current file
+    result = unzCloseCurrentFile(mArchive);
+    if (result != UNZ_OK) return false;
+
 	return true;
 }
 

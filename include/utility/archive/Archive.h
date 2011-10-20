@@ -96,6 +96,9 @@ public:
 	bool extractAll(std::vector<ArchiveItem_t>& archive_items);
 
 private:
+	bool extractCurrentFile(ArchiveItem_t& archive_item);
+
+private:
 	std::string mArchiveName;
 	zip_file_t mArchive;
 	ArchiveMode mArchiveMode;
