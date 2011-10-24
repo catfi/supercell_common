@@ -26,11 +26,11 @@ INCLUDE_DIRECTORIES(
 
 ADD_LIBRARY(zillians-common-utility-archive
 	Archive.cpp
-	${ZILLIANS_DEP_PATH}/linux/zlib/contrib/minizip/zip.c
-	${ZILLIANS_DEP_PATH}/linux/zlib/contrib/minizip/unzip.c
-	${ZILLIANS_DEP_PATH}/linux/zlib/contrib/minizip/ioapi.c	
+	${ZILLIANS_DEP_PATH}/linux/zlib/minizip/zip.c
+	${ZILLIANS_DEP_PATH}/linux/zlib/minizip/unzip.c
+	${ZILLIANS_DEP_PATH}/linux/zlib/minizip/ioapi.c	
 	)
 	
 TARGET_LINK_LIBRARIES(zillians-common-utility-archive
-	${ZILLIANS_DEP_PATH}/linux/zlib/lib/libz.so
+	${ZLIB_LIBRARIES}
 	)

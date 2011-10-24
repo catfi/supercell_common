@@ -23,8 +23,8 @@
 #ifndef ZILLIANS_ARCHIVE_H_
 #define ZILLIANS_ARCHIVE_H_
 
-#include "zlib/contrib/minizip/zip.h"
-#include "zlib/contrib/minizip/unzip.h"
+#include "zlib/minizip/zip.h"
+#include "zlib/minizip/unzip.h"
 
 #include <string>
 #include <vector>
