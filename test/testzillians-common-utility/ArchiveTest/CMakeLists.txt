@@ -1,6 +1,6 @@
 #
 # Zillians MMO
-# Copyright (C) 2007-2010 Zillians.com, Inc.
+# Copyright (C) 2007-2009 Zillians.com, Inc.
 # For more information see http:#www.zillians.com
 #
 # Zillians MMO is the library and runtime for massive multiplayer online game
@@ -19,25 +19,14 @@
 # Contact Information: info@zillians.com
 #
 
-INCLUDE_DIRECTORIES(${PROJECT_COMMON_SOURCE_DIR}/include/)
-
-ADD_LIBRARY(zillians-common-utility
-    utility/crypto/base64.cpp
-    utility/crypto/Crypto.cpp
-    utility/crypto/machine_info.cpp
-	utility/BitTrickUtil.cpp
-	utility/DemanglingUtil.cpp
-	utility/StringUtil.cpp
-    utility/TimerUtil.cpp
-	utility/UUIDUtil.cpp
-	utility/DependencySolver.cpp
-	utility/UnicodeUtil.cpp
-	utility/sha1.cpp
+INCLUDE_DIRECTORIES(
+	${zillians-common_SOURCE_DIR}/include
+	${ZILLIANS_DEP_PATH}/linux
+	)
+	
+ADD_EXECUTABLE(ArchiveTest ArchiveTest.cpp)
+	
+TARGET_LINK_LIBRARIES(ArchiveTest
+    zillians-common-core
+    zillians-common-utility-archive
     )
-
-TARGET_LINK_LIBRARIES(zillians-common-utility
-    boost_system
-    ${OPENSSL_LIBRARIES}
-    )
-
-ADD_SUBDIRECTORY(utility/archive)
