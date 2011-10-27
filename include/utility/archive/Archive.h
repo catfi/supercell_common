@@ -96,6 +96,15 @@ public:
 	bool extractAll(std::vector<ArchiveItem_t>& archive_items);
 
 	/**
+	 * Extract all files in the archive to the specific folder, also return a list of ArchiveItem_t
+	 *
+	 * @param archive_items: return a list of archive items
+	 * @param folder_path : the folder to place the extracted files
+	 * @return True if success; otherwise, false
+	 */
+	bool extractAllToFolder(std::vector<ArchiveItem_t>& archive_items, std::string folder_path = "");
+
+	/**
 	 * Set the compress level. Range is 0~9.
 	 *
 	 * @param level : level of compression
