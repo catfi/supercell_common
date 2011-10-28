@@ -115,7 +115,7 @@ bool Archive::add(const std::string& filename)
 	file.read( (char*)&archive_item.buffer[0], archive_item.buffer.size() );
 	file.close();
 
-	// TODO: fill the archive_item.zip_info
+	// TODO: fill the archive_item.zip_info (which inculdes file date)
 	std::memset(&archive_item.zip_info, 0, sizeof(zip_fileinfo));
 
 	return add(archive_item);
@@ -143,6 +143,29 @@ bool Archive::extractAll(std::vector<ArchiveItem_t>& archive_items)
     	}
     }
 
+	return true;
+}
+
+bool Archive::extractAllToFolder(std::vector<ArchiveItem_t>& archive_items, std::string folder_path = "")
+{
+	/**
+	 * TODO: put the files under the folder_path, instead, currently only put to the current folder
+	 * TODO: the extracted item ArchiveItem_t may contain the filename like this one some_folder/abc.txt, however,
+	 * 		 currently not support to generate the unexisted folder
+	 */
+	if (!extractAll(archive_items)) return false;
+
+
+	// Now, write to the disk
+	for (int i = 0; i < archive_items.size(); i++)
+	{
+		ArchiveItem_t& item = archive_items[i];
+		std::ofstream file(item.filename.c_str(), std::ios::out | std::ios::binary);
+		file.write((char*)&item.buffer[0], item.buffer.size());
+		file.close();
+
+		// TODO: (not sure) write back unzip_info
+	}
 	return true;
 }
 
