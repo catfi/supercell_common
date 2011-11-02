@@ -24,7 +24,6 @@
 #define ZILLIANS_PREREQUISITE_H_
 
 #include "core/Common.h"
-#include "core/FastCallback.h"
 #include "core/ObjectPool.h"
 #include "core/SharedPtr.h"
 #include "core/Buffer.h"

@@ -78,7 +78,7 @@ class Singleton
 	struct CreateDelegate<V, SingletonInitialization::manual>
 	{
 		static void create(V** p)
-		{ }
+		{ UNUSED_ARGUMENT(p); }
 	};
 
 public:
