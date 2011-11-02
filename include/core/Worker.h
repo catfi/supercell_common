@@ -26,10 +26,11 @@
 #include "core/Prerequisite.h"
 #include "core/ConditionVariable.h"
 #include "core/Singleton.h"
+#include <tbb/concurrent_queue.h>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <tbb/concurrent_queue.h>
+#include <boost/asio.hpp>
 
 /**
  * @brief The maximum concurrent blocking calls to a single worker instance.
