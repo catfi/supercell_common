@@ -165,7 +165,7 @@ struct MutablePointer
 #endif
 #endif
 		pointerReference(ref.pointerReference), pointerOffset(ref.pointerOffset), pointerOwner(false)
-	{ }
+	{ UNUSED_ARGUMENT(offset); }
 
 	~MutablePointer()
 	{ if(pointerOwner) { SAFE_DELETE(pointerReference); } }

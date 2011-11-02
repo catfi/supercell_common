@@ -39,6 +39,15 @@
 #include <boost/cstdint.hpp>
 #endif
 
+#define UNUSED_ARGUMENT(x) \
+	(void)x
+
+#define UNREACHABLE_CODE() \
+	BOOST_ASSERT(false && "reaching unreachable code")
+
+#define UNIMPLEMENTED_CODE() \
+	BOOST_ASSERT(false && "not yet implemented")
+
 namespace zillians {
 //////////////////////////////////////////////////////////////////////////
 /// Define common types

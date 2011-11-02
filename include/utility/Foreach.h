@@ -32,15 +32,25 @@
 #include <map>
 #include <set>
 #include <queue>
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
-#include <unordered_set>
-#include <unordered_map>
-#else
-#include <tr1/unordered_set>
-#include <tr1/unordered_map>
+#include <deque>
+
+#ifdef __PLATFORM_LINUX__
+	#ifdef __GXX_EXPERIMENTAL_CXX0X__
+		#include <unordered_set>
+		#include <unordered_map>
+	#else
+		#include <tr1/unordered_set>
+		#include <tr1/unordered_map>
+	#endif
+
+	#include <ext/hash_set>
+	#include <ext/hash_map>
 #endif
-#include <ext/hash_set>
-#include <ext/hash_map>
+
+#ifdef __PLATFORM_WINDOWS__
+	#include <hash_set>
+	#include <hash_map>
+#endif
 
 namespace zillians {
 
@@ -57,6 +67,7 @@ struct foreach_trait<zillians::int8>
 
 	static inline iterator_type beginof(container_type a)
 	{
+		UNUSED_ARGUMENT(a);
 		return 0;
 	}
 	static inline iterator_type endof(container_type a)
@@ -75,6 +86,7 @@ struct foreach_trait<zillians::int16>
 
 	static inline iterator_type beginof(container_type a)
 	{
+		UNUSED_ARGUMENT(a);
 		return 0;
 	}
 	static inline iterator_type endof(container_type a)
@@ -93,6 +105,7 @@ struct foreach_trait<zillians::int32>
 
 	static inline iterator_type beginof(container_type a)
 	{
+		UNUSED_ARGUMENT(a);
 		return 0;
 	}
 	static inline iterator_type endof(container_type a)
@@ -111,6 +124,7 @@ struct foreach_trait<zillians::int64>
 
 	static inline iterator_type beginof(container_type a)
 	{
+		UNUSED_ARGUMENT(a);
 		return 0;
 	}
 	static inline iterator_type endof(container_type a)
@@ -129,6 +143,7 @@ struct foreach_trait<zillians::uint8>
 
 	static inline iterator_type beginof(container_type a)
 	{
+		UNUSED_ARGUMENT(a);
 		return 0;
 	}
 	static inline iterator_type endof(container_type a)
@@ -147,6 +162,7 @@ struct foreach_trait<zillians::uint16>
 
 	static inline iterator_type beginof(container_type a)
 	{
+		UNUSED_ARGUMENT(a);
 		return 0;
 	}
 	static inline iterator_type endof(container_type a)
@@ -164,6 +180,7 @@ struct foreach_trait<zillians::uint32>
 
 	static inline iterator_type beginof(container_type a)
 	{
+		UNUSED_ARGUMENT(a);
 		return 0;
 	}
 	static inline iterator_type endof(container_type a)
@@ -181,6 +198,7 @@ struct foreach_trait<zillians::uint64>
 
 	static inline iterator_type beginof(container_type a)
 	{
+		UNUSED_ARGUMENT(a);
 		return 0;
 	}
 	static inline iterator_type endof(container_type a)
@@ -245,6 +263,62 @@ struct foreach_trait<std::vector<T, Alloc>>
 	static inline const_reverse_iterator_type reverse_endof(const container_type& a)
 	{ return a.rend(); }
 
+};
+
+template <typename T, typename Sequence>
+struct foreach_trait<std::queue<T, Sequence>>
+{
+	typedef std::queue<T,Sequence> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+};
+
+template <typename T, typename Alloc>
+struct foreach_trait<std::deque<T, Alloc>>
+{
+	typedef std::deque<T,Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::reverse_iterator reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_reverse_iterator const_reverse_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline reverse_iterator_type reverse_beginof(container_type& a)
+	{ return a.rbegin(); }
+
+	static inline reverse_iterator_type reverse_endof(container_type& a)
+	{ return a.rend(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+
+	static inline const_reverse_iterator_type reverse_beginof(const container_type& a)
+	{ return a.rbegin(); }
+
+	static inline const_reverse_iterator_type reverse_endof(const container_type& a)
+	{ return a.rend(); }
 };
 
 template <typename T, typename Alloc>
@@ -423,6 +497,8 @@ struct foreach_trait<std::multiset<Key, Compare, Alloc>>
 	{ return a.rend(); }
 };
 
+#ifdef __PLATFORM_LINUX__
+
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 template <typename Value, typename Hash, typename Pred, typename Alloc>
 struct foreach_trait<std::unordered_set<Value, Hash, Pred, Alloc>>
@@ -550,6 +626,53 @@ struct foreach_trait<__gnu_cxx::hash_set<Value, Hash, EqualKey, Alloc>>
 	static inline const_iterator_type endof(const container_type& a)
 	{ return a.end(); }
 };
+#endif
+
+#ifdef __PLATFORM_WINDOWS__
+
+template <typename Key, typename Value, typename EqualKey, typename Hash, typename Alloc>
+struct foreach_trait<stdext::hash_map<Key, Value, Hash, EqualKey, Alloc>>
+{
+	typedef stdext::hash_map<Key, Value, Hash, EqualKey, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+};
+
+template <typename Value, typename Hash, typename EqualKey, typename Alloc>
+struct foreach_trait<stdext::hash_set<Value, Hash, EqualKey, Alloc>>
+{
+	typedef stdext::hash_set<Value, Hash, EqualKey, Alloc> container_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::iterator iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::const_iterator const_iterator_type;
+	typedef BOOST_DEDUCED_TYPENAME container_type::value_type value_type;
+
+	static inline iterator_type beginof(container_type& a)
+	{ return a.begin(); }
+
+	static inline iterator_type endof(container_type& a)
+	{ return a.end(); }
+
+	static inline const_iterator_type beginof(const container_type& a)
+	{ return a.begin(); }
+
+	static inline const_iterator_type endof(const container_type& a)
+	{ return a.end(); }
+};
+
+#endif
 
 struct foreach_value_dummy_cond
 {

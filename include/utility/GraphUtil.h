@@ -308,6 +308,8 @@ inline const typename IndirectGraphTraits::vertex_reference_type& vertex_ref(
 	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
 	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
 
+	UNUSED_ARGUMENT(m_);
+
 	indirect_vertex_property_map prop_map = get(vertex_indirect_reference, g_);
 	return prop_map[u_];
 }
@@ -322,6 +324,8 @@ inline typename Graph::vertex_descriptor vertex(
 	typedef typename IndirectGraphTraits::vertex_reference_type indirect_vertex_reference_type;
 	typedef typename boost::property_map< Graph, vertex_indirect_reference_t>::type indirect_vertex_property_map;
 	BOOST_STATIC_ASSERT((!!boost::is_same<indirect_vertex_reference_type, typename indirect_vertex_property_map::value_type>::value));
+
+	UNUSED_ARGUMENT(g_);
 
 	typename Graph::vertex_descriptor u;
 	if(!m_.findVertexReference(ru_, u))

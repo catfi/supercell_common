@@ -129,7 +129,7 @@ template<typename Visitor, typename VisitedList, typename Invoker>
 struct vtable_append_helper_impl<Visitor, VisitedList, Invoker, true>
 {
 	static void add(typename Visitor::VTableT& vtable)
-	{ }
+	{ UNUSED_ARGUMENT(vtable); }
 };
 
 template<typename Visitor, typename VisitedList, typename Invoker>
@@ -185,6 +185,8 @@ struct VisitableBase
 	template<typename Visitable>
 	size_t _get_tag_helper(const Visitable* v) const
 	{
+		UNUSED_ARGUMENT(v);
+
 		std::size_t t = visitor::detail::get_tag<Visitable, Base>();
 #if ENABLE_DEBUG_VISITOR
 		printf("tag for %s = %ld\n", typeid(v).name(), t);
