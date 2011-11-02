@@ -24,6 +24,8 @@
 #define ZILLIANS_DEPENDENCYSOLVER_H_
 
 #include "core/Prerequisite.h"
+#include "core/PrerequisiteBoost.h"
+
 #include "core/Singleton.h"
 #include "utility/GraphUtil.h"
 

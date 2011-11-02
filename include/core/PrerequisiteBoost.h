@@ -16,14 +16,16 @@
  * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * @date 2009/02/09 Nothing - Added BufferManager.h include
- */
 
-#ifndef ZILLIANS_PREREQUISITE_H_
-#define ZILLIANS_PREREQUISITE_H_
+/// @deprecated header
+
+#ifndef ZILLIANS_PREREQUISITE_BOOST_H_
+#define ZILLIANS_PREREQUISITE_BOOST_H_
 
 #if BUILD_WITH_BOOST
+
+#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
+
 #include <boost/assert.hpp>
 #include <boost/algorithm/minmax.hpp>
 #include <boost/noncopyable.hpp>
@@ -46,6 +48,7 @@
 #include <boost/lambda/exceptions.hpp>
 #include <boost/lambda/algorithm.hpp>
 #include <boost/lexical_cast.hpp>
+
 #endif
 
-#endif/*ZILLIANS_PREREQUISITE_H_*/
+#endif/*ZILLIANS_PREREQUISITE_BOOST_H_*/

@@ -1,11 +1,23 @@
-#include <tuple>
-#include <iostream>
-#include <vector>
-#include <string>
-#include <functional>
-#include <memory>
-#include <assert.h>
-#include <boost/function.hpp>
+/**
+ * Zillians MMO
+ * Copyright (C) 2011-2011 Zillians.com, Inc.
+ * For more information see http://www.zillians.com
+ *
+ * Zillians MMO is the library and runtime for massive multiplayer online game
+ * development in utility computing model, which runs as a service for every
+ * developer to build their virtual world running on our GPU-assisted machines.
+ *
+ * This is a close source library intended to be used solely within Zillians.com
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER(S) BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+#include "core/Prerequisite.h"
 #include "tbb/flow_graph.h"
 
 namespace zillians {
@@ -23,8 +35,8 @@ private:
     typedef tbb::flow::join_node<TP2> JoinNodeType;
     typedef tbb::flow::function_node<TP2, value_type> FoldNodeType;
     typedef tbb::flow::function_node<value_type, value_type> DummyFuncType;
-    static value_type dummyTP2Func(const TP2& t) {return 0;}
-    static value_type dummyFunc(const value_type& t) {return 0;}
+    static value_type dummyTP2Func(const TP2& t) { UNUSED_ARGUMENT(t); return 0; }
+    static value_type dummyFunc(const value_type& t) { UNUSED_ARGUMENT(t); return 0; }
 
 public:
     JoinFunctionModule(tbb::flow::graph& g,
