@@ -735,6 +735,7 @@ public:
 	 */
 	inline static std::size_t probeSizeBuiltin(const bool& value)
 	{
+		UNUSED_ARGUMENT(value);
 		return sizeof(int8);
 	}
 
@@ -796,6 +797,7 @@ public:
 	 */
 	inline static std::size_t probeSizeBuiltin(const boost::system::error_code& value)
 	{
+		UNUSED_ARGUMENT(value);
 		return sizeof(int32) + sizeof(int32);
 	}
 
@@ -823,6 +825,7 @@ public:
 	template<typename T>
 	inline static std::size_t probeSizeBuiltin(const T& value)
 	{
+		UNUSED_ARGUMENT(value);
 		return sizeof(T);
 	}
 
