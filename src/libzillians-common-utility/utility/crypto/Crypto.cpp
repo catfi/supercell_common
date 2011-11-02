@@ -56,7 +56,7 @@ namespace zillians {
 std::string Crypto_t::encryptStringBasic(std::string Data, std::string Key, bool PostBase64Encode)
 {
 	std::string EncryptedData;
-	for(int i = 0; i<Data.length(); i++)
+	for(size_t i = 0; i<Data.length(); i++)
 		EncryptedData.append(1, _encode_char_rolling_offset(Data.c_str()[i], Key.c_str()[i%Key.length()]));
 	if(PostBase64Encode)
 		return base64_encode(reinterpret_cast<const unsigned char*>(EncryptedData.c_str()), EncryptedData.length());
@@ -67,7 +67,7 @@ std::string Crypto_t::decryptStringBasic(std::string Data, std::string Key, bool
 	if(PreBase64Decode)
 		Data = base64_decode(Data);
 	std::string DecryptedData;
-	for(int i = 0; i<Data.length(); i++)
+	for(size_t i = 0; i<Data.length(); i++)
 		DecryptedData.append(1, _decode_char_rolling_offset(Data.c_str()[i], Key.c_str()[i%Key.length()]));
 	return DecryptedData;
 }
@@ -88,12 +88,12 @@ bool Crypto_t::symmetricCipher(const std::vector<unsigned char>& in_buffer, int 
 
 	// Each cipher has its own taste for the key and IV. So we need to check if the input key and IV is appropriate
 	// for the specific cipher module
-	if (key.size() < EVP_CIPHER_key_length(cipher) || iv.size() < EVP_CIPHER_iv_length(cipher))
+	if (key.size() < static_cast<size_t>(EVP_CIPHER_key_length(cipher)) || iv.size() < static_cast<size_t>(EVP_CIPHER_iv_length(cipher)))
 	{
 		return false;
 	}
 
-	EVP_CIPHER_CTX ctx = {0};
+	EVP_CIPHER_CTX ctx;
 	EVP_CIPHER_CTX_init(&ctx);
 	EVP_CipherInit_ex(&ctx, cipher, NULL, (const unsigned char*)key.c_str(), (const unsigned char*)iv.c_str(), encode);
 	size_t block_size = EVP_CIPHER_block_size(cipher);

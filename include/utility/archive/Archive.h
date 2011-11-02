@@ -115,8 +115,8 @@ private:
 	bool extractCurrentFile(ArchiveItem_t& archive_item);
 
 private:
-	std::string mArchiveName;
 	zip_file_t mArchive;
+	std::string mArchiveName;
 	ArchiveMode mArchiveMode;
 
 	// Only work for compression

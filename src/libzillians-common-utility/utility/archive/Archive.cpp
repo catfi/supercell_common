@@ -131,7 +131,7 @@ bool Archive::extractAll(std::vector<ArchiveItem_t>& archive_items)
 
     // Extract one file at a time and then jump to the next file
    	archive_items.resize( global_info.number_entry );
-    for (int i = 0; i < global_info.number_entry; i++)
+    for (size_t i = 0; i < global_info.number_entry; i++)
     {
     	if (!extractCurrentFile(archive_items[i])) return false;
 
@@ -146,7 +146,7 @@ bool Archive::extractAll(std::vector<ArchiveItem_t>& archive_items)
 	return true;
 }
 
-bool Archive::extractAllToFolder(std::vector<ArchiveItem_t>& archive_items, std::string folder_path = "")
+bool Archive::extractAllToFolder(std::vector<ArchiveItem_t>& archive_items, std::string /*folder_path*/)
 {
 	/**
 	 * TODO: put the files under the folder_path, instead, currently only put to the current folder
@@ -157,7 +157,7 @@ bool Archive::extractAllToFolder(std::vector<ArchiveItem_t>& archive_items, std:
 
 
 	// Now, write to the disk
-	for (int i = 0; i < archive_items.size(); i++)
+	for (size_t i = 0; i < archive_items.size(); i++)
 	{
 		ArchiveItem_t& item = archive_items[i];
 		std::ofstream file(item.filename.c_str(), std::ios::out | std::ios::binary);
