@@ -39,8 +39,6 @@
 #include <boost/array.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
-#include <boost/asio.hpp>
-#include <boost/asio/error.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>

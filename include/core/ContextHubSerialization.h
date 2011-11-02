@@ -38,6 +38,9 @@ struct ContextHubSerializationBase
     template<typename Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
+    	UNUSED_ARGUMENT(ar);
+    	UNUSED_ARGUMENT(version);
+
     	// dummy serialization
     }
 };
@@ -51,6 +54,8 @@ struct ContextHubSerializationImpl : public ContextHubSerializationImpl<N-1, Typ
     template<class Archive>
     void save(Archive& ar, const unsigned int version) const
     {
+    	UNUSED_ARGUMENT(version);
+
     	typedef typename boost::mpl::at<Types, boost::mpl::int_<N - 1> >::type T;
     	ar & boost::serialization::base_object<ContextHubSerializationImpl<N-1,Types>>(*this);
 
@@ -61,6 +66,8 @@ struct ContextHubSerializationImpl : public ContextHubSerializationImpl<N-1, Typ
     template<class Archive>
     void load(Archive& ar, const unsigned int version)
     {
+    	UNUSED_ARGUMENT(version);
+
     	typedef typename boost::mpl::at<Types, boost::mpl::int_<N - 1> >::type T;
     	ar & boost::serialization::base_object<ContextHubSerializationImpl<N-1,Types>>(*this);
 
@@ -83,6 +90,8 @@ struct ContextHubSerializationImpl<0, Types> : public ContextHubSerializationBas
     template<typename Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
+    	UNUSED_ARGUMENT(version);
+
     	ar & boost::serialization::base_object<ContextHubSerializationBase>(*this);
     }
 
@@ -98,6 +107,8 @@ struct ContextHubSerialization
     template<typename Archive>
     void serialize(Archive& ar, const unsigned int version)
     {
+    	UNUSED_ARGUMENT(version);
+
     	ar & t;
     }
 
