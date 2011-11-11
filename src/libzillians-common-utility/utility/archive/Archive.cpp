@@ -20,6 +20,7 @@
  * @date May 19, 2010 sdk - Initial version created.
  */
 
+#include <boost/filesystem.hpp>
 #include "utility/archive/Archive.h"
 #include <fstream>
 #include <cstring>
@@ -31,7 +32,9 @@ Archive::Archive(const std::string& archive_name, ArchiveMode mode) :
 	mArchiveName(archive_name),
 	mArchiveMode(mode),
 	mCompressLevel(Z_DEFAULT_COMPRESSION)
-{}
+{
+    open();
+}
 
 Archive::~Archive()
 {
@@ -146,26 +149,44 @@ bool Archive::extractAll(std::vector<ArchiveItem_t>& archive_items)
 	return true;
 }
 
-bool Archive::extractAllToFolder(std::vector<ArchiveItem_t>& archive_items, std::string /*folder_path*/)
+static bool isPath(const std::string& path)
 {
-	/**
-	 * TODO: put the files under the folder_path, instead, currently only put to the current folder
-	 * TODO: the extracted item ArchiveItem_t may contain the filename like this one some_folder/abc.txt, however,
-	 * 		 currently not support to generate the unexisted folder
-	 */
+    return path[path.size()-1] == '/';
+}
+
+bool Archive::extractAllToFolder(std::vector<ArchiveItem_t>& archive_items, std::string folder_path)
+{
+    // change to the target folder
 	if (!extractAll(archive_items)) return false;
 
+    if (!folder_path.empty())
+    {
+        boost::filesystem3::create_directories(folder_path);
+    }
+
+    boost::filesystem3::path originalCurrentPath = boost::filesystem3::current_path();
+    boost::filesystem3::current_path(folder_path);
 
 	// Now, write to the disk
 	for (size_t i = 0; i < archive_items.size(); i++)
 	{
 		ArchiveItem_t& item = archive_items[i];
-		std::ofstream file(item.filename.c_str(), std::ios::out | std::ios::binary);
-		file.write((char*)&item.buffer[0], item.buffer.size());
-		file.close();
-
-		// TODO: (not sure) write back unzip_info
+        if(isPath(item.filename))
+        {
+            boost::filesystem::create_directories(item.filename);
+        }
+        else
+        {
+            std::ofstream file(item.filename.c_str(), std::ios::out | std::ios::binary);
+            file.write((char*)&item.buffer[0], item.buffer.size());
+            file.close();
+        }
 	}
+
+    // TODO: (not sure) write back unzip_info
+
+    // change back the target folder
+    boost::filesystem3::current_path(originalCurrentPath);
 	return true;
 }
 
