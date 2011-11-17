@@ -29,7 +29,6 @@
 #include <string>
 
 ////////////////////////////////////////////////////////////////////////////
-using namespace std;
 using namespace boost::spirit::classic;
 using namespace phoenix;
 
