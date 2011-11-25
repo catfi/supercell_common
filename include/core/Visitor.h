@@ -465,9 +465,11 @@ protected:
 			template<typename VisitorImpl, typename Visitable>						\
 			static ReturnT invoke(VisitorImpl& visitor, Visitable& visitable)		\
 			{																		\
-				return visitor.apply(visitable);							\
+				return visitor.apply(visitable);							        \
 			}																		\
-		} invoker;
+		} invoker;                                                                  \
+		using GenericVisitor::apply;
+
 
 #define CREATE_VOID_INVOKER(invoker, function_name)	\
 		typedef struct { 															\
