@@ -26,6 +26,7 @@
 #include "core/Common.h"
 #include "core/ObjectPool.h"
 #include "core/SharedPtr.h"
+#include "core/Containers.h"
 #include "core/Buffer.h"
 #include "core/Logger.h"
 
