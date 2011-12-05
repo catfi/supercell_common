@@ -460,17 +460,6 @@ protected:
 			}																		\
 		} invoker;
 
-#define CREATE_GENERIC_INVOKER(invoker)	\
-		using GenericVisitor::apply; \
-		typedef struct { 															\
-			template<typename VisitorImpl, typename Visitable>						\
-			static ReturnT invoke(VisitorImpl& visitor, Visitable& visitable)		\
-			{																		\
-				return visitor.apply(visitable);							        \
-			}																		\
-		} invoker;
-
-
 #define CREATE_VOID_INVOKER(invoker, function_name)	\
 		typedef struct { 															\
 			template<typename VisitorImpl, typename Visitable>						\
