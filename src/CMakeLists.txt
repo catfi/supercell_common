@@ -20,19 +20,4 @@
 #
 
 ADD_SUBDIRECTORY(libzillians-common-core)
-
-IF(COROSYNC_FOUND)
-	ADD_SUBDIRECTORY(libzillians-common-networking)
-ENDIF(COROSYNC_FOUND)
-
-ADD_SUBDIRECTORY(libzillians-common-networking-tcp)
-
-IF(RDMA_FOUND)
-    ADD_SUBDIRECTORY(libzillians-common-networking-infiniband)
-ENDIF(RDMA_FOUND)
-
-IF(COROSYNC_FOUND)
-    ADD_SUBDIRECTORY(libzillians-common-networking-cpg)
-ENDIF(COROSYNC_FOUND)
-
 ADD_SUBDIRECTORY(libzillians-common-utility)

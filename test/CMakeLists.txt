@@ -28,7 +28,6 @@ zillians_create_test_subject(SUBJECT common-misc)
 zillians_add_subject_to_subject(PARENT common CHILD common-misc)
 
 ADD_SUBDIRECTORY(testzillians-common-core)
-ADD_SUBDIRECTORY(testzillians-common-networking)
 ADD_SUBDIRECTORY(testzillians-common-threading)
 ADD_SUBDIRECTORY(testzillians-common-utility)
 ADD_SUBDIRECTORY(testzillians-others)
