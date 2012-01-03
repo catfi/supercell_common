@@ -1,9 +1,0 @@
-#!/bin/sh
-
-cd $1
-
-ssh $2 `pwd`/RdmaDirectSendTest server $3:7777 &
-
-sleep 1
-
-ssh $3 `pwd`/RdmaDirectSendTest client $2:7777

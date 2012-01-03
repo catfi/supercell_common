@@ -25,7 +25,6 @@ ADD_EXECUTABLE(ScalablePoolAllocatorTest ScalablePoolAllocatorTestOriginal.cpp)
 
 TARGET_LINK_LIBRARIES(ScalablePoolAllocatorTest 
     zillians-common-core 
-    zillians-common-networking
     )
 
 zillians_add_simple_test(TARGET ScalablePoolAllocatorTest)

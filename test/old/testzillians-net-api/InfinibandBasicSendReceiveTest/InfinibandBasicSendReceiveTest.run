@@ -1,9 +1,0 @@
-#!/bin/sh
-
-cd $1
-
-ssh $2 `pwd`/RdmaBasicSendReceiveTest server 10.3.1.1:7777 &
-
-sleep 1
-
-ssh $3 `pwd`/RdmaBasicSendReceiveTest client 10.3.1.1:7777 1000
